@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block body %}
+{% if current_user %}
+{% include partials/characters.html %}
+{% else %}
+{% include partials/new_user.html %}
+{% end %}
+
+{% end %}

@@ -1,0 +1,17 @@
+.navbar {
+	margin-bottom: 0;
+}
+
+.hero-unit {
+	background-image: url('../media/soulblade.jpg');
+	background-size: cover;
+	background-position: top;
+	color: white;
+	height: 500px;
+	text-align: center;
+	padding-top: 100px;
+}
+
+.single-character {
+	padding: 10px;
+}

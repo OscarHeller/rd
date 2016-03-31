@@ -1,0 +1,20 @@
+<div class="container">
+	<h2>Your Characters</h2>
+	<div class="well">
+		<a href="/player/create" class="btn btn-primary">New Character</a>
+	</div>
+	{% if mobiles %}
+		<div class="row">
+			{% for mobile in mobiles %}
+			<div class="col-sm-4">
+			<div class="single-character well">
+				<h3>{{ mobile['name'] }}<small> {{ mobile['charClass'] }}</small></h3>
+				<a href="/client/{{ mobile['_id'] }}" class="btn btn-success">Log In</a>
+			</div>
+			</div>
+			{% end %}
+		</div>
+	{% else %}
+	<h1>You don't have any characters yet. Create one today!</h1>
+	{% end %}
+</div>

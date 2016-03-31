@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block head %}
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="../static/js/editor.js"></script>
+<style>
+.table
+{
+  text-align: center;
+}
+.table td {
+  position: relative;
+}
+td:after {
+  content: '';
+  display: block;
+  margin-top: 100%;
+}
+td .content {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+</style>
+{% end %}
+
+{% block body %}
+<div class="app" ng-app="map" ng-controller="mapCtrl">
+  <div class="container" style="margin-top: 20px;">
+    <div class="row">
+      <div class="col-sm-4">
+        <div class="panel panel-default">
+          <div class="panel-heading" href="#collapse1" data-toggle="collapse">
+            <h4 class="h4 panel-title">Rooms:<span class="glyphicon glyphicon-chevron-down pull-right"></span></h4>
+          </div>
+          <div class="panel-collapse collapse" id="collapse1">
+            <ul class="list-group">
+              <li class="list-group-item {{! isDeleted(g) }}" ng-repeat="g in rooms">
+                <div class="row">
+                  <div class="col-xs-8" ng-click="editRoom(g);">{{! g.name }}</div>
+                  <div class="col-xs-4 text-right"><a href="" class="btn btn-danger btn-sm glyphicon glyphicon-remove" ng-click="removeRoom(g)"></a></div>
+                </div>
+              </li>
+            </ul>            
+          </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading" href="#collapse2" data-toggle="collapse">
+              <h4 class="h4 panel-title">Items:<span class="glyphicon glyphicon-chevron-down pull-right"></span></h4>
+          </div>
+          <div class="panel-collapse collapse" id="collapse2">
+            <ul class="list-group">
+              <li class="list-group-item {{! isDeleted(i) }}" ng-repeat="i in items">
+                <div class="row">
+                  <div class="col-xs-8">
+                    <span class="" ng-click="editItem(i);">{{! i.name }}</span>
+                  </div>
+                  <div class="col-xs-4 text-right"><a href="" class="btn btn-danger btn-sm glyphicon glyphicon-remove" ng-click="removeItem(i)"></a></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading" href="#collapse3" data-toggle="collapse">
+              <h4 class="h4 panel-title">NPCs:<span class="glyphicon glyphicon-chevron-down pull-right"></span></h4>
+          </div>
+          <div class="panel-collapse collapse" id="collapse3">
+            <ul class="list-group">
+              <li class="list-group-item {{! isDeleted(npc) }}" ng-repeat="npc in npcs">
+                <div class="row">
+                  <div class="col-xs-8">
+                    <span class="" ng-click="editNPC(npc);">{{! npc.name }}</span>
+                  </div>
+                  <div class="col-xs-4 text-right"><a href="" class="btn btn-danger btn-sm glyphicon glyphicon-remove" ng-click="removeNPC(npc)"></a></div>                  
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-8">
+        <div class="panel panel-success">
+          <div class="panel-heading" href="#collapseAddRoom" data-toggle="collapse">Add/Edit Room</div>
+          <div class="panel-body panel-collapse collapse" id="collapseAddRoom">
+            <div class="form-group">
+              <label for="nodeName">Name:</label>
+              <input type="text" class="form-control" id="nodeName" ng-model="newRoom.name"/>
+            </div>
+            <div class="form-group">
+              <label for="roomDesc">Description:</label>
+              <input type="text" class="form-control" id="roomDesc" ng-model="newRoom.description">
+            </div>
+              <div class="row">
+                <div class="col-xs-2">
+                  <span class='h5'>Add Exits</span>
+                </div>
+                <div class="col-xs-4">
+                  <select name="target" id="" class="form-control" ng-model="newExit.target" >
+                    <option  ng-repeat="g in rooms" value="{{! g.id }}">{{! g.name }}</option>
+                  </select>
+                </div>
+                <div class="col-xs-4">
+                  <select class="form-control" ng-model="newExit.direction">
+                    <option value="South">South</option>
+                    <option value="North">North</option>
+                    <option value="Up">Up</option>
+                    <option value="Down">Down</option>
+                    <option value="East">East</option>
+                    <option value="West">West</option>
+                  </select>
+                </div>
+                <div class="col-xs-2">
+                  <a href="" class="btn btn-warning glyphicon glyphicon-plus" ng-click="addExit();"></a>
+                </div>
+              </div>
+              <ul class="list-inline">
+                <li>Exits:</li>
+                <li ng-repeat="exit in newRoom.exits">
+                  <div class="label label-info"><strong>{{! exit.direction }}:</strong> {{! rooms[exit.target].name }}
+                    <a href="" class="glyphicon glyphicon-remove" ng-click="removeExit(exit);"></a>
+                  </div>
+                </li>
+              </ul>
+              <div class="row">
+                <div class="col-xs-2">
+                  <span class='h5'>Add Item</span>
+                </div>
+                <div class="col-xs-4">
+                  <select class="form-control" ng-model="newItemKey">
+                    <option ng-repeat="item in items" value="{{! item['_id']['$oid'] }}">{{! item['name'] }}</option>
+                  </select>
+                </div>
+                <div class="col-xs-2">
+                  <a href="" class="btn btn-warning glyphicon glyphicon-plus" ng-click="addItemKey();"></a>
+                </div>
+              </div>
+              <ul class="list-inline">
+                <li>Items:</li>
+                <li ng-repeat="item in newRoom.items">
+                  <div class="label label-info">{{! findItem(item) }}
+                    <a href="" class="glyphicon glyphicon-remove" ng-click="removeItemFromRoom(item);"></a>
+                  </div>
+                </li>
+              </ul>
+              <div class="row">
+                <div class="col-xs-2">
+                  <span class='h5'>Add NPC</span>
+                </div>
+                <div class="col-xs-4">
+                  <select class="form-control" ng-model="newNPCKey">
+                    <option ng-repeat="npc in npcs" value="{{! npc['_id']['$oid'] }}">{{! npc['name'] }}</option>
+                  </select>
+                </div>
+                <div class="col-xs-2">
+                  <a href="" class="btn btn-warning glyphicon glyphicon-plus" ng-click="addNPCKey();"></a>
+                </div>
+              </div>
+              <ul class="list-inline">
+                <li>Items:</li>
+                <li ng-repeat="npc in newRoom.npcs">
+                  <div class="label label-info">{{! findNPC(npc) }}
+                    <a href="" class="glyphicon glyphicon-remove" ng-click="removeNPCFromRoom(npc);"></a>
+                  </div>
+                </li>
+              </ul>              
+            <a href="" class="btn btn-primary" ng-click="submitRoom()">Submit</a>
+            <a href="" class="btn btn-default" ng-click="setNewRoom()">Cancel</a>
+          </div>
+        </div>
+        <div class="panel panel-warning">
+          <div class="panel-heading" href="#collapseAddNPC" data-toggle="collapse">
+            <h3 class="h3 panel-title">Add/Edit NPC</h3>
+          </div>
+          <div class="panel-body panel-collapse collapse" id="collapseAddNPC">
+            <div class="form-group">
+              <div class="col-xs-3"><label for="npcName">Name:</label></div>
+              <div class="col-xs-9"><input type="text" id="npcName" ng-model="newNPC.name" class='form-control'></div>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-3">
+                <label for="npcKeyword">Add Keyword: </label>
+              </div>
+              <div class="col-xs-8">
+                <input type="text" class="form-control" id="npcKeyword" ng-model="newNPCKeyword">
+              </div>
+              <div class="col-xs-1">
+                <a href="" class="glyphicon glyphicon-plus btn btn-warning" ng-click="addNPCKeyword();"></a>
+              </div>
+              <ul class="list-inline">
+                <li>Keywords:</li>
+                <li ng-repeat="keyword in newNPC.keywords">
+                  <div class="label label-warning">{{! keyword }}
+                    <a href="" class="glyphicon glyphicon-remove" ng-click="removeNPCKeyword(keyword);"></a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-2">
+                <label for="npcStatField">Add Stat: </label>
+              </div>
+              <div class="col-xs-4">
+                <input type="text" class="form-control" id="npcStatField" ng-model="newNPCStat.field">
+              </div>
+              <div class="col-xs-4">
+                <input type="text" class="form-control" id="npcStatValue" ng-model="newNPCStat.val">
+              </div>              
+              <div class="col-xs-1">
+                <a href="" class="glyphicon glyphicon-plus btn btn-warning" ng-click="addNPCStat();"></a>
+              </div>
+              <ul class="list-inline">
+                <li>Stats:</li>
+                <li ng-repeat="(field, value) in newNPC.stats">
+                  <div class="label label-success"><strong>{{! field }}:</strong> {{! value }}
+                    <a href="" class="glyphicon glyphicon-remove" ng-click="removeNPCStat(stat);"></a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <a href="" class="btn btn-primary" ng-click="submitNPC()">Submit</a>
+            <a href="" class="btn btn-default" ng-click="setNewNPC()">Cancel</a>             
+          </div>
+        </div>
+        <div class="panel panel-info">
+          <div class="panel-heading" href="#collapseAddItem" data-toggle="collapse">
+            <h3 class="h3 panel-title">Add/Edit Item</h3>
+          </div>
+          <div class="panel-body panel-collapse collapse" id="collapseAddItem">
+            <div class="form-group">
+              <div class="col-xs-3">
+                <label for="itemName">Name: </label>
+              </div>
+              <div class="col-xs-9">
+                <input type="text" class="form-control" id="itemName" ng-model="newItem.name">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-3">
+                <label for="itemWear">Wear: </label>
+              </div>
+              <div class="col-xs-9">
+                <input type="text" class="form-control" id="itemWear" ng-model="newItem.wear">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-3">
+                <label for="itemKeyword">Add Keyword: </label>
+              </div>
+              <div class="col-xs-8">
+                <input type="text" class="form-control" id="itemKeyword" ng-model="newItemKeyword">
+              </div>
+              <div class="col-xs-1">
+                <a href="" class="glyphicon glyphicon-plus btn btn-warning" ng-click="addItemKeyword();"></a>
+              </div>
+              <ul class="list-inline">
+                <li>Keywords:</li>
+                <li ng-repeat="keyword in newItem.keywords">
+                  <div class="label label-warning">{{! keyword }}
+                    <a href="" class="glyphicon glyphicon-remove" ng-click="removeItemKeyword(keyword);"></a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-2">
+                <label for="itemStatField">Add Stat: </label>
+              </div>
+              <div class="col-xs-4">
+                <input type="text" class="form-control" id="itemStatField" ng-model="newItemStat.field">
+              </div>
+              <div class="col-xs-4">
+                <input type="text" class="form-control" id="itemStatValue" ng-model="newItemStat.val">
+              </div>              
+              <div class="col-xs-1">
+                <a href="" class="glyphicon glyphicon-plus btn btn-warning" ng-click="addItemStat();"></a>
+              </div>
+              <ul class="list-inline">
+                <li>Stats:</li>
+                <li ng-repeat="(field, value) in newItem.stats">
+                  <div class="label label-success"><strong>{{! field }}:</strong> {{! value }}
+                    <a href="" class="glyphicon glyphicon-remove" ng-click="removeItemStat(field);"></a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <a href="" class="btn btn-primary" ng-click="submitItem()">Submit</a>
+            <a href="" class="btn btn-default" ng-click="setNewItem()">Cancel</a>             
+          </div>
+        </div>
+      <a ng-click='save();' class='btn btn-lg btn-primary'>Save!</a>    
+      </div>
+    </div>
+  </div>
+</div>
+{% end %}

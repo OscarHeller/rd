@@ -10,15 +10,23 @@ def push():
 	local('git push')
 
 def pull():
-	code_dir = 'rd'
+	code_dir = '~/rd'
 	with cd(code_dir):
 		run('git pull')
 
 def kill():
-	run('sudo service mongod status')
 	run('sudo killall -9 python')
+
+def database():
+	run('sudo service mongod status')
+
+def restart():
+	pass
 
 def deploy():
 	commit()
 	push()
 	pull()
+	kill()
+	database()
+	restart()

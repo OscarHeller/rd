@@ -1,6 +1,7 @@
 from fabric.api import *
 
 env.hosts = ['104.236.28.149']
+env.user = 'rd'
 
 def commit():
 	local('git add . && git commit')

@@ -23,6 +23,7 @@ def database():
 
 def restart():
 	run('set -m; nohup python ~/rd/web/web.py &')
+	run('set -m; nohup python ~/rd/game/game.py &')
 
 def deploy():
 	commit()

@@ -10,7 +10,7 @@ def push():
 	local('git push')
 
 def pull():
-	code_dir = '~/rd'
+	code_dir = 'rd'
 	with cd(code_dir):
 		run('git pull')
 

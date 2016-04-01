@@ -15,7 +15,8 @@ def pull():
 		run('git pull')
 
 def kill():
-	run('sudo killall -9 python')
+	with settings(warn_only=True):
+		run('sudo killall -9 python')
 
 def database():
 	run('sudo service mongod status')

@@ -192,7 +192,8 @@ function showServerResponse(data) {
   }
 
   var li = document.createElement('li');
-  li.innerHTML = shortTime + ': ' + txt;
+  // li.innerHTML = shortTime + ': ' + txt;
+  li.innerHTML = txt;
   $('.output > ul').append(li); 
 
   // If there are more than 50 nodes, remove the oldest node

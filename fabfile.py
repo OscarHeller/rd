@@ -4,7 +4,7 @@ env.hosts = ['104.236.28.149']
 env.user = 'root'
 
 def commit():
-	local('git add . && git commit -m "Testing Fabric."')
+	local('git add . && git commit')
 
 def push():
 	local('git push')

@@ -1,7 +1,7 @@
 from fabric.api import *
 
 env.hosts = ['104.236.28.149']
-env.user = 'ghostwheel'
+env.user = 'root'
 
 def commit():
 	local('git add . && git commit')
@@ -16,10 +16,10 @@ def pull():
 
 def kill():
 	with settings(warn_only=True):
-		run('sudo killall -9 python')
+		run('killall -9 python')
 
 def database():
-	run('sudo service mongod status')
+	run('service mongod status')
 
 def restart():
 	pass

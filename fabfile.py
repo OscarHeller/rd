@@ -18,3 +18,4 @@ def deploy():
 	commit()
 	push()
 	pull()
+	

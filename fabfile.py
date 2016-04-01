@@ -14,8 +14,11 @@ def pull():
 	with cd(code_dir):
 		run('git pull')
 
+def kill():
+	run('sudo service mongod status')
+	run('sudo killall -9 python')
+
 def deploy():
 	commit()
 	push()
 	pull()
-	

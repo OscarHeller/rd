@@ -4,7 +4,7 @@ env.hosts = ['104.236.28.149']
 env.user = 'root'
 
 def commit():
-	local('git add . && git commit')
+	local('git add . && git commit -m "Testing Fabric."')
 
 def push():
 	local('git push')
@@ -22,7 +22,7 @@ def database():
 	run('service mongod status')
 
 def restart():
-	run('set m; nohup python ~/rd/web/web.py &')
+	run('set -m; nohup python ~/rd/web/web.py &')
 
 def deploy():
 	commit()

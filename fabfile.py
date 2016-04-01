@@ -31,3 +31,4 @@ def deploy():
 	kill()
 	database()
 	restart()
+

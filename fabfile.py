@@ -22,8 +22,8 @@ def database():
 	run('service mongod status')
 
 def restart():
-	run('python ~/rd/game/game.py')
-	run('python ~/rd/web/web.py')
+	run('nohup python ~/rd/game/game.py &')
+	run('nohup python ~/rd/web/web.py &')
 
 def deploy():
 	commit()

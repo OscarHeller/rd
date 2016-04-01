@@ -22,7 +22,8 @@ def database():
 	run('service mongod status')
 
 def restart():
-	pass
+	run('python ~/rd/game/game.py')
+	run('python ~/rd/web/web.py')
 
 def deploy():
 	commit()

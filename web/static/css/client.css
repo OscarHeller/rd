@@ -50,6 +50,8 @@ body {
 
 .center {
 	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
 }
 
 .right {
@@ -131,6 +133,7 @@ body {
 	flex-grow: 12;
 	flex-basis: 0;
 	position: relative;
+  margin: 10px;
 }
 
 /* Output */
@@ -195,6 +198,8 @@ body {
 /* Charges */
 
 .charges {
+  margin: 10px;
+  margin-left: 0;
 }
 
 .charges .charged {
@@ -245,7 +250,7 @@ body {
 }
 
 .menus > div {
-height: 57px;
+	height: 57px;
   width: 51px;
   display: inline-block;
   margin-right: 10px;
@@ -292,3 +297,53 @@ height: 57px;
 .who-menu {
   background: url(../media/icons/awareness.png);
 }
+
+/* Affects */
+
+.spacer {
+	flex-grow: 1;
+	flex-basis: 0;
+}
+
+.affect span {
+	position: absolute;
+	left: 100%;
+	top: 0;
+  margin-left: 10px;
+  line-height: 32px;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.affect-friendly-false {
+	background-color: rgba(255,74,74,0.5);
+	border: 2px solid red;
+}
+
+.affect-friendly-true {
+	background-color: rgba(74,255,74,0.5);
+	border: 2px solid green;
+}
+
+.affect {
+	height: 32px;
+	width: 32px;
+	margin: 10px;
+	background-size: contain;
+	background-position: center;
+	position: relative;
+}
+
+.affect-name-blind {
+	background-image: url(../media/icons/blindfold.png);
+}
+
+.affect-name-berserk {
+	background-image: url(../media/icons/pyromaniac.png);
+}
+
+.affect-name-sneak {
+	background-image: url(../media/icons/sly.png);
+}
+

@@ -1,9 +1,11 @@
 REFRESHABLE = True
 NOT_REFRESHABLE = False
 
+FRIENDLY = True
+NOT_FRIENDLY = False
 
 class Affect(object):
-	def __init__(self, name, caster, target, duration, refreshable):
+	def __init__(self, name, caster, target, duration, refreshable, friendly):
 		if not target:
 			assert 0, 'Affect must have target.'
 
@@ -12,6 +14,7 @@ class Affect(object):
 		self.caster = caster
 		self.game = target.game
 		self.refreshable = refreshable
+		self.friendly = friendly
 
 		# Convert duration (in seconds) to duration (in game cycles)
 		self.duration = duration / self.game.interval
@@ -74,7 +77,7 @@ class Affect(object):
 
 class Berserk(Affect):
 	def __init__(self, caster, target, duration):
-		super(Berserk, self).__init__('berserk', caster, target, duration, NOT_REFRESHABLE)
+		super(Berserk, self).__init__('berserk', caster, target, duration, NOT_REFRESHABLE, FRIENDLY)
 
 	def apply(self):
 		self.target.affects.append(self)
@@ -89,7 +92,7 @@ class Berserk(Affect):
 
 class Blind(Affect):
 	def __init__(self, caster, target, duration):
-		super(Blind, self).__init__('blind', caster, target, duration, NOT_REFRESHABLE)
+		super(Blind, self).__init__('blind', caster, target, duration, NOT_REFRESHABLE, NOT_FRIENDLY)
 
 	def apply(self):
 		self.target.affects.append(self)
@@ -106,7 +109,7 @@ class Blind(Affect):
 
 class DirtKick(Affect):
 	def __init__(self, caster, target, duration):
-		super(DirtKick, self).__init__('dirtkick', caster, target, duration, NOT_REFRESHABLE)
+		super(DirtKick, self).__init__('dirtkick', caster, target, duration, NOT_REFRESHABLE, NOT_FRIENDLY)
 
 	def apply(self):
 		self.target.affects.append(self)
@@ -123,22 +126,22 @@ class DirtKick(Affect):
 
 class Nervous(Affect):
 	def __init__(self, caster, target, duration):
-		super(Nervous, self).__init__('nervousness', caster, target, duration, REFRESHABLE)
+		super(Nervous, self).__init__('nervousness', caster, target, duration, REFRESHABLE, NOT_FRIENDLY)
 
 
 class Stun(Affect):
 	def __init__(self, caster, target, duration):
-		super(Stun, self).__init__('stun', caster, target, duration, REFRESHABLE)
+		super(Stun, self).__init__('stun', caster, target, duration, REFRESHABLE, NOT_FRIENDLY)
 
 
 class JustDied(Affect):
 	def __init__(self, caster, target, duration):
-		super(JustDied, self).__init__('just died', caster, target, duration, REFRESHABLE)
+		super(JustDied, self).__init__('just died', caster, target, duration, REFRESHABLE, NOT_FRIENDLY)
 
 
 class Sneak(Affect):
 	def __init__(self, caster, target, duration):
-		super(Sneak, self).__init__('sneak', caster, target, duration, REFRESHABLE)
+		super(Sneak, self).__init__('sneak', caster, target, duration, REFRESHABLE, FRIENDLY)
 
 	def wear(self):
 		self.target.affects.remove(self)

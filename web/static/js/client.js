@@ -167,8 +167,9 @@ function showServerResponse(data) {
     });
 
     $('.affects > ul').empty();
+    console.log(data.affects);
     $.each(data.affects, function(key, value) {
-      $('.affects > ul').append('<li>' + key + ': ' + value + 's</li>');
+      $('.affects > ul').append('<li class="affect affect-name-' + key + ' affect-friendly-' + value.friendly + '"><span>' + value.duration + 's</span></li>');
     });
 
     $('.charges > ul > li').removeClass('charged');

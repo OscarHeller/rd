@@ -109,7 +109,10 @@ class Mobile:
 		affectList = {}
 
 		for affect in self.affects:
-			affectList[affect.name] = affect.duration
+			affectList[affect.name] = {
+				'duration' : affect.duration,
+				'friendly' : affect.friendly
+			}
 
 		return affectList
 

@@ -48,7 +48,7 @@ class Mobile:
 		self.commandInterpreter = CommandInterpreter(self.game, self, self.charClass)
 
 	def getCommandInterpreters(self):
- 		return self.commandInterpreters + self.room.getCommandInterpreters()
+ 		return self.commandInterpreters
 
 	def appendEnemyConditionToBuffer(self):
 		if self.combat:

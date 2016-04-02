@@ -103,10 +103,11 @@ class PlayerList(Command):
       sender.sendToClient(buf)
     elif args[0].isdigit():
       players = [mobile for mobile in self.game.mobiles if mobile.client]
-      vnum = int(args[0])
+      vnum = int(args.pop(0))
+      #args.remove(0)
       if vnum < len(players):
         player = players[vnum]
-        if len(args) == 1:
+        if len(args) == 0:
             sender.sendToClient(player.name)
         else:
             player.processCommand(" ".join(args))

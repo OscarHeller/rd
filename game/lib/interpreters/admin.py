@@ -16,7 +16,7 @@ class Goto(Command):
         for i in range(0, len(self.game.rooms)):
           buf += str(i) + ": " + self.game.rooms[i].name + "\n\r"
         sender.sendToClient(buf)
-    else:
+    elif args[0].isdigit():
       vnum = int(args[0])
       if self.game.rooms[vnum]:
         r = sender.room
@@ -42,7 +42,7 @@ class CreateItem(Command):
         item = self.game.items[i_keys[i]]
         buf += str(i) + ": " + item.name + "\n\r"
       sender.sendToClient(buf)
-    else:
+    elif args[0].isdigit():
       import copy
 
       i_keys = self.game.items.keys()
@@ -72,7 +72,7 @@ class SpawnMobile(Command):
         mobile = self.game.mobile_list[i_keys[i]]
         buf += str(i) + ": " + mobile["name"] + "\n\r"
       sender.sendToClient(buf)
-    else:
+    elif args[0].isdigit():
       from lib.mobile import Mobile
 
       i_keys = self.game.mobile_list.keys()
@@ -101,16 +101,57 @@ class PlayerList(Command):
       for i in range(0, len(players)):
         buf += str(i) + ": " + players[i].name + "\n\r"
       sender.sendToClient(buf)
-    elif len(args) == 1:
-      players = [mobile for mobile in self.game.mobiles if mobile.client]
-      vnum = int(args[0])
-      if players[vnum]:
-        sender.sendToClient(players[vnum].name)
-    else:
-      players = [mobile for mobile in self.game.mobiles if mobile.client]
-      vnum = int(args.pop(0))
-      player = players[vnum]
-      if player:
-        player.processCommand(" ".join(args))
+    elif args[0].isdigit():
+      if len(args) == 1:
+        players = [mobile for mobile in self.game.mobiles if mobile.client]
+        vnum = int(args[0])
+        if players[vnum]:
+          sender.sendToClient(players[vnum].name)
+      else:
+        players = [mobile for mobile in self.game.mobiles if mobile.client]
+        vnum = int(args.pop(0))
+        player = players[vnum]
+        if player:
+          player.processCommand(" ".join(args))
 
-commandList = [Goto, CreateItem, SpawnMobile, PlayerList]
+class Reload(Command):
+  def __init__(self, game):
+    super(Reload, self).__init__(game, 'reload')
+
+  def execute(self, args, config):
+    sender = config['sender']
+    [mobile.sendToClient('reloading objects... started') for mobile in self.game.mobiles]
+    self.game.loadItems()
+    self.game.loadMobiles()
+    [mobile.sendToClient('reloading objects... done') for mobile in self.game.mobiles]    
+
+class Repop(Command):
+  def __init__(self, game):
+    super(Repop, self).__init__(game, 'repop')
+
+  def execute(self, args, config):
+    sender = config['sender']
+    [mobile.sendToClient('repopulating rooms... started') for mobile in self.game.mobiles]
+    self.game.repopulate()
+    [mobile.sendToClient('repopulating rooms... done') for mobile in self.game.mobiles]
+
+class WizInfo(Command):
+  def __init__(self, game):
+    super(WizInfo, self).__init__(game, 'wizinfo')
+
+  def execute(self, args, config):
+    sender = config['sender']
+    buf = """
+      <b>Commands</b>: (1) (2) (...) description (with 1) (with 2) (...)\n\r
+      -----------------------------------------------------\n\r
+      <b>Goto</b>: (i) display list of rooms (go to room by i)\n\r
+      <b>CreateItem</b>: (i) display list of items (create item by i)\n\r
+      <b>SpawnMobile</b>: (i) display list of npc mobiles (create mobile by i)\n\r
+      <b>PlayerList</b>: (i) (c) display list of players (player info by i) (player[i] execute 'c')\n\r
+      <b>Reload</b>: reload item/mobile lists from database\n\r
+      <b>Repop</b>: repopulate rooms with items/npcs/exits as defined in database\n\r
+      <b>WizInfo</b>: you're looking at it
+    """
+    sender.sendToClient(buf)
+
+commandList = [Goto, CreateItem, SpawnMobile, PlayerList, Reload, Repop, WizInfo]

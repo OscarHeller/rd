@@ -15,10 +15,6 @@ class Item:
 		self.roll = config['roll'] if 'roll' in config else 0
 		self.commandInterpreters = []
 
-		if 'description' in self.stats:
-			self.commandInterpreters.append(Examine)
-
-
 	def getRoll(self):
 		return int(self.roll)
 

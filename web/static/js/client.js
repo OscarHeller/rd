@@ -1,6 +1,9 @@
 var domain = document.domain;
 var latencies = [];
 
+var commandHistory = [];
+var historyPointer = 0;
+
 jQuery(function($){
 
   if (!('WebSocket' in window)) {
@@ -35,14 +38,22 @@ jQuery(function($){
         executeClientCommand(text.substring(1));
       }
       else {
+        historyPointer = 0;
+        commandHistory.unshift(text);
         socket.send(text);        
       }
       $txt.val('');    
     });
 
-    $txt.keypress(function(evt){
+    $txt.keydown(function(evt){
       if(evt.which == 13){
         $btnSend.click();
+      } else if (evt.which == 38) {
+        $('.data').val(commandHistory[historyPointer]).focus();
+        historyPointer = (historyPointer + 1) % commandHistory.length;
+      } else if (evt.which == 27) {
+        $('.data').val("");
+        historyPointer = 0;
       }
     });
 

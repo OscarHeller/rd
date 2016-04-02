@@ -54,9 +54,52 @@ body {
 
 .right {
 	flex-grow: 5;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Info */
+
+.info {
+	flex-grow: 6;
+	flex-basis: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.info-panels {
+	flex-grow: 12;
+	margin-right: 8px;
+	overflow-y: scroll;
+	background: rgba(0,0,0,0.6);
+	margin-bottom: 10px;
+	padding: 10px;
+	border-left: 2px solid black;
+	border-bottom: 2px solid black;
+	border-top: 2px solid black;
+	box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+	color: #ccc;
+}
+
+.info-panels > div:not(.active) {
+  display: none;
+}
+
+.info-panels > div {
 }
 
 /* Room */
+.room {
+	flex-grow: 6;
+	flex-basis: 0;
+	background: rgba(0,0,0,0.6);
+	margin-bottom: 10px;
+	padding: 10px;
+	border-left: 2px solid black;
+	border-bottom: 2px solid black;
+	box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+	color: #ccc;
+}
 
 .room p {
 	margin: 14px 0;
@@ -76,7 +119,7 @@ body {
 	background: rgba(255,0,0,0.25);
 }
 .hpcontainer {
-	flex-grow: 9;
+	flex-grow: 12;
 	flex-basis: 0;
 	position: relative;
 }
@@ -96,7 +139,6 @@ body {
 }
 
 .output li:last-child {
-	margin-bottom: 0;
 }
 
 .output li {
@@ -138,13 +180,12 @@ body {
 .player-gui {
 	display: flex;
 	flex-direction: row;
+	background: black;
 }
 
 /* Charges */
 
 .charges {
-	flex-grow: 3;
-	flex-basis: 0;
 }
 
 .charges .charged {
@@ -181,4 +222,50 @@ body {
 
 ::-webkit-scrollbar-thumb:window-inactive {
 	background: rgba(255,255,255,0.4); 
+}
+
+/* Menus */
+
+.menus {
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+.menus > div {
+  height: 41px;
+  width: 41px;
+  display: inline-block;
+  margin-right: 10px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-color: white;
+  border-bottom: none;
+  position: relative;
+}
+
+.menus > div > span {
+  font-weight: 700;
+  width: 100%;
+  display: block;
+  text-align: center;
+  background: rgba(255,255,255,0.5);
+  color: black;
+  position: relative;
+}
+
+.inventory-menu {
+  background: url(../media/icons/knapsack.png);
+}
+
+.equipment-menu {
+  background: url(../media/icons/battle-gear.png);
+}
+
+.comm-menu {
+  background: url(../media/icons/conversation.png);
+}
+
+.who-menu {
+  background: url(../media/icons/awareness.png);
 }

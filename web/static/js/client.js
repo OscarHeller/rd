@@ -207,25 +207,25 @@ function showServerResponse(data) {
 
 function executeClientCommand(text) {
   if (text == 'i') {
-    $('.info > div:not(.inventory)').removeClass('active');
+    $('.info-panels > div:not(.inventory)').removeClass('active');
     $('.menus > div:not(.inventory-menu)').removeClass('active');
     $('.inventory').addClass('active');
     $('.inventory-menu').addClass('active');
   }
   else if (text == 'e') {
-    $('.info > div:not(.equipment)').removeClass('active');
+    $('.info-panels > div:not(.equipment)').removeClass('active');
     $('.menus > div:not(.equipment-menu)').removeClass('active');
     $('.equipment').addClass('active');
     $('.equipment-menu').addClass('active'); 
   }
   else if (text == 'w') {
-    $('.info > div:not(.who)').removeClass('active');
+    $('.info-panels > div:not(.who)').removeClass('active');
     $('.menus > div:not(.who-menu)').removeClass('active');
     $('.who').addClass('active');
     $('.who-menu').addClass('active');  
   }
   else if (text == 'c') {
-    $('.info > div:not(.comm)').removeClass('active');
+    $('.info-panels > div:not(.comm)').removeClass('active');
     $('.menus > div:not(.comm-menu)').removeClass('active');
     $('.comm').addClass('active');
     $('.comm-menu').addClass('active'); 

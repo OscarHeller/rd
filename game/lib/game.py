@@ -114,6 +114,7 @@ class Game:
 
 	# The MESSAGE is always sent without a name, to be formatted in IF appropriate
 	def sendCondition(self, condition, message, lookers=None, max=None):
+		print "Warning: sendCondition is deprecated, please use list comprehension instead!"
 		lookers = lookers if lookers else []
 		found = False
 		sendCount = 0

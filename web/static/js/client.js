@@ -138,13 +138,13 @@ function showServerResponse(data) {
     $('.room-name').html( data.room.title );
     $('.room-desc').html( data.room.desc );
 
-    $('.room > ul').empty();
+    $('.room > .room-info > ul').empty();
     $.each(data.room.mobiles, function(key, value) {
-      $('.room > ul').append('<li>' + value + '</li>');
+      $('.room > .room-info > ul').append('<li>' + value + '</li>');
     });
-    $('.room > ul').append('<br>');
+    $('.room > .room-info > ul').append('<br>');
     $.each(data.room.items, function(key, value) {
-      $('.room > ul').append('<li>' + value + '</li>');
+      $('.room > .room-info > ul').append('<li>' + value + '</li>');
     });
 
     // Player
@@ -171,6 +171,7 @@ function showServerResponse(data) {
       $('.affects > ul').append('<li>' + key + ': ' + value + 's</li>');
     });
 
+    $('.charges > ul > li').removeClass('charged');
     $('.charges > ul > li:nth-child(-n+' + data.player.charges + ')').addClass('charged');
 
     $('.who > ul').empty();

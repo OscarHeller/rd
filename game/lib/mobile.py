@@ -25,7 +25,7 @@ class Mobile:
 			'hitpoints': 900,
 			'maxhitpoints': 1000,
 			'defense': 1,
-			'charges': 3,
+			'charges': 2,
 			'maxcharges': 3
 		}
 		self.position = Position.standing
@@ -165,6 +165,8 @@ class Mobile:
 					'items' : inroom_items
 				}
 
+				print 'sendToClient {}'.format(self.getStat('charges'))
+
 				data['player'] = {
 					'hp' : self.stats['hitpoints'],
 					'maxhp' : self.stats['maxhitpoints'],
@@ -214,6 +216,10 @@ class Mobile:
 			return s
 		else:
 			return 0
+
+	def setStat(self, stat, value):
+		if stat in self.stats:
+			self.stats[stat] = value
 
 	def update(self, amount):
 		self.unLag(amount)

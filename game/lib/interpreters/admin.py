@@ -102,17 +102,15 @@ class PlayerList(Command):
         buf += str(i) + ": " + players[i].name + "\n\r"
       sender.sendToClient(buf)
     elif args[0].isdigit():
-      if len(args) == 1:
-        players = [mobile for mobile in self.game.mobiles if mobile.client]
-        vnum = int(args[0])
-        if players[vnum]:
-          sender.sendToClient(players[vnum].name)
-      else:
-        players = [mobile for mobile in self.game.mobiles if mobile.client]
-        vnum = int(args.pop(0))
+      players = [mobile for mobile in self.game.mobiles if mobile.client]
+      vnum = int(args.pop(0))
+      #args.remove(0)
+      if vnum < len(players):
         player = players[vnum]
-        if player:
-          player.processCommand(" ".join(args))
+        if len(args) == 0:
+            sender.sendToClient(player.name)
+        else:
+            player.processCommand(" ".join(args))
 
 class Reload(Command):
   def __init__(self, game):

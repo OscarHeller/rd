@@ -28,8 +28,10 @@ class Mobile:
 			'charges': 2,
 			'maxcharges': 3
 		}
-		for k, v in config['stats'].iteritems():
-			self.stats[k] = v
+
+		if 'stats' in config:
+			for k, v in config['stats'].iteritems():
+				self.stats[k] = v
 
 		self.position = Position.standing
 		self.affects = []

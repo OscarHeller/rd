@@ -96,10 +96,11 @@ class Berserk(Command):
 			sender.sendToClient('You can\'t get any angrier!')
 			return
 
-		success = True if random.randint(0, 99) > 24 else False
+		# success = True if random.randint(0, 99) > 24 else False
+		success = True
 		if success:
 			sender.heal(25)
-			affect.Affect.factory('Berserk', sender, sender, 4)
+			affect.Affect.factory('Berserk', sender, sender, 40)
 		else:
 			sender.sendToClient('You fail to get mad.')
 

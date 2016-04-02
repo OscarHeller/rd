@@ -74,6 +74,12 @@ class Game:
 	def updateGame(self):
 		self.clock += self.interval
 
+		# Restore charges
+		if self.clock % 6 * self.interval == 0:
+			for mobile in [m for m in self.mobiles if m.getStat('charges') < m.getStat('maxcharges')]:
+				mobile.setStat('charges', mobile.getStat('charges') + 1)
+				mobile.sendToClient('You gain a charge.')
+
 		combatBuffer = {}
 		for mobile in self.mobiles:
 			mobile.update(self.interval)

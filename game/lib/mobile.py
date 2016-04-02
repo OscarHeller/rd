@@ -25,7 +25,7 @@ class Mobile:
 			'hitpoints': 900,
 			'maxhitpoints': 1000,
 			'defense': 1,
-			'charges': 3,
+			'charges': 2,
 			'maxcharges': 3
 		}
 		for k, v in config['stats'].iteritems():
@@ -112,7 +112,10 @@ class Mobile:
 		affectList = {}
 
 		for affect in self.affects:
-			affectList[affect.name] = affect.duration
+			affectList[affect.name] = {
+				'duration' : affect.duration,
+				'friendly' : affect.friendly
+			}
 
 		return affectList
 
@@ -167,6 +170,8 @@ class Mobile:
 					'mobiles' : inroom_mobiles,
 					'items' : inroom_items
 				}
+
+				print 'sendToClient {}'.format(self.getStat('charges'))
 
 				data['player'] = {
 					'hp' : self.stats['hitpoints'],
@@ -230,6 +235,10 @@ class Mobile:
 
 	def loadEquipment(self, equipment):
 		return {key: Item(self.game.items[value]) for key, value in equipment.iteritems()}
+
+	def setStat(self, stat, value):
+		if stat in self.stats:
+			self.stats[stat] = value
 
 	def update(self, amount):
 		self.unLag(amount)

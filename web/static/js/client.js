@@ -149,19 +149,19 @@ function showServerResponse(data) {
     $('.room-name').html( data.room.title );
     $('.room-desc').html( data.room.desc );
 
-    $('.room > ul').empty();
+    $('.room > .room-info > ul').empty();
     $.each(data.room.mobiles, function(key, value) {
-      $('.room > ul').append('<li>' + value + '</li>');
+      $('.room > .room-info > ul').append('<li>' + value + '</li>');
     });
-    $('.room > ul').append('<br>');
+    $('.room > .room-info > ul').append('<br>');
     $.each(data.room.items, function(key, value) {
-      $('.room > ul').append('<li>' + value + '</li>');
+      $('.room > .room-info > ul').append('<li>' + value + '</li>');
     });
 
     // Player
     $('.player-name').html ( data.player.name );
 
-    $('.hpinterior').width( ( data.player.hp / data.player.maxhp * 100 ) + '%' );
+    $('.hpinterior').css('width', ( data.player.hp / data.player.maxhp * 100 ) + '%' );
     $('.hp').html( data.player.hp + '/' + data.player.maxhp + 'hp');
 
     $('.player-combo').html( data.player.charRace + ' ' + data.player.charClass );
@@ -178,10 +178,12 @@ function showServerResponse(data) {
     });
 
     $('.affects > ul').empty();
+    console.log(data.affects);
     $.each(data.affects, function(key, value) {
-      $('.affects > ul').append('<li>' + key + ': ' + value + 's</li>');
+      $('.affects > ul').append('<li class="affect affect-name-' + key + ' affect-friendly-' + value.friendly + '"><span>' + value.duration + 's</span></li>');
     });
 
+    $('.charges > ul > li').removeClass('charged');
     $('.charges > ul > li:nth-child(-n+' + data.player.charges + ')').addClass('charged');
 
     $('.who > ul').empty();
@@ -218,25 +220,25 @@ function showServerResponse(data) {
 
 function executeClientCommand(text) {
   if (text == 'i') {
-    $('.info > div:not(.inventory)').removeClass('active');
+    $('.info-panels > div:not(.inventory)').removeClass('active');
     $('.menus > div:not(.inventory-menu)').removeClass('active');
     $('.inventory').addClass('active');
     $('.inventory-menu').addClass('active');
   }
   else if (text == 'e') {
-    $('.info > div:not(.equipment)').removeClass('active');
+    $('.info-panels > div:not(.equipment)').removeClass('active');
     $('.menus > div:not(.equipment-menu)').removeClass('active');
     $('.equipment').addClass('active');
     $('.equipment-menu').addClass('active'); 
   }
   else if (text == 'w') {
-    $('.info > div:not(.who)').removeClass('active');
+    $('.info-panels > div:not(.who)').removeClass('active');
     $('.menus > div:not(.who-menu)').removeClass('active');
     $('.who').addClass('active');
     $('.who-menu').addClass('active');  
   }
   else if (text == 'c') {
-    $('.info > div:not(.comm)').removeClass('active');
+    $('.info-panels > div:not(.comm)').removeClass('active');
     $('.menus > div:not(.comm-menu)').removeClass('active');
     $('.comm').addClass('active');
     $('.comm-menu').addClass('active'); 

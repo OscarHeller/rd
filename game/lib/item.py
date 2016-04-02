@@ -36,27 +36,3 @@ class Item:
 
 	def getName(self, looker=False):
 		return self.name
-
-	def getCommandInterpreters(self):
-		return self.commandInterpreters
-
-class Examine(Command):
-	def __init__(self, game):
-		super(Examine, self).__init__(game, 'examine')
-		self.useInCombat = True
-		self.minPosition = Position.resting
-
-	def execute(self, args, config):
-		sender = config['sender']
-		items = sender.room.items
-
-		if len(args) <= 0:
-			sender.sendToClient('Examine what?')
-			return
-
-		for item in items:
-			if utility.matchList(args[0], item.keywords):
-				if 'description' in item.stats:
-					sender.sendToClient(item.stats['description'])
-					return
-		sender.sendToClient('You don\'t see that here.')

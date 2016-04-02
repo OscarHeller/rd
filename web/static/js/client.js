@@ -150,7 +150,7 @@ function showServerResponse(data) {
     // Player
     $('.player-name').html ( data.player.name );
 
-    $('.hpinterior').width( ( data.player.hp / data.player.maxhp * 100 ) + '%' );
+    $('.hpinterior').css('width', ( data.player.hp / data.player.maxhp * 100 ) + '%' );
     $('.hp').html( data.player.hp + '/' + data.player.maxhp + 'hp');
 
     $('.player-combo').html( data.player.charRace + ' ' + data.player.charClass );

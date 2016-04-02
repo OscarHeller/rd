@@ -64,21 +64,21 @@ body {
 
 /* HP Bar */
 
-.hp {
-	padding: 10px;
-}
+.hp {}
 
 .hpinterior {
 	background: red;
 	transition: width 0.5s;
+	padding: 10px;
 }
 .hpbar {
-	position: relative;
+	width: 100%;
 	background: rgba(255,0,0,0.25);
 }
 .hpcontainer {
 	flex-grow: 9;
 	flex-basis: 0;
+	position: relative;
 }
 
 /* Output */

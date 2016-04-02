@@ -8,6 +8,7 @@ class Item:
 		self.name = config['name']
 		# self.longName = config['longName']
 		# self.description = config['description']
+		self.id = config['_id'] if '_id' in config else 'NA'
 		self.keywords = config['keywords'] if 'keywords' in config else name
 		self.wear = config['wear'] if 'wear' in config else None
 		self.stats = config['stats'] if 'stats' in config else {}
@@ -25,7 +26,7 @@ class Item:
 		if stat in self.stats:
 			return self.stats[stat]
 		else:
-			return 0
+			return None
 
 	def getRoomDesc(self, looker=False):
 		desc = self.getName(looker).capitalize()

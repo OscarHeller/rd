@@ -8,9 +8,7 @@ class Goto(Command):
   def execute(self, args, config):
     sender = config['sender']
     #quick double check here, but only immortals should even have this command
-    if sender.charClass is not 'warrior':
-      sender.sendToClient('yeah right')
-    elif len(args) <= 0:
+    if len(args) <= 0:
       # show available rooms & their 'vnum'?
         buf = ""
         for i in range(0, len(self.game.rooms)):
@@ -32,9 +30,7 @@ class CreateItem(Command):
   def execute(self, args, config):
     sender = config['sender']
     #quick double check here, but only immortals should even have this command
-    if sender.charClass is not 'warrior':
-      sender.sendToClient('yeah right')
-    elif len(args) <= 0:
+    if len(args) <= 0:
       # show available rooms & their 'vnum'?
       i_keys = self.game.items.keys()
       buf = ""
@@ -62,9 +58,7 @@ class SpawnMobile(Command):
   def execute(self, args, config):
     sender = config['sender']
     #quick double check here, but only immortals should even have this command
-    if sender.charClass is not 'warrior':
-      sender.sendToClient('yeah right')
-    elif len(args) <= 0:
+    if len(args) <= 0:
       # show available rooms & their 'vnum'?
       i_keys = self.game.mobile_list.keys()
       buf = ""
@@ -93,9 +87,7 @@ class PlayerList(Command):
   def execute(self, args, config):
     sender = config['sender']
     #quick double check here, but only immortals should even have this command
-    if sender.charClass is not 'warrior':
-      sender.sendToClient('yeah right')
-    elif len(args) <= 0:
+    if len(args) <= 0:
       buf = "Players: \n\r"
       players = [mobile for mobile in self.game.mobiles if mobile.client]
       for i in range(0, len(players)):
@@ -108,9 +100,35 @@ class PlayerList(Command):
       if vnum < len(players):
         player = players[vnum]
         if len(args) == 0:
-            sender.sendToClient(player.name)
+          sender.sendToClient(player.name)
         else:
-            player.processCommand(" ".join(args))
+          player.processCommand(" ".join(args))
+
+class SetStat(Command):
+  def __init__(self, game):
+    super(SetStat, self).__init__(game, 'setstat')
+
+  def execute(self, args, config):
+    sender = config['sender']
+    #quick double check here, but only immortals should even have this command
+    if len(args) <= 0:
+      buf = "Players: \n\r"
+      players = [mobile for mobile in self.game.mobiles if mobile.client]
+      for i in range(0, len(players)):
+        buf += str(i) + ": " + players[i].name + "\n\r"
+      sender.sendToClient(buf)
+    elif args[0].isdigit():
+      players = [mobile for mobile in self.game.mobiles if mobile.client]
+      vnum = int(args.pop(0))
+      #args.remove(0)
+      if vnum < len(players):
+        player = players[vnum]
+        if len(args) >= 2:
+          if args[0] in player.stats:
+            player.stats[args[0]] = args[1]
+        else:
+          sender.sendToClient("Stats:\n\r" + "\n\r".join([str(key) + ": " + str(value) for key, value in player.stats.iteritems()]))
+
 
 class Reload(Command):
   def __init__(self, game):
@@ -152,4 +170,4 @@ class WizInfo(Command):
     """
     sender.sendToClient(buf)
 
-commandList = [Goto, CreateItem, SpawnMobile, PlayerList, Reload, Repop, WizInfo]
+commandList = [Goto, CreateItem, SpawnMobile, PlayerList, Reload, Repop, SetStat, WizInfo]

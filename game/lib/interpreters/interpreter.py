@@ -4,7 +4,7 @@ from lib.interpreters.constants import Range, Position
 
 
 class CommandInterpreter:
-	def __init__(self, game, mobile, charClass):
+	def __init__(self, game, mobile):
 		self.game = game
 		self.mobile = mobile
 

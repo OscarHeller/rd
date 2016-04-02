@@ -29,6 +29,6 @@ class PlayerCreateHandler(BaseHandler):
 			self.set_flash(flash, 'validation')
 			self.redirect('/player/create')
 		else:
-			config = {'user_id': object_user_id, 'name': name, 'charClass': charClass, 'stats': {'favoriteColor': favoriteColor}}
+			config = {'user_id': object_user_id, 'name': name, 'charClass': charClass, 'stats': {'favoriteColor': favoriteColor, 'charClass': charClass }}
 			self.db.mobiles.insert_one(config)
 			self.redirect('/')

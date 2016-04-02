@@ -28,26 +28,29 @@ class Mobile:
 			'charges': 3,
 			'maxcharges': 3
 		}
+		for k, v in config['stats'].iteritems():
+			self.stats[k] = v
+
 		self.position = Position.standing
 		self.affects = []
-		self.inventory = []
-		self.equipment = {'weapon': None}
+		self.inventory = self.loadInventory(config['inventory'] if 'inventory' in config else [])
+		self.equipment = self.loadEquipment(config['equipment'] if 'equipment' in config else {})
 
 		self.keywords = config['keywords'] if 'keywords' in config else [self.name]
 		self.level = config['level'] if 'level' in config else 1
 		self.experience = config['experience'] if 'experience' in config else 0
 
-		self.charClass = config['charClass'] if 'charClass' in config else 'dClass'
+		#self.charClass = config['charClass'] if 'charClass' in config else 'dClass'
 		self.charRace = config['charRace'] if 'charRace' in config else 'human'
 		self.clan = config['clan'] if 'clan' in config else 'dClan'
 		self.title = config['title'] if 'title' in config else 'the Default'
 
 		self.commandInterpreters = []
-		if self.charClass == 'warrior':
+		if 'charClass' in self.stats and self.stats['charClass'] == 'warrior':
 			self.commandInterpreters.extend(warrior.commandList)
 		self.commandInterpreters.extend(admin.commandList)
 		# DON'T FORGET to load in a command interpreter
-		self.commandInterpreter = CommandInterpreter(self.game, self, self.charClass)
+		self.commandInterpreter = CommandInterpreter(self.game, self)
 
 	def getCommandInterpreters(self):
  		return self.commandInterpreters
@@ -171,7 +174,7 @@ class Mobile:
 					'name' : self.getName(),
 					'charges' : self.stats['charges'],
 					'charRace' : self.charRace,
-					'charClass' : self.charClass
+					'charClass' : self.getStat('charClass')
 				}
 
 			self.client.sendToClient(data)
@@ -208,12 +211,25 @@ class Mobile:
 	def getStat(self, stat):
 		if stat in self.stats:
 			s = self.stats[stat]
-			for e in self.equipment:
-				if self.equipment[e]:
-					s += int(self.equipment[e].getStat(stat))
+			for slot, item in self.equipment.iteritems():
+				si = item.getStat(stat)
+				if si and type(s) is type(si):
+					s += si
 			return s
 		else:
 			return 0
+
+	def saveInventory(self):
+		return [str(item.id) for item in self.inventory]
+
+	def loadInventory(self, items):
+		return [Item(self.game.items[item]) for item in items]
+
+	def saveEquipment(self):
+		return {key: str(value.id) for key, value in self.equipment.iteritems()}
+
+	def loadEquipment(self, equipment):
+		return {key: Item(self.game.items[value]) for key, value in equipment.iteritems()}
 
 	def update(self, amount):
 		self.unLag(amount)

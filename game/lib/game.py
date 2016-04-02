@@ -138,6 +138,7 @@ class Game:
 		return found
 
 	def getPlayerById(self, playerId):
+		print self.mobiles
 		matches = [mobile for mobile in self.mobiles if mobile.id == playerId]
 
 		return matches[0] if len(matches) > 0 else False
@@ -165,7 +166,7 @@ class Game:
 			# Make a new mobile
 			name = playerData['name']
 
-			newMobile = Mobile(name, self, {'charClass': 'warrior'})
+			newMobile = Mobile(name, self, {'stats': {'charClass': 'warrior'}})
 			newMobile.client = client
 			self.mobiles.append(newMobile)
 
@@ -196,7 +197,8 @@ class Game:
 		items = [item for item in self.db.items.find()]
 		self.items = {}
 		for i in range(0, len(items)):
-			self.items[str(items[i]['_id'])] = Item(items[i])
+			self.items[str(items[i]['_id'])] = items[i]
+		print self.items
 
 	def loadRooms(self):
 		import copy
@@ -214,7 +216,7 @@ class Game:
 			newRoom.exits = []
 			if 'items' in rooms[i]:
 				for item in rooms[i]['items']:#
-					newRoom.items.append(copy.deepcopy(self.items[item]))
+					newRoom.items.append(Item(self.items[item]))
 
 			if 'npcs' in rooms[i]:
 				for mobile in rooms[i]['npcs']:

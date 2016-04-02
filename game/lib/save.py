@@ -24,11 +24,13 @@ class databaseDaemon():
 
 		# See if mobile by same name already exists in DB
 		# time.sleep(5)
-
+		
 		mobileJSON = {
 			'name': mobile.name,
 			'stats': mobile.stats,
-			'room': mobile.room.getIndex()
+			'room': mobile.room.getIndex(),
+			'inventory': mobile.saveInventory(),
+			'equipment': mobile.saveEquipment()
 		}
 
 		post_id = collection.update_one(

@@ -33,7 +33,7 @@ class Who(Command):
 			whoBuf += '[{level:2} {charRace:10} {charClass:>10}] [ {clan} ] {linkdead}{name} {title}\n\r'.format(
 				level=mobile.level,
 				charRace=mobile.charRace,
-				charClass=mobile.charClass,
+				charClass=mobile.getStat('charClass'),
 				clan=mobile.clan,
 				name=mobile.getName(sender),  # FIX ME: should the name be visible when you are blinded?  probably not, right?
 				title=mobile.title,

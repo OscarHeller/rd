@@ -114,6 +114,7 @@ class Game:
 
 	# The MESSAGE is always sent without a name, to be formatted in IF appropriate
 	def sendCondition(self, condition, message, lookers=None, max=None):
+		print "Warning: sendCondition is deprecated, please use list comprehension instead!"
 		lookers = lookers if lookers else []
 		found = False
 		sendCount = 0
@@ -202,10 +203,15 @@ class Game:
 
 		rooms = self.db.rooms.find()
 		for i in range(0, rooms.count()):   # default is zero
-			newRoom = Room(self, rooms[i])
-			print newRoom
-			print rooms[i]
-			newRoom.id = rooms[i]['id']
+			exists = [r for r in self.rooms if r.id == rooms[i]['id']]
+			if len(exists) > 0:
+				newRoom = exists[0]
+			else:
+				newRoom = Room(self, rooms[i])
+				newRoom.id = rooms[i]['id']
+
+			newRoom.items = []
+			newRoom.exits = []
 			if 'items' in rooms[i]:
 				for item in rooms[i]['items']:#
 					newRoom.items.append(copy.deepcopy(self.items[item]))
@@ -216,7 +222,8 @@ class Game:
 					m.room = newRoom
 					self.mobiles.append(m)
 
-			self.rooms.append(newRoom)
+			if len(exists) <= 0:
+				self.rooms.append(newRoom)
 
 		# have to load all the rooms BEFORE loading the exits
 		for i in range(0, rooms.count()):
@@ -226,6 +233,10 @@ class Game:
 				target_room = next(room for room in self.rooms if room.id == exit['target'])
 				direction = exit['direction']
 				self.rooms[i].exits.append(Exit(direction.lower(), target_room))
+
+	def repopulate(self):
+		self.mobiles = [mobile for mobile in self.mobiles if mobile.client]
+		self.loadRooms()
 
 	def simpleInit(self):
 		self.loadItems() # loads item 'prototypes'

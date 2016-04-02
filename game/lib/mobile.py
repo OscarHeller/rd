@@ -6,6 +6,7 @@ import datetime
 
 # classes!
 from lib.interpreters import warrior
+from lib.interpreters import admin
 
 class Mobile:
 	def __init__(self, name, game, config={}):
@@ -44,11 +45,12 @@ class Mobile:
 		self.commandInterpreters = []
 		if self.charClass == 'warrior':
 			self.commandInterpreters.extend(warrior.commandList)
+		self.commandInterpreters.extend(admin.commandList)
 		# DON'T FORGET to load in a command interpreter
 		self.commandInterpreter = CommandInterpreter(self.game, self, self.charClass)
 
 	def getCommandInterpreters(self):
- 		return self.commandInterpreters + self.room.getCommandInterpreters()
+ 		return self.commandInterpreters
 
 	def appendEnemyConditionToBuffer(self):
 		if self.combat:

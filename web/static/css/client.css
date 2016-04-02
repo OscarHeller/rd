@@ -1,287 +1,184 @@
-/* General Elements */
+/* Layout */
+
+* {
+	box-sizing: border-box;
+}
 
 html, body {
-  height: 100%;
-  width: 100%;
-  padding: 0;
-  margin: 0;
-  text-align: left;
-  font-family: 'Roboto', sans-serif;
+	height: 100%;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	text-align: left;
+	font-family: 'Roboto', sans-serif;
 }
 
 li {
-  list-style: none;
+	list-style: none;
 }
 
 h1, h2, h3, h4, h5, h6, p, ul, li {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 h1 {
-  font-family: 'Playfair Display', serif;
-  font-weight: 700;
-}
-
-/* Layout */
-
-.third {
-  flex-grow: 1;
-  flex-basis: 0;
-}
-
-.header {
-  display: flex;
+	font-family: 'Playfair Display', serif;
+	font-weight: 700;
 }
 
 body {
-  background: url(../media/temple.jpg);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  font-size: 14px;
+	background: url(../media/temple.jpg);
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-color: white;
+	font-size: 14px;
+	display: flex;
+	flex-direction: row;
 }
 
-.content {
-  flex-grow: 1;
-  flex-basis: 0;
-  display: flex;
-  flex-direction: row;
-  position: relative;
+.left, .center, .right {
+	flex-basis: 0;
+	position: relative;
 }
 
-.content > div {
-  position: relative;
+.left {
+	flex-grow: 6;
+	display: flex;
+	flex-direction: column;
 }
 
-.content-panel {
-  position: absolute;
-  bottom: 0;
-  background: rgba(255,255,255,0.6);
-  width: calc(100% - 30px);
-  padding: 10px;
+.center {
+	flex-grow: 1;
 }
 
-/* Room Info */
+.right {
+	flex-grow: 5;
+}
+
+/* Room */
 
 .room p {
-  margin: 14px 0;
-}
-
-/* In Room */
-
-.inroom  {
-
-}
-
-/* Player Info */
-
-.player-name, .player-combo {
-  display: inline-block;
-}
-
-.player-info > span {
-  display: block;
-}
-
-.player-text {
-  background: rgba(255,255,255,0.6);
-  padding: 10px;
-  margin-bottom: 10px;
-  width: calc(100% - 30px);
+	margin: 14px 0;
 }
 
 /* HP Bar */
 
 .hp {
-  padding: 10px;
+	padding: 10px;
 }
 
-.hpinterior {;
-  background: red;
-  transition: width 0.5s;
+.hpinterior {
+	background: red;
+	transition: width 0.5s;
 }
 .hpbar {
-  position: relative;
-  background: rgba(255,0,0,0.25);
+	position: relative;
+	background: rgba(255,0,0,0.25);
 }
 .hpcontainer {
-  width: calc(100% - 10px);
+	flex-grow: 9;
+	flex-basis: 0;
 }
 
 /* Output */
 
 .output {
-  max-height: calc(100% - 20px);
-  overflow-y: scroll;
-  overflow-x: hidden;
-  background: none;
-  padding: 0;
-  width: calc(100% - 10px);
+	overflow-y: scroll;
+	overflow-x: hidden;
+	background: none;
+	padding: 0;
+	width: 100%;
+	flex-grow: 12;
+	flex-basis: 0;
+	position: relative;
+	direction: rtl;
 }
 
-.output li:first-child {
-  margin-top: 0;
+.output li:last-child {
+	margin-bottom: 0;
 }
 
 .output li {
-  background: rgba(0,0,0,0.6);
-  margin-top: 10px;
-  padding: 10px;
-  border: 2px solid black;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
-  margin-right: 4px;
-  color: #ccc;
+	background: rgba(0,0,0,0.6);
+	margin-bottom: 10px;
+	padding: 10px;
+	border: 2px solid black;
+	border-left: none;
+	box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+	color: #ccc;
 }
 
-/* Affects */
-
-.affects > ul > li {
-    background: black;
-    display: inline-block;
-    color: white;
+.output > ul {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	max-height: 100%;
+	direction: ltr;
 }
 
-/* Footer */
-
-.footer {
-  display: flex;
-  margin-top: 10px;
-}
-
-/* Text Entry */
+/* Input */
 
 .data {
-  width: calc(100% - 10px);
-  border: none;
-  display: block;
-  padding: 10px;
-  font-size: 18px;
-  box-sizing: border-box;
-  color: white;
-  background: black;
-}
-
-.send {
-  flex-grow: 2;
-  flex-basis: 0;
-  margin-bottom: 0;
+	width: 100%;
+	border: none;
+	display: block;
+	padding: 10px;
+	font-size: 18px;
+	box-sizing: border-box;
+	color: white;
+	background: black;
 }
 
 .data:focus {
-  outline: none;
+	outline: none;
 }
 
-/* Menu Bar */
-
-.menus {
-  flex-grow: 1;
-  flex-basis: 0;
-}
-
-.menus > div {
-  height: 41px;
-  width: 41px;
-  display: inline-block;
-  margin-right: 10px;
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-color: white;
-  border-bottom: none;
-  position: relative;
-}
-
-.menus > div > span {
-  font-weight: 700;
-  width: 100%;
-  display: block;
-  text-align: center;
-  background: rgba(255,255,255,0.5);
-  color: black;
-  position: relative;
-}
-
-.inventory-menu {
-  background: url(../media/icons/knapsack.png);
-}
-
-.equipment-menu {
-  background: url(../media/icons/battle-gear.png);
-}
-
-.comm-menu {
-  background: url(../media/icons/conversation.png);
-}
-
-.who-menu {
-  background: url(../media/icons/awareness.png);
-}
-
-.menus > .active:before {
-  content: '';
-  position: absolute;
-  bottom: 100%;
-  width: 100%;
-  height: 10px;
-  background: rgba(255,255,255,0.6);
-}
-
-/* Panels */
-
-.info > div:not(.active) {
-  display: none;
-}
-
-/* Colors */
-
-.lightyellow {
-  color: orange;
+/* Player GUI */
+.player-gui {
+	display: flex;
+	flex-direction: row;
 }
 
 /* Charges */
 
 .charges {
-  margin-top: 10px;
+	flex-grow: 3;
+	flex-basis: 0;
 }
 
 .charges .charged {
-  background: url(../media/icons/portal.png);
+	background: url(../media/icons/portal.png);
 }
 
 .charges li {
-  height: 32px;
-  width: 32px;
-  display: inline-block;
-  background-size: contain;
-  background: url(../media/icons/portal black.png);
+	height: 32px;
+	width: 32px;
+	display: inline-block;
+	background-size: contain;
+	background: url(../media/icons/portal black.png);
 }
 
 /* Scrollbar*/
 
 ::-webkit-scrollbar {
-  width: 8px;
+	width: 8px;
 }
  
 /* Track */
 
 ::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
-  -webkit-border-radius: 8px;
-  border-radius: 8px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background: rgba(0,0,0,0.6);
 }
  
 /* Handle */
 
 ::-webkit-scrollbar-thumb {
-  -webkit-border-radius: 8px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.8); 
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+	background: rgba(255,255,255,0.8); 
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
 }
 
 ::-webkit-scrollbar-thumb:window-inactive {
-  background: rgba(255,255,255,0.4); 
+	background: rgba(255,255,255,0.4); 
 }

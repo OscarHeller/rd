@@ -10,52 +10,34 @@
   <link href="{{ static_url('css/client.css') }}" type="text/css" rel="stylesheet" />
 </head>
 <body>
-<div class="header">
-  <div class="third">
-  </div>
-  <div class="player-info third">
-    <div class="player-text">
-      <h1 class="player-name"></h1>
-      <p class="player-combo"></p>
-    </div>
-    <div class="player-gui">
-      <div class="hpcontainer">
-        <div class="hpbar"><div class="hpinterior">
-        <span class="hp"></span></div></div>
+<div class="left">
+  <div class="output"><ul></ul></div>
+  <div class="affects"><ul></ul></div>
+  <div class="player-gui">
+    <div class="hpcontainer">
+      <div class="hpbar">
+        <div class="hpinterior"><span class="hp"></span></div>
       </div>
-      <div class="charges"><ul><li></li><li></li><li></li></ul></div>
     </div>
+    <div class="charges"><ul><li></li><li></li><li></li></ul></div>
   </div>
-  <div class="third">
-    <div class="affects"><ul></ul></div>
-  </div>
-</div>
-<div class="content">
-  <div class="third">
-    <div class="content-panel room">
-      <h1 class="room-name"></h1>
-      <p class="room-desc"></p>
-      <ul></ul>
-    </div>
-  </div>
-  <div class="third">
-    <div class="content-panel output">
-      <ul></ul>
-    </div>
-  </div>
-  <div class="third">
-    <div class="content-panel info">
-      <div class="inventory active"><h1>Inventory</h1><ul></ul></div>
-      <div class="equipment"><h1>Equipment</h1><ul></ul></div>
-      <div class="who"><h1>Who</h1><ul></ul></div>
-      <div class="comm"><h1>Communications</h1><ul></ul></div>
-    </div>
-  </div>
-</div>
-<div class="footer">
   <div class="send">
     <input type="text" class="data" size="100" placeholder="Enter a command" />
     <input type="button" class="sendtext" style="display: none;" value="send text"/>
+  </div>
+</div>
+<div class="center"></div>
+<div class="right">
+  <div class="room">
+    <h1 class="room-name"></h1>
+    <p class="room-desc"></p>
+    <ul></ul>
+  </div>
+  <div class="info">
+    <div class="inventory active"><h1>Inventory</h1><ul></ul></div>
+    <div class="equipment"><h1>Equipment</h1><ul></ul></div>
+    <div class="who"><h1>Who</h1><ul></ul></div>
+    <div class="comm"><h1>Communications</h1><ul></ul></div>
   </div>
   <div class="menus">
     <div class="inventory-menu active"><span>F1</span></div>

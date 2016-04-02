@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="left">
-  <div class="output"><ul></ul></div>
+  <div class="output scrollable"><ul></ul></div>
   <div class="affects"><ul></ul></div>
   <div class="player-gui">
     <div class="hpcontainer">
@@ -26,40 +26,27 @@
     <input type="button" class="sendtext" style="display: none;" value="send text"/>
   </div>
 </div>
-<div class="center"></div>
+<div class="center">
+</div>
 <div class="right">
   <div class="room">
-    <h1 class="room-name"></h1>
-    <p class="room-desc"></p>
-    <ul></ul>
+    <div class="room-info scrollable">
+      <h1 class="room-name"></h1>
+      <p class="room-desc"></p>
+      <ul></ul>
+    </div>
   </div>
   <div class="info">
-    <div class="info-panels">
+    <div class="info-panels scrollable">
       <div class="inventory"><h1>Inventory</h1><ul></ul></div>
       <div class="equipment"><h1>Equipment</h1><ul></ul></div>
       <div class="who"><h1>Who</h1><ul></ul></div>
-      <div class="comm active"><h1>Communications</h1><ul>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      <li>dog</li>
-      </ul></div>
+      <div class="comm active"><h1>Communications</h1><ul></ul></div>
     </div>
     <div class="menus">
-      <div class="inventory-menu active"><span>F1</span></div>
+      <div class="inventory-menu"><span>F1</span></div>
       <div class="equipment-menu"><span>F2</span></div>
-      <div class="comm-menu"><span>F3</span></div>
+      <div class="comm-menu active"><span>F3</span></div>
       <div class="who-menu"><span>F4</span></div>
     </div>
   </div>

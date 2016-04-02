@@ -350,3 +350,13 @@ body {
 .affect-name-sneak {
 	background-image: url(../media/icons/sly.png);
 }
+
+/* Colors */
+
+.lightyellow {
+  color: orange;
+}
+
+.lightred {
+	color: red;
+}

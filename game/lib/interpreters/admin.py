@@ -36,7 +36,7 @@ class CreateItem(Command):
       buf = ""
       for i in range(0, len(i_keys)):
         item = self.game.items[i_keys[i]]
-        buf += str(i) + ": " + item.name + "\n\r"
+        buf += str(i) + ": " + item['name'] + "\n\r"
       sender.sendToClient(buf)
     elif args[0].isdigit():
       import copy
@@ -48,8 +48,8 @@ class CreateItem(Command):
         r = sender.room
         item = copy.deepcopy(self.game.items[key])
         sender.room.items.append(item)
-        sender.sendToClient("You create a " + item.name)
-        [mobile.sendToClient(sender.name + " creates a " + item.name) for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]
+        sender.sendToClient("You create a " + item['name'])
+        [mobile.sendToClient(sender.name + " creates a " + item['name']) for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]
 
 class SpawnMobile(Command):
   def __init__(self, game):

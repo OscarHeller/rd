@@ -38,17 +38,17 @@ class CreateItem(Command):
         buf += str(i) + ": " + item['name'] + "\n\r"
       sender.sendToClient(buf)
     elif args[0].isdigit():
-      import copy
+      from lib.item import Item
 
       i_keys = self.game.items.keys()
       vnum = int(args[0])
-      key = i_keys[vnum]
-      if self.game.items[key]:
+      key = i_keys[vnum] if vnum < len(i_keys) else "bafdlasdfa"
+      if key in self.game.items:
         r = sender.room
-        item = copy.deepcopy(self.game.items[key])
+        item = Item(self.game.items[key])
         sender.room.items.append(item)
-        sender.sendToClient("You create a " + item['name'])
-        [mobile.sendToClient(sender.name + " creates a " + item['name']) for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]
+        sender.sendToClient("You create a " + item.name)
+        [mobile.sendToClient(sender.name + " creates a " + item.name) for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]
 
 class SpawnMobile(Command):
   def __init__(self, game):
@@ -70,8 +70,8 @@ class SpawnMobile(Command):
 
       i_keys = self.game.mobile_list.keys()
       vnum = int(args[0])
-      key = i_keys[vnum]
-      if self.game.mobile_list[key]:
+      key = i_keys[vnum] if vnum < len(i_keys) else "bafdlasdfa"
+      if key in self.game.mobile_list:
         i = self.game.mobile_list[key]
         m = Mobile(i['name'], self.game, i)
         m.room = sender.room

@@ -48,7 +48,7 @@ class Yell(Command):
 		sender = config['sender']
 
 		yelling = ' '.join(args)
-		message = '{name} yells \'{yelling}\''
+		message = '@r{name} yells \'{yelling}\'@x'
 
 		targets = [mobile.sendToClient(message.format(
 			name=sender.getName(mobile), yelling=yelling), comm=True) for mobile in self.game.mobiles if mobile.room.area == sender.room.area and mobile != sender]

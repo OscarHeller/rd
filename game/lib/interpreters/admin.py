@@ -29,7 +29,6 @@ class CreateItem(Command):
 
   def execute(self, args, config):
     sender = config['sender']
-    #quick double check here, but only immortals should even have this command
     if len(args) <= 0:
       # show available rooms & their 'vnum'?
       i_keys = self.game.items.keys()

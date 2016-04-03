@@ -219,9 +219,10 @@ class Mobile:
 		if stat in self.stats:
 			s = self.stats[stat]
 			for slot, item in self.equipment.iteritems():
-				si = item.getStat(stat)
-				if si and type(s) is type(si):
-					s += si
+				if item:
+					si = item.getStat(stat)
+					if si and type(s) is type(si):
+						s += si
 			return s
 		else:
 			return 0

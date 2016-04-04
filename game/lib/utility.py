@@ -8,6 +8,7 @@ def match(search, target):
 
 def matchList(search, listOfTargets):
 	for target in listOfTargets:
-		if re.match(search, target, re.I):
-			return True
+		result = re.match(search, target, re.I)
+		if result:
+			return result
 	return False

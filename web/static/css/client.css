@@ -33,6 +33,7 @@ h1 {
 	font-family: HeadingFont, serif;
 	font-weight: 400;
 	text-transform: lowercase;
+	color: white;
 }
 
 body {
@@ -185,7 +186,9 @@ body {
 /* Footer */
 
 .footer {
-	background: url(http://i227.photobucket.com/albums/dd217/biged781/StoneBackground.png);
+	border-top: 2px solid black;
+	border-right: 2px solid black;
+	background: linear-gradient(to bottom, black, #404040);
 }
 
 /* Input */
@@ -200,7 +203,6 @@ body {
 	display: block;
 	padding: 10px;
 	font-size: 18px;
-	box-sizing: border-box;
 	color: white;
 	background: black;
 }
@@ -267,6 +269,8 @@ body {
 .menus {
   flex-grow: 1;
   flex-basis: 0;
+  border-left: 2px solid black;
+  border-top: 2px solid black;
   background: linear-gradient(to bottom, black, rgba(0,0,0,0.6));
   z-index: 1;
 }

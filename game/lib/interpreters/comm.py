@@ -82,7 +82,7 @@ class Tell(Command):
 		else:
 			target = targets[0]
 
-		target.sendToClient('@b{name} tells you \'{message}\'@x'.format(name=sender.getName(target), message=' '.join(message)), comm=True)
-		sender.sendToClient('@bYou tell {name} \'{message}\'@x'.format(name=target.getName(sender), message=' '.join(message)), comm=True)
+		target.sendToClient('@m{name} tells you \'@y{message}@x\'@x'.format(name=sender.getName(target), message=' '.join(message)), comm=True)
+		sender.sendToClient('@mYou tell {name} \'@y{message}@x\'@x'.format(name=target.getName(sender), message=' '.join(message)), comm=True)
 
 commandList = [Say, Yell, Tell]

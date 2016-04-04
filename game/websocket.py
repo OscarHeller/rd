@@ -98,6 +98,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 			return '<span class="lightyellow">'
 		elif code == '@r':
 			return '<span class="lightred">'
+		elif code == '@m':
+			return '<span class="magenta">'
 		elif code == '@x':
 			return '</span>'
 		return ''

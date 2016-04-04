@@ -1,3 +1,10 @@
+/* Fonts */
+
+@font-face {
+	font-family: HeadingFont;
+	src: url('../media/fonts/Plane Crash.ttf');
+}
+
 /* Layout */
 
 * {
@@ -23,8 +30,9 @@ h1, h2, h3, h4, h5, h6, p, ul, li {
 }
 
 h1 {
-	font-family: 'Playfair Display', serif;
-	font-weight: 700;
+	font-family: HeadingFont, serif;
+	font-weight: 400;
+	text-transform: lowercase;
 }
 
 body {
@@ -74,11 +82,8 @@ body {
 	margin-right: 8px;
 	overflow-y: scroll;
 	background: rgba(0,0,0,0.6);
-	margin-bottom: 10px;
 	padding: 10px;
 	border-left: 2px solid black;
-	border-bottom: 2px solid black;
-	border-top: 2px solid black;
 	box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
 	color: #ccc;
 }
@@ -148,9 +153,11 @@ body {
 	flex-basis: 0;
 	position: relative;
 	direction: rtl;
+	margin-bottom: 10px;
 }
 
 .output li:last-child {
+	margin-bottom: 0;
 }
 
 .output li {
@@ -260,55 +267,71 @@ body {
 .menus {
   flex-grow: 1;
   flex-basis: 0;
+  background: linear-gradient(to bottom, black, rgba(0,0,0,0.6));
+  z-index: 1;
 }
 
-.menus > div {
-	height: 57px;
-  width: 51px;
+.menu {
+	height: 32px;
+  width: 32px;
   display: inline-block;
-  margin-right: 10px;
-  background-position: center bottom;
-  background-size: 41px;
-  background-repeat: no-repeat;
-  background-color: black;
-  border-bottom: none;
-  border-right: 5px solid black;
-  border-left: 5px solid black;
-}
-
-.menus > div > span {
-  font-weight: 700;
-  width: 100%;
-  display: block;
-  text-align: center;
-  color: white;
+  cursor: pointer;
+  margin: 5px;
   position: relative;
+  text-align: center;
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
 }
 
-.menus > .active {
-    background-color: white;
-    border-right: 5px solid green;
-    border-left: 5px solid green;
+.menu.active {
+    -webkit-filter: grayscale(0%);
+    filter: grayscale(0%);	
 }
 
-.menus > div.active > span {
-    color: black;
+.menu .menu-hotkey {
+	opacity: 0;
+  font-weight: 700;
+  line-height: 32px;
+  color: white;
+  z-index: 3;
+  font-size: 20px;
 }
 
-.inventory-menu {
-  background: url(../media/icons/knapsack.png);
+.menu:hover:before {
+	opacity: 0.75;
 }
 
-.equipment-menu {
-  background: url(../media/icons/battle-gear.png);
+.menu:hover .menu-hotkey {
+	opacity: 1;
 }
 
-.comm-menu {
-  background: url(../media/icons/conversation.png);
+.menu:before {
+	height: 100%;
+	width: 100%;
+	content: '';
+	top: 0;
+	left: 0;
+	position: absolute;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: -1;
 }
 
-.who-menu {
-  background: url(../media/icons/awareness.png);
+.inventory-menu:before {
+  background-image: url(../media/icons/knapsack.png);
+}
+
+.equipment-menu:before {
+  background-image: url(../media/icons/battle-gear.png);
+}
+
+.comm-menu:before {
+  background-image: url(../media/icons/conversation.png);
+}
+
+.who-menu:before {
+  background-image: url(../media/icons/awareness.png);
 }
 
 /* Affects */

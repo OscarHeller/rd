@@ -175,7 +175,17 @@ body {
 	direction: ltr;
 }
 
+/* Footer */
+
+.footer {
+	background: url(http://i227.photobucket.com/albums/dd217/biged781/StoneBackground.png);
+}
+
 /* Input */
+
+.send {
+    margin: 0 8px 8px 8px;
+}
 
 .data {
 	width: 100%;
@@ -196,7 +206,6 @@ body {
 .player-gui {
 	display: flex;
 	flex-direction: row;
-	background: black;
 }
 
 /* Charges */
@@ -219,6 +228,7 @@ body {
     background-image: url(http://cdn.nodepoule.eu/img/faq/mana-cristal.png);
     -webkit-filter: grayscale(100%);
     filter: grayscale(100%);
+    margin: 0 2px;
 }
 
 /* Scrollbar*/
@@ -243,8 +253,7 @@ body {
 
 .scrollable:hover::-webkit-scrollbar-thumb {
 	background: rgba(255,255,255,0.8); 
-}
- 
+} 
 
 /* Menus */
 

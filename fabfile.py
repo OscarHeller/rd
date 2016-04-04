@@ -33,3 +33,7 @@ def deploy():
 	database()
 	restart()
 
+def reboot():
+	kill()
+	database()
+	restart()

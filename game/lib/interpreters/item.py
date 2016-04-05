@@ -43,22 +43,6 @@ class Get(Command):
 		sender.sendToClient('You don\'t see that here.')
 
 
-class Inventory(Command):
-	def __init__(self, game):
-		super(Inventory, self).__init__(game, 'inventory')
-		self.useInCombat = True
-		self.minPosition = Position.sleeping
-
-	def execute(self, args, config):
-		sender = config['sender']
-
-		buf = 'Inventory:\n\r'
-		for item in sender.inventory:
-			buf += item.getName(sender) + '\n\r'
-
-		sender.sendToClient(buf)
-
-
 class Drop(Command):
 	def __init__(self, game):
 		super(Drop, self).__init__(game, 'drop')
@@ -122,20 +106,6 @@ class Remove(Command):
 				sender.sendToClient(buf)
 				return
 		sender.sendToClient('You aren\'t wearing that.')
-
-
-class Equipment(Command):
-	def __init__(self, game):
-		super(Equipment, self).__init__(game, 'equipment')
-		self.useInCombat = True
-		self.minPosition = Position.sleeping
-
-	def execute(self, args, config):
-		sender = config['sender']
-		buf = 'You are wearing:\n\r'
-		for e in sender.equipment:
-			if sender.equipment[e]:
-				buf += '{slot} : {item}'.format(slot=e, item=sender.equipment[e].getName(sender))
 		sender.sendToClient(buf)
 
-commandList = [Wear, Get, Drop, Remove, Inventory, Equipment]
+commandList = [Wear, Get, Drop, Remove]

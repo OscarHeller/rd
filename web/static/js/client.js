@@ -7,7 +7,7 @@ var historyPointer = 0;
 jQuery(function($){
 
   if (!('WebSocket' in window)) {
-    console.log('Your browser does not support web sockets');
+    console.log('Your browser does not support websockets.');
   }else{
   	console.log('Setting up websocket.');
     setup();
@@ -20,7 +20,6 @@ jQuery(function($){
 
     var host = 'ws://' + domain + ':4000';
     var socket = new WebSocket(host);
-    //console.log('socket status: ' + socket.readyState);   
     
     var $txt = $('.data');
     var $btnSend = $('.sendtext');
@@ -99,7 +98,7 @@ jQuery(function($){
       }
 
     }else{
-      console.log('invalid socket');
+      console.log('Invalid socket.');
     }
 
     setKeyboardListeners();
@@ -109,7 +108,6 @@ jQuery(function($){
 });
 
 function showServerResponse(data) {
-  console.log('SERVER: ' + data);
   var txt = '';
   var richData = false;
   try {
@@ -151,7 +149,7 @@ function showServerResponse(data) {
     $('.room-desc').html( data.room.desc );
 
     if (data.room.bg) {
-      console.log('yeah!');
+      console.log('Background image found.');
       $('body').css({'background-image': 'url(' + data.room.bg + ')' });
     } else {
       $('body').css({'background-image': '' });
@@ -186,7 +184,6 @@ function showServerResponse(data) {
     });
 
     $('.affects > ul').empty();
-    //console.log(data.affects);
     $.each(data.affects, function(key, value) {
       $('.affects > ul').append('<li class="affect affect-name-' + key + ' affect-friendly-' + value.friendly + '"><span>' + value.duration + 's</span></li>');
     });

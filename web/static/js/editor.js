@@ -217,7 +217,6 @@ app.controller('mapCtrl', function ($scope) {
     request.open('PATCH', '/editor', true);
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.onload = function (data) {
-      //console.log(data, request.response);
       $scope.load();
     };
     //request.send('rooms=' + rooms + '&items=' + items + '&npcs=' + npcs );

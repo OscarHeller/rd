@@ -28,19 +28,7 @@ class Craft(Command):
 		sender = config['sender']
 
 		if not args:
-			# Send a list of recipes
-			craftingBuffer = ''
-
-			craftingBuffer += '============================================================\n\r'
-			craftingBuffer += '=                   Available Recipes                      =\n\r'
-			craftingBuffer += '============================================================\n\r'
-
-			for recipe in self.game.recipes:
-				craftingBuffer += '\n\r' + recipe.name + '\n\r'
-				for ingredient in recipe.ingredients:
-					craftingBuffer += '- {num} {name}\n\r'.format(num=recipe.ingredients[ingredient], name=ingredient)
-
-			sender.sendToClient(craftingBuffer)
+			sender.sendToClient('What do you want to craft?')
 			return
 
 		recipeName = args[0]

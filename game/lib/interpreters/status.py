@@ -119,16 +119,5 @@ class Commands(Command):
 			buf += commandObject.__name__ + '\n\r'
 		sender.sendToClient(buf)
 
-class Blind(Command):
-	def __init__(self, game):
-		super(Blind, self).__init__(game, 'blind')
-		self.minPosition = Position.sleeping
-		self.useInCombat = True
-
-	def execute(self, args, config):
-		sender = config['sender']
-		from lib.affect import Affect
-		Affect.factory('Blind', sender, sender, 20)
-
 
 commandList = [Who, Score, Affects, Look, Commands]

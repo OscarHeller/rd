@@ -16,7 +16,7 @@ class databaseDaemon():
 		global noSave
 
 		if noSave:
-			print ('noSave enabled.')
+			print ('Saving is disabled.')
 			return None
 
 		db = self.db

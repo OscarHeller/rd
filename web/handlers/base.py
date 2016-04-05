@@ -36,7 +36,6 @@ class BaseHandler(tornado.web.RequestHandler):
 			item = items[i]
 			if '_id' in item:
 				if 'delete' in item and item['delete'] == 1:
-					print 'blargh', item
 					self.db.items.delete_one({'_id': item['_id']})
 				else:
 					self.db.items.update_one({'_id': item['_id']}, {'$set': item}, True)

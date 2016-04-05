@@ -26,7 +26,6 @@ class CommandInterpreter:
 
 
 	def processCommand(self, command):
-		print 'Command: ' + command
 		if self.lag > 0:
 			self.commandQueue.append(command)
 			return
@@ -85,26 +84,20 @@ class CommandInterpreter:
 
 		# Do target checks here.
 		if commandObject.canTarget:
-			print 'Can target'
 			if len(args) <= 0:
 				# No target was supplied.
 				if commandObject.requireTarget:
-					print 'Requires target'
 					if commandObject.aggro and sender.combat:
-						print 'Aggro and in combat'
 						# It's an aggressive spell and you're in combat. Target the enemy.
 						target = sender.combat
 					elif not commandObject.aggro:
-						print 'Not aggro'
 						# It's a beneficial spell. You're the default target.
 						target = sender
 					else:
-						print 'Aggro and not in combat'
 						# It's an aggressive spell that requires a target and you're not in combat.
 						sender.sendToClient('You need a target.')
 						return
 				else:
-					print 'Doesn\'t require a target.'
 					# It doesn't require a target.
 					pass
 			else:

@@ -23,7 +23,6 @@ class EditorHandler(BaseHandler):
     #newItemData = self.get_argument('items')
     #newNPCData = self.get_argument('npcs')
     # hang on ... print newRoomData here again - is the string itself cut off?!
-    print data
     #from bson.json_util import loads
     self.set_rooms(newRoomData)
     self.set_items(newItemData)

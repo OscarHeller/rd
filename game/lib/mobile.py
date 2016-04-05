@@ -51,8 +51,6 @@ class Mobile:
 		self.commandInterpreters = []
 		if 'charClass' in self.stats and self.stats['charClass'] == 'warrior':
 			self.commandInterpreters.extend(warrior.commandList)
-		
-		print self.stats['charClass'] if 'charClass' in self.stats else "bla"
 
 		#if 'charClass' in self.stats and self.stats['charClass'] == 'immortal':
 		# FIX ME: not working properly, for some reason class isn't being set at the right place
@@ -187,8 +185,6 @@ class Mobile:
 				'items' : inroom_items,
 				'bg' : self.room.bg
 			}
-
-			print 'sendToClient {}'.format(self.getStat('charges'))
 
 			data['player'] = {
 				'hp' : self.stats['hitpoints'],

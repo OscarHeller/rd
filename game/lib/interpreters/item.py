@@ -135,7 +135,6 @@ class Equipment(Command):
 		buf = 'You are wearing:\n\r'
 		for e in sender.equipment:
 			if sender.equipment[e]:
-				print e, sender.equipment[e]
 				buf += '{slot} : {item}'.format(slot=e, item=sender.equipment[e].getName(sender))
 		sender.sendToClient(buf)
 

@@ -44,8 +44,6 @@ class Game:
 		if not potentialTargets:
 			return False
 
-		print potentialTargets
-
 		targets = []
 
 		for potentialTarget in potentialTargets:
@@ -56,8 +54,6 @@ class Game:
 
 		if not targets:
 			return False
-
-		print targets
 
 		targets.sort(key=lambda x: x.name)
 
@@ -144,7 +140,6 @@ class Game:
 		return found
 
 	def getPlayerById(self, playerId):
-		print self.mobiles
 		matches = [mobile for mobile in self.mobiles if mobile.id == playerId]
 
 		return matches[0] if len(matches) > 0 else False
@@ -158,7 +153,7 @@ class Game:
 		if candidatePlayer:
 			# If candidate is linkdead, reconnect
 			if candidatePlayer.isLinkdead():
-				print 'Reconnecting to player {name}'.format(name=candidatePlayer.name)
+				print '{name} has reconnected.'.format(name=candidatePlayer.name)
 				candidatePlayer.client = client
 				candidatePlayer.sendToClient('Reconnecting.')
 				candidatePlayer.processCommand('look')
@@ -204,7 +199,6 @@ class Game:
 		self.items = {}
 		for i in range(0, len(items)):
 			self.items[str(items[i]['_id'])] = items[i]
-		print self.items
 
 	def loadRooms(self):
 		import copy

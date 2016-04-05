@@ -62,7 +62,6 @@ app.controller('mapCtrl', function ($scope) {
     //$scope.newRoom.description = $(".")
     //$scope.newRoom.description = $("#roomDesc").val();
     $scope.newRoom.description = $('#roomDesc').val();//.replace(/"/g, '&quot;');
-    console.log($scope.newRoom.description);
     $scope.rooms[id] = $scope.newRoom;
     $scope.newRoom.id = id;
     $scope.setNewRoom();
@@ -212,7 +211,7 @@ app.controller('mapCtrl', function ($scope) {
     };
 
     //var data = 'rooms=' + rooms + '&items=' + items + '&npcs=' + npcs;
-   
+    // obligatory comment so I can commit & deploy
     
     var request = new XMLHttpRequest();
     request.open('PATCH', '/editor', true);
@@ -222,7 +221,6 @@ app.controller('mapCtrl', function ($scope) {
       $scope.load();
     };
     //request.send('rooms=' + rooms + '&items=' + items + '&npcs=' + npcs );
-    console.log('aafasd', angular.toJson(data));
     request.send('data=' + angular.toJson(data).replace(/;/g, "%3B"));
   };
 

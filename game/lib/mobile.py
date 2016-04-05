@@ -140,6 +140,24 @@ class Mobile:
 
 		return desc
 
+	def getScore(self):
+		score = {
+			'name' : self.getName(),
+			'charRace' : self.charRace,
+			'charClass' : self.getStat('charClass')
+		}
+
+		for stat in self.stats:
+			score[stat] = self.stats[stat]
+
+		return score
+
+	def getCommandList(self):
+		commands = []
+		for commandObject in self.commandInterpreter.commandInterpreters:
+			commands.append(commandObject.__name__)
+		return commands
+
 	def getWhoDesc(self, looker=None):
 		return '[{level:2} {charRace:10} {charClass:>10}] [ {clan} ] {linkdead}{name} {title}\n\r'.format(
 				level=self.level,
@@ -149,6 +167,22 @@ class Mobile:
 				name=self.getName(looker),  # FIX ME: should the name be visible when you are blinded?  probably not, right?
 				title=self.title,
 				linkdead='[LINKDEAD] ' if self.isLinkdead() else '')
+
+	def getCraftRecipes(self):
+		craft = {}
+
+		for recipe in self.game.recipes:
+			ingredients = []
+
+			for ingredient in recipe.ingredients:
+				ingredients.append({
+					'count' : recipe.ingredients[ingredient],
+					'name' : ingredient
+					})
+
+			craft[recipe.name] = ingredients
+
+		return craft
 
 	def sendToClient(self, message, names=None, comm=False):
 		names = names if names else []
@@ -160,6 +194,10 @@ class Mobile:
 				message.format(*[sender.getName(self) for sender in names])
 				message = message[0].capitalize() + message[1:]
 			data = {}
+
+			data['commands'] = self.getCommandList()
+			data['score'] = self.getScore()
+			data['craft'] = self.getCraftRecipes()
 			
 			data['equipment'] = self.getEquipmentList()
 			data['inventory'] = [item.name for item in self.inventory]
@@ -190,9 +228,7 @@ class Mobile:
 				'hp' : self.stats['hitpoints'],
 				'maxhp' : self.stats['maxhitpoints'],
 				'name' : self.getName(),
-				'charges' : self.stats['charges'],
-				'charRace' : self.charRace,
-				'charClass' : self.getStat('charClass')
+				'charges' : self.stats['charges']
 			}
 
 			self.client.sendToClient(data)

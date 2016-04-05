@@ -109,6 +109,7 @@ jQuery(function($){
 function showServerResponse(data) {
   try {
     data = JSON.parse(data);
+    console.log(data);
     parseServerResponse(data);
   }
   catch(err) {
@@ -192,6 +193,19 @@ function parseServerResponse(data) {
   }
 
   // Info Panels
+  if( data.hasOwnProperty('craft') ) {
+    $('.craft > ul').empty();
+    $.each(data.craft, function(key, value) {
+      var buf = '<li><h2>' + key + '</h2><ul>';
+
+      $.each(value, function(key, value) {
+        buf += '<li>' + value.count + ': ' + value.name + '</li>';
+      });
+      buf += '</ul></li>';
+      $('.craft > ul').append(buf);
+    });
+  }
+
   if( data.hasOwnProperty('inventory') ) {
     $('.inventory > ul').empty();
     $.each(data.inventory, function(key, value) {
@@ -261,6 +275,15 @@ function executeClientCommand(text) {
   else if (text == 'c') {
     setActiveMenu('comm');
   }
+  else if (text == 'r') {
+    setActiveMenu('craft');
+  }
+  else if (text == 's') {
+    setActiveMenu('score');
+  }
+  else if (text == 'm') {
+    setActiveMenu('commands');
+  }
 }
 
 function setActiveMenu(text) {
@@ -288,6 +311,18 @@ function setKeyboardListeners() {
   shortcut.add('F4', function() {
     setActiveMenu('who');
   });
+  
+  shortcut.add('F5', function() {
+    setActiveMenu('craft');
+  });
+  
+  shortcut.add('F6', function() {
+    setActiveMenu('commands');
+  });
+  
+  shortcut.add('F7', function() {
+    setActiveMenu('score');
+  });
 }
 
 function setClickListeners() {
@@ -307,5 +342,17 @@ function setClickListeners() {
 
   $('.comm-menu').click(function() {
     setActiveMenu('comm');
+  });
+
+  $('.craft-menu').click(function() {
+    setActiveMenu('craft');
+  });
+
+  $('.commands-menu').click(function() {
+    setActiveMenu('commands');
+  });
+
+  $('.score-menu').click(function() {
+    setActiveMenu('score');
   });
 }

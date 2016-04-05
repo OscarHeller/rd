@@ -148,9 +148,9 @@ def craftingInit(game):
 
 	werewindleRecipe.result = werewindle
 
-	werewindleRecipe.ingredients[livingChaos] = 1
-	werewindleRecipe.ingredients[shadowWisp] = 1
-	werewindleRecipe.ingredients[patternShard] = 1
+	werewindleRecipe.ingredients[livingChaos.name] = 1
+	werewindleRecipe.ingredients[shadowWisp.name] = 1
+	werewindleRecipe.ingredients[patternShard.name] = 1
 
 	game.recipes.append(grayswandirRecipe)
 	game.recipes.append(werewindleRecipe)

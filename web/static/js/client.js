@@ -213,6 +213,13 @@ function parseServerResponse(data) {
     });
   }
 
+  if( data.hasOwnProperty('score') ) {
+    $('.score > ul').empty();
+    $.each(data.score, function(key, value) {
+      $('.score > ul').append('<li>' + key + ': ' + value + '</li>');
+    });
+  }
+
   if( data.hasOwnProperty('inventory') ) {
     $('.inventory > ul').empty();
     $.each(data.inventory, function(key, value) {

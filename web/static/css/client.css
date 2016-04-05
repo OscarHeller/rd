@@ -338,6 +338,18 @@ body {
   background-image: url(../media/icons/awareness.png);
 }
 
+.craft-menu:before {
+  background-image: url(../media/icons/anvil-impact.png);
+}
+
+.commands-menu:before {
+  background-image: url(../media/icons/info.png);
+}
+
+.score-menu:before {
+  background-image: url(../media/icons/heart-beats.png);
+}
+
 /* Affects */
 
 .spacer {

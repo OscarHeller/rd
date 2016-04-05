@@ -108,22 +108,20 @@ jQuery(function($){
 });
 
 function showServerResponse(data) {
-  var txt = '';
-  var richData = false;
   try {
-    data = JSON.parse(data); 
-    txt = data.message;
-    richData = true
+    data = JSON.parse(data);
+    parseServerResponse(data);
   }
   catch(err) {
-    txt = data;
+    console.log('Server response: ' + err);
   }
+}
 
-  // If there's richData, use it
-  if ( richData ) {
-
-    var d = new Date();
+function parseServerResponse(data) {
+  // Time
+  if( data.hasOwnProperty('time') ) {
     var serverDate = new Date(data.time);
+    var d = new Date();
     var shortTime = serverDate.getHours() + ':' + (serverDate.getMinutes()<10?'0':'') + serverDate.getMinutes() + ':' + (serverDate.getSeconds()<10?'0':'') + serverDate.getSeconds();
     var longTime = 'Last Sync: ' + serverDate.getHours() + ':' + (serverDate.getMinutes()<10?'0':'') + serverDate.getMinutes() + ':' + serverDate.getSeconds() + ':' + serverDate.getMilliseconds();
 
@@ -142,63 +140,104 @@ function showServerResponse(data) {
       currentLatency = Math.round( currentLatency / latencies.length );
     }
 
-    $('.latency').html('Latency (last five requests): ' + currentLatency + 'ms' );
+    console.log('Latency (last five requests): ' + currentLatency + 'ms' );
+  }
 
-    // Room
-    $('.room-name').html( data.room.title );
-    $('.room-desc').html( data.room.desc );
-
-    if (data.room.bg) {
-      console.log('Background image found.');
-      $('body').css({'background-image': 'url(' + data.room.bg + ')' });
-    } else {
-      $('body').css({'background-image': '' });
+  // Room
+  if( data.hasOwnProperty('room') ) {
+    if ( data.room.hasOwnProperty('title') ) {
+      $('.room-name').html( data.room.title );
+    }
+    if ( data.room.hasOwnProperty('desc') ) {
+      $('.room-desc').html( data.room.desc );
     }
 
-    $('.room > .room-info > ul').empty();
-    $.each(data.room.mobiles, function(key, value) {
-      $('.room > .room-info > ul').append('<li>' + value + '</li>');
-    });
-    $('.room > .room-info > ul').append('<br>');
-    $.each(data.room.items, function(key, value) {
-      $('.room > .room-info > ul').append('<li>' + value + '</li>');
-    });
+    if ( data.room.hasOwnProperty('bg') && data.room.bg ) {
+      console.log('Background image found: ' + data.room.bg);
+      $('body').css({'background-image': 'url(' + data.room.bg + ')' });
+    }
 
-    // Player
-    $('.player-name').html ( data.player.name );
+    if ( data.room.hasOwnProperty('mobiles') ) {
+      $('.room > .room-info > ul').empty();
+      $.each(data.room.mobiles, function(key, value) {
+        $('.room > .room-info > ul').append('<li>' + value + '</li>');
+      });
+    }
 
-    $('.hpinterior').css('width', ( data.player.hp / data.player.maxhp * 100 ) + '%' );
-    $('.hp').html( data.player.hp + '/' + data.player.maxhp + 'hp');
+    if ( data.room.hasOwnProperty('items') ) {
+      $('.room > .room-info > ul').append('<br>');
+      $.each(data.room.items, function(key, value) {
+        $('.room > .room-info > ul').append('<li>' + value + '</li>');
+      });
+    }
+  }
 
-    $('.player-combo').html( data.player.charRace + ' ' + data.player.charClass );
+  // Player
+  if( data.hasOwnProperty('player') ) {
+    if( data.player.hasOwnProperty('name') ) {
+      $('.player-name').html ( data.player.name );
+    }
+    if( data.player.hasOwnProperty('hp') && data.player.hasOwnProperty('maxhp') ) {
+      $('.hpinterior').css('width', ( data.player.hp / data.player.maxhp * 100 ) + '%' );
+      $('.hp').html( data.player.hp + '/' + data.player.maxhp + 'hp');
+    }
 
-    // Info Panels
+    if( data.player.hasOwnProperty('charRace') && data.player.hasOwnProperty('charClass') ) {
+      $('.player-combo').html( data.player.charRace + ' ' + data.player.charClass );
+    }
+
+    if( data.player.hasOwnProperty('charges') ) {
+      $('.charges > ul > li').removeClass('charged');
+      $('.charges > ul > li:nth-child(-n+' + data.player.charges + ')').addClass('charged');
+    }
+  }
+
+  // Info Panels
+  if( data.hasOwnProperty('inventory') ) {
     $('.inventory > ul').empty();
     $.each(data.inventory, function(key, value) {
       $('.inventory > ul').append('<li>' + value + '</li>');
     });
+  }
 
+  if( data.hasOwnProperty('equipment') ) {
     $('.equipment > ul').empty();
     $.each(data.equipment, function(key, value) {
       $('.equipment > ul').append('<li>&lt;' + key + '&gt; ' + value + '</li>');
     });
+  }
 
+  if( data.hasOwnProperty('affects') ) {
     $('.affects > ul').empty();
     $.each(data.affects, function(key, value) {
       $('.affects > ul').append('<li class="affect affect-name-' + key + ' affect-friendly-' + value.friendly + '"><span>' + value.duration + 's</span></li>');
     });
+  }
 
-    $('.charges > ul > li').removeClass('charged');
-    $('.charges > ul > li:nth-child(-n+' + data.player.charges + ')').addClass('charged');
-
+  if( data.hasOwnProperty('who') ) {
     $('.who > ul').empty();
     $.each(data.who, function(key, value) {
       $('.who > ul').append('<li>' + value + '</li>');
     });
+  }
+
+  if ( data.hasOwnProperty('message') ) {
+
+    var li = document.createElement('li');
+    li.innerHTML = data.message;
+    $('.output > ul').append(li); 
+
+    // If there are more than 50 nodes, remove the oldest node
+    var outputCount = $('.output > ul > li').length;
+    if ( outputCount > 50 ) {
+      $('.output > ul > li:first-child').remove();
+    }
+
+    $('.output').scrollTop( $('.output')[0].scrollHeight );
 
     if ( data.comm ) {
       var li = document.createElement('li');
-      li.innerHTML = shortTime + ': ' + txt;
+      li.innerHTML = data.message;
       $('.comm').append(li);
 
       // If there are more than 50 nodes, remove the oldest node
@@ -208,19 +247,6 @@ function showServerResponse(data) {
       }
     }
   }
-
-  var li = document.createElement('li');
-  // li.innerHTML = shortTime + ': ' + txt;
-  li.innerHTML = txt;
-  $('.output > ul').append(li); 
-
-  // If there are more than 50 nodes, remove the oldest node
-  var outputCount = $('.output > ul > li').length;
-  if ( outputCount > 50 ) {
-    $('.output > ul > li:first-child').remove();
-  }
-
-  $('.output').scrollTop( $('.output')[0].scrollHeight );
 }
 
 function executeClientCommand(text) {

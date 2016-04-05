@@ -52,8 +52,7 @@ class Quit(Command):
 		sender.sendToClient('Alas, all good things must come to an end.')
 
 		# Kill client connection
-		if sender.client.getClientType() == 'websocket':
-			sender.client.close()
+		sender.client.close()
 
 		if 'nervous' in sender.affects:
 			# If client is nervous, make them linkdead (and only decrement linkdead if not nervous)

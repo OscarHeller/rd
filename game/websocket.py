@@ -26,9 +26,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 			'time': datetime.datetime.utcnow().isoformat()
 		})
 
-	def getClientType(self):
-		return 'websocket'
-
 	def sendToClient(self, data):
 		try:
 			data['message'] = self.colorize(data['message'])
@@ -59,7 +56,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 				return False
 			return True
 		else:
-			print ('Player load failed in WSHandler.')
+			print ('Player ID not found in database.')
 			self.sendToClient({'message': 'Player ID not found in database.'})
 			return False
 

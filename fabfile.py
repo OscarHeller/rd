@@ -20,8 +20,6 @@ def restart():
 	run('set -m; nohup python ~/rd/game/game.py &')
 
 def deploy():
-	commit()
-	push()
 	pull()
 	kill()
 	database()

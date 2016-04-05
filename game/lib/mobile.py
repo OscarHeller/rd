@@ -162,44 +162,42 @@ class Mobile:
 				message.format(*[sender.getName(self) for sender in names])
 				message = message[0].capitalize() + message[1:]
 			data = {}
-			if self.client.getClientType() != 'websocket':
-				data['message'] = message + '\n\r' + self.getPrompt()
-			else:
-				data['equipment'] = self.getEquipmentList()
-				data['inventory'] = [item.name for item in self.inventory]
-				data['who'] = [mobile.getWhoDesc() for mobile in self.game.mobiles if mobile.client is not None]
-				data['time'] = datetime.datetime.utcnow().isoformat()
-				data['message'] = message
-				data['affects'] = self.getAffectList()
+			
+			data['equipment'] = self.getEquipmentList()
+			data['inventory'] = [item.name for item in self.inventory]
+			data['who'] = [mobile.getWhoDesc() for mobile in self.game.mobiles if mobile.client is not None]
+			data['time'] = datetime.datetime.utcnow().isoformat()
+			data['message'] = message
+			data['affects'] = self.getAffectList()
 
-				data['comm'] = comm
+			data['comm'] = comm
 
-				inroom_mobiles = [mobile.getRoomDesc(self) for mobile in self.game.mobiles if mobile.room == self.room and mobile is not self]
-				if not inroom_mobiles:
-					inroom_mobiles = ['Nobody\'s here.']
+			inroom_mobiles = [mobile.getRoomDesc(self) for mobile in self.game.mobiles if mobile.room == self.room and mobile is not self]
+			if not inroom_mobiles:
+				inroom_mobiles = ['Nobody\'s here.']
 
-				inroom_items = [item.getRoomDesc(self) for item in self.room.items]
-				if not inroom_items:
-					inroom_items = ['No items here.']
+			inroom_items = [item.getRoomDesc(self) for item in self.room.items]
+			if not inroom_items:
+				inroom_items = ['No items here.']
 
-				data['room'] = {
-					'title' : self.room.name,
-					'desc' : self.room.desc,
-					'mobiles' : inroom_mobiles,
-					'items' : inroom_items,
-					'bg' : self.room.bg
-				}
+			data['room'] = {
+				'title' : self.room.name,
+				'desc' : self.room.desc,
+				'mobiles' : inroom_mobiles,
+				'items' : inroom_items,
+				'bg' : self.room.bg
+			}
 
-				print 'sendToClient {}'.format(self.getStat('charges'))
+			print 'sendToClient {}'.format(self.getStat('charges'))
 
-				data['player'] = {
-					'hp' : self.stats['hitpoints'],
-					'maxhp' : self.stats['maxhitpoints'],
-					'name' : self.getName(),
-					'charges' : self.stats['charges'],
-					'charRace' : self.charRace,
-					'charClass' : self.getStat('charClass')
-				}
+			data['player'] = {
+				'hp' : self.stats['hitpoints'],
+				'maxhp' : self.stats['maxhitpoints'],
+				'name' : self.getName(),
+				'charges' : self.stats['charges'],
+				'charRace' : self.charRace,
+				'charClass' : self.getStat('charClass')
+			}
 
 			self.client.sendToClient(data)
 

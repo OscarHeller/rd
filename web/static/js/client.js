@@ -103,6 +103,7 @@ jQuery(function($){
     }
 
     setKeyboardListeners();
+    setClickListeners();
 
   }
 });
@@ -227,47 +228,62 @@ function showServerResponse(data) {
 
 function executeClientCommand(text) {
   if (text == 'i') {
-    $('.info-panels > div:not(.inventory)').removeClass('active');
-    $('.menus > div:not(.inventory-menu)').removeClass('active');
-    $('.inventory').addClass('active');
-    $('.inventory-menu').addClass('active');
+    setActiveMenu('inventory');
   }
   else if (text == 'e') {
-    $('.info-panels > div:not(.equipment)').removeClass('active');
-    $('.menus > div:not(.equipment-menu)').removeClass('active');
-    $('.equipment').addClass('active');
-    $('.equipment-menu').addClass('active'); 
+    setActiveMenu('equipment');
   }
   else if (text == 'w') {
-    $('.info-panels > div:not(.who)').removeClass('active');
-    $('.menus > div:not(.who-menu)').removeClass('active');
-    $('.who').addClass('active');
-    $('.who-menu').addClass('active');  
+    setActiveMenu('who');
   }
   else if (text == 'c') {
-    $('.info-panels > div:not(.comm)').removeClass('active');
-    $('.menus > div:not(.comm-menu)').removeClass('active');
-    $('.comm').addClass('active');
-    $('.comm-menu').addClass('active'); 
+    setActiveMenu('comm');
   }
+}
+
+function setActiveMenu(text) {
+    $('.info-panels > div:not(.' + text + ')').removeClass('active');
+    $('.menus > div:not(.' + text + '-menu)').removeClass('active');
+    $('.' + text + '').addClass('active');
+    $('.' + text + '-menu').addClass('active');
 }
 
 function setKeyboardListeners() {
   console.log('Setting keyboard listeners.');
 
   shortcut.add('F1', function() {
-    executeClientCommand('i');
+    setActiveMenu('inventory');
   });
   
   shortcut.add('F2', function() {
-    executeClientCommand('e');
+    setActiveMenu('equipment');
   });
   
   shortcut.add('F3', function() {
-    executeClientCommand('c');
+    setActiveMenu('comm');
   });
   
   shortcut.add('F4', function() {
-    executeClientCommand('w');
+    setActiveMenu('who');
+  });
+}
+
+function setClickListeners() {
+  console.log('Setting click listeners.');
+
+  $('.inventory-menu').click(function() {
+    setActiveMenu('inventory');
+  });
+
+  $('.equipment-menu').click(function() {
+    setActiveMenu('equipment');
+  });
+
+  $('.who-menu').click(function() {
+    setActiveMenu('who');
+  });
+
+  $('.comm-menu').click(function() {
+    setActiveMenu('comm');
   });
 }

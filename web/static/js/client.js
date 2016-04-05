@@ -311,19 +311,19 @@ function setKeyboardListeners() {
   console.log('Setting keyboard listeners.');
 
   shortcut.add('F1', function() {
-    setActiveMenu('inventory');
+    setActiveMenu('who');
   });
   
   shortcut.add('F2', function() {
-    setActiveMenu('equipment');
+    setActiveMenu('inventory');
   });
   
   shortcut.add('F3', function() {
-    setActiveMenu('comm');
+    setActiveMenu('equipment');
   });
   
   shortcut.add('F4', function() {
-    setActiveMenu('who');
+    setActiveMenu('comm');
   });
   
   shortcut.add('F5', function() {

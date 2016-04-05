@@ -109,7 +109,6 @@ jQuery(function($){
 function showServerResponse(data) {
   try {
     data = JSON.parse(data);
-    console.log(data);
     parseServerResponse(data);
   }
   catch(err) {

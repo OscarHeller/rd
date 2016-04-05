@@ -65,17 +65,24 @@ class Tell(Command):
 		super(Tell, self).__init__(game, 'tell')
 		self.useInCombat = True
 		self.minPosition = Position.resting
-		self.range = Range.game
-		self.canTarget = True
-		self.requireTarget = True
 
 	def execute(self, args, config):
 		sender = config['sender']
-		target = config['target']
 
 		message = args[1:]
 
-		target.sendToClient('@b{name} tells you \'{message}\'@x'.format(name=sender.getName(target), message=' '.join(message)), comm=True)
-		sender.sendToClient('@bYou tell {name} \'{message}\'@x'.format(name=target.getName(sender), message=' '.join(message)), comm=True)
+		if not message:
+			sender.sendToClient('What do you want to tell them?')
+			return
+
+		targets = [ mobile for mobile in self.game.mobiles if mobile.client and utility.match( args[0], mobile.getName() ) ]
+		if not targets:
+			sender.sendToClient('You can\'t find them.')
+			return
+		else:
+			target = targets[0]
+
+		target.sendToClient('@m{name} tells you \'@y{message}@x\'@x'.format(name=sender.getName(target), message=' '.join(message)), comm=True)
+		sender.sendToClient('@mYou tell {name} \'@y{message}@x\'@x'.format(name=target.getName(sender), message=' '.join(message)), comm=True)
 
 commandList = [Say, Yell, Tell]

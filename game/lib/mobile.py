@@ -40,13 +40,13 @@ class Mobile:
 		self.equipment = self.loadEquipment(config['equipment'] if 'equipment' in config else {})
 
 		self.keywords = config['keywords'] if 'keywords' in config else [self.name]
-		self.level = config['level'] if 'level' in config else 1
+		self.level = config['level'] if 'level' in config else 51
 		self.experience = config['experience'] if 'experience' in config else 0
 
 		#self.charClass = config['charClass'] if 'charClass' in config else 'dClass'
 		self.charRace = config['charRace'] if 'charRace' in config else 'human'
-		self.clan = config['clan'] if 'clan' in config else 'dClan'
-		self.title = config['title'] if 'title' in config else 'the Default'
+		self.clan = config['clan'] if 'clan' in config else 'Loner'
+		self.title = config['title'] if 'title' in config else 'the Default Character'
 
 		self.commandInterpreters = []
 		if 'charClass' in self.stats and self.stats['charClass'] == 'warrior':
@@ -142,6 +142,15 @@ class Mobile:
 
 		return desc
 
+	def getWhoDesc(self, looker=None):
+		return '[{level:2} {charRace:10} {charClass:>10}] [ {clan} ] {linkdead}{name} {title}\n\r'.format(
+				level=self.level,
+				charRace=self.charRace.capitalize(),
+				charClass=self.getStat('charClass').capitalize(),
+				clan=self.clan,
+				name=self.getName(looker),  # FIX ME: should the name be visible when you are blinded?  probably not, right?
+				title=self.title,
+				linkdead='[LINKDEAD] ' if self.isLinkdead() else '')
 
 	def sendToClient(self, message, names=None, comm=False):
 		names = names if names else []
@@ -158,7 +167,7 @@ class Mobile:
 			else:
 				data['equipment'] = self.getEquipmentList()
 				data['inventory'] = [item.name for item in self.inventory]
-				data['who'] = [mobile.name for mobile in self.game.mobiles]
+				data['who'] = [mobile.getWhoDesc() for mobile in self.game.mobiles if mobile.client is not None]
 				data['time'] = datetime.datetime.utcnow().isoformat()
 				data['message'] = message
 				data['affects'] = self.getAffectList()
@@ -281,3 +290,4 @@ class Mobile:
 			return self.name
 		else:
 			return 'someone'
+		

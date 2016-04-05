@@ -131,4 +131,4 @@ class Blind(Command):
 		Affect.factory('Blind', sender, sender, 20)
 
 
-commandList = [Who, Score, Affects, Look, Commands, Blind]
+commandList = [Who, Score, Affects, Look, Commands]

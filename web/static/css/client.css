@@ -37,7 +37,7 @@ h1 {
 }
 
 body {
-	background: url(../media/temple.jpg);
+	background: linear-gradient(45deg, #404040, #bbb);
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-color: white;

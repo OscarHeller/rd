@@ -13,8 +13,7 @@ jQuery(function($){
     setup();
   }
 
-  function setup(){
-   
+  function setup(){   
     // Note: You have to change the host var 
     // if your client runs on a different machine than the websocket server
 

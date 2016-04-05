@@ -100,7 +100,7 @@ class Berserk(Command):
 		success = True
 		if success:
 			sender.heal(25)
-			affect.Affect.factory('Berserk', sender, sender, 40)
+			affect.Affect.factory('Berserk', sender, sender, 5)
 		else:
 			sender.sendToClient('You fail to get mad.')
 

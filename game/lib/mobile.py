@@ -26,7 +26,8 @@ class Mobile:
 			'maxhitpoints': 1000,
 			'defense': 1,
 			'charges': 2,
-			'maxcharges': 3
+			'maxcharges': 3,
+			'charClass': 'warrior'
 		}
 
 		if 'stats' in config:
@@ -50,7 +51,13 @@ class Mobile:
 		self.commandInterpreters = []
 		if 'charClass' in self.stats and self.stats['charClass'] == 'warrior':
 			self.commandInterpreters.extend(warrior.commandList)
+		
+		print self.stats['charClass'] if 'charClass' in self.stats else "bla"
+
+		#if 'charClass' in self.stats and self.stats['charClass'] == 'immortal':
+		# FIX ME: not working properly, for some reason class isn't being set at the right place
 		self.commandInterpreters.extend(admin.commandList)
+#			print 'what the actual hell'
 		# DON'T FORGET to load in a command interpreter
 		self.commandInterpreter = CommandInterpreter(self.game, self)
 
@@ -170,7 +177,8 @@ class Mobile:
 					'title' : self.room.name,
 					'desc' : self.room.desc,
 					'mobiles' : inroom_mobiles,
-					'items' : inroom_items
+					'items' : inroom_items,
+					'bg' : self.room.bg
 				}
 
 				print 'sendToClient {}'.format(self.getStat('charges'))

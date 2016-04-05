@@ -2,6 +2,7 @@ class Room:
 	def __init__(self, game, config):
 		self.name = config['name'] if 'name' in config else 'NO NAME'
 		self.desc = config['description'] if 'description' in config else ''
+		self.bg = config['bg'] if 'bg' in config else None
 		self.exits = []
 		self.items = []
 		self.commandInterpreters = []

@@ -9,8 +9,10 @@ app.controller('mapCtrl', function ($scope) {
   $scope.newExit;
   $scope.newItem;
   $scope.newNPC;
+  $("#roomDesc").jqte();
 
   $scope.load = function () {
+
     $scope.rooms = {};
     $scope.items = [];
     $scope.npcs = [];
@@ -57,6 +59,10 @@ app.controller('mapCtrl', function ($scope) {
   }  
   $scope.submitRoom = function () {
     var id = $scope.newRoom.id === undefined ? ++uid : $scope.newRoom.id;
+    //$scope.newRoom.description = $(".")
+    //$scope.newRoom.description = $("#roomDesc").val();
+    $scope.newRoom.description = $('#roomDesc').val();//.replace(/"/g, '&quot;');
+    console.log($scope.newRoom.description);
     $scope.rooms[id] = $scope.newRoom;
     $scope.newRoom.id = id;
     $scope.setNewRoom();
@@ -64,6 +70,7 @@ app.controller('mapCtrl', function ($scope) {
   }
   $scope.editRoom = function (room) {
     $scope.newRoom = room;
+    $("#roomDesc").jqteVal($scope.newRoom.description);
   }
   $scope.removeRoom = function (room) { 
     if (window.confirm("Are you sure you want to delete this room?")) {
@@ -196,19 +203,27 @@ app.controller('mapCtrl', function ($scope) {
     for (key in $scope.rooms) {
       roomData.push($scope.rooms[key]);
     }
-    var rooms = angular.toJson($scope.rooms);
-    var items = angular.toJson($scope.items);
-    var npcs = angular.toJson($scope.npcs);
+    //var rooms = angular.toJson($scope.rooms);
+    //var items = angular.toJson($scope.items);
+    //var npcs = angular.toJson($scope.npcs);
 
-    console.log($scope.items[0]);
+    var data = {
+      rooms: $scope.rooms, items: $scope.items, npcs: $scope.npcs
+    };
+
+    //var data = 'rooms=' + rooms + '&items=' + items + '&npcs=' + npcs;
+   
+    
     var request = new XMLHttpRequest();
     request.open('PATCH', '/editor', true);
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.onload = function (data) {
-      console.log(data, request.response);
+      //console.log(data, request.response);
       $scope.load();
     };
-    request.send('rooms=' + rooms + '&items=' + items + "&npcs=" + npcs );
+    //request.send('rooms=' + rooms + '&items=' + items + '&npcs=' + npcs );
+    console.log('aafasd', angular.toJson(data));
+    request.send('data=' + angular.toJson(data).replace(/;/g, "%3B"));
   };
 
   $scope.load();

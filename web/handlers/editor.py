@@ -13,10 +13,18 @@ class EditorHandler(BaseHandler):
     self.write(dumps(result))
 
   def patch(self):
-    newRoomData = self.get_argument('rooms')
-    newItemData = self.get_argument('items')
-    newNPCData = self.get_argument('npcs')
+
     from bson.json_util import loads
-    self.set_rooms(loads(newRoomData))
-    self.set_items(loads(newItemData))
-    self.set_npcs(loads(newNPCData))
+    data = loads(self.get_argument('data'))
+    newRoomData = data['rooms']
+    newItemData = data['items']
+    newNPCData = data['npcs']
+    #newRoomData = self.get_argument('rooms')
+    #newItemData = self.get_argument('items')
+    #newNPCData = self.get_argument('npcs')
+    # hang on ... print newRoomData here again - is the string itself cut off?!
+    print data
+    #from bson.json_util import loads
+    self.set_rooms(newRoomData)
+    self.set_items(newItemData)
+    self.set_npcs(newNPCData)

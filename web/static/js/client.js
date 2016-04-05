@@ -149,6 +149,13 @@ function showServerResponse(data) {
     $('.room-name').html( data.room.title );
     $('.room-desc').html( data.room.desc );
 
+    if (data.room.bg) {
+      console.log('yeah!');
+      $('body').css({'background-image': 'url(' + data.room.bg + ')' });
+    } else {
+      $('body').css({'background-image': '' });
+    }
+
     $('.room > .room-info > ul').empty();
     $.each(data.room.mobiles, function(key, value) {
       $('.room > .room-info > ul').append('<li>' + value + '</li>');
@@ -178,7 +185,7 @@ function showServerResponse(data) {
     });
 
     $('.affects > ul').empty();
-    console.log(data.affects);
+    //console.log(data.affects);
     $.each(data.affects, function(key, value) {
       $('.affects > ul').append('<li class="affect affect-name-' + key + ' affect-friendly-' + value.friendly + '"><span>' + value.duration + 's</span></li>');
     });

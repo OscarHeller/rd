@@ -201,8 +201,6 @@ class Game:
 			self.items[str(items[i]['_id'])] = items[i]
 
 	def loadRooms(self):
-		import copy
-
 		rooms = self.db.rooms.find()
 		for i in range(0, rooms.count()):   # default is zero
 			exists = [r for r in self.rooms if r.id == rooms[i]['id']]
@@ -237,7 +235,11 @@ class Game:
 				self.rooms[i].exits.append(Exit(direction.lower(), target_room))
 
 	def repopulate(self):
-		self.mobiles = [mobile for mobile in self.mobiles if mobile.client]
+		self.loadItems()
+		self.loadMobiles()
+		# reload all mobiles except for players, and those in combat
+		self.mobiles = [mobile for mobile in self.mobiles if mobile.client or mobile.combat]
+		[mobile.sendToClient('Something flickers.') for mobile in self.mobiles]
 		self.loadRooms()
 
 	def simpleInit(self):

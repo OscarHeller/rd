@@ -135,10 +135,12 @@ class Reload(Command):
 
   def execute(self, args, config):
     sender = config['sender']
-    [mobile.sendToClient('reloading objects... started') for mobile in self.game.mobiles]
+    sender.sendToClient('reloading...')
+    #[mobile.sendToClient('reloading objects... started') for mobile in self.game.mobiles]
     self.game.loadItems()
     self.game.loadMobiles()
-    [mobile.sendToClient('reloading objects... done') for mobile in self.game.mobiles]    
+    sender.sendToClient('...done!')
+    #[mobile.sendToClient('reloading objects... done') for mobile in self.game.mobiles]    
 
 class Repop(Command):
   def __init__(self, game):
@@ -146,9 +148,11 @@ class Repop(Command):
 
   def execute(self, args, config):
     sender = config['sender']
-    [mobile.sendToClient('repopulating rooms... started') for mobile in self.game.mobiles]
+    #[mobile.sendToClient('repopulating rooms... started') for mobile in self.game.mobiles]
+    sender.sendToClient('reloading...')
     self.game.repopulate()
-    [mobile.sendToClient('repopulating rooms... done') for mobile in self.game.mobiles]
+    sender.sendToClient('...done')
+    #[mobile.sendToClient('repopulating rooms... done') for mobile in self.game.mobiles]
 
 class WizInfo(Command):
   def __init__(self, game):

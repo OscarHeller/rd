@@ -96,7 +96,8 @@ def doDamage(sender, amount, noun='hit', target=None):
 		buf['room'] = '{{0}}\'s {adj} {noun} {vplural} {{1}}{tag}. ({damage})\n\r'.format(
 			noun=noun, adj=decorators[2], vplural=decorators[1], tag=decorators[3], damage=amount)
 
-		target.stats['hitpoints'] -= sender.getStat('damage')
+		#target.stats['hitpoints'] -= sender.getStat('damage')
+		target.stats['hitpoints'] -= amount
 		if target.getStat('hitpoints') <= 0:
 			exp = target.level * 500
 			target.die()

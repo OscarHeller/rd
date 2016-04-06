@@ -32,7 +32,13 @@ class Mobile:
 
 		if 'stats' in config:
 			for k, v in config['stats'].iteritems():
-				self.stats[k] = v
+				if k in self.stats:
+					if type(self.stats[k]) is int:
+						self.stats[k] = int(v)
+					else:
+						self.stats[k] = str(v)
+				else:
+					self.stats[k] = str(v)
 
 		self.position = Position.standing
 		self.affects = []

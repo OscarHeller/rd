@@ -74,38 +74,11 @@ class Game:
 		if self.clock % 6 * self.interval == 0:
 			for mobile in [m for m in self.mobiles if m.getStat('charges') < m.getStat('maxcharges')]:
 				mobile.setStat('charges', mobile.getStat('charges') + 1)
-				mobile.sendToClient('You gain a charge.')
 
-		combatBuffer = {}
 		for mobile in self.mobiles:
 			mobile.update(self.interval)
-			if self.clock % 3 * self.interval == 0:
-				b2, target = combat.doCombat(mobile)
 
-				if not target:
-					continue
-
-				mobile.sendToBuffer(b2['sender'].format(target=target.getName(mobile)))
-
-				target.sendToBuffer(b2['target'].format(name=mobile.getName(target)))
-
-				mobile.game.sendToBufferCondition(
-					(lambda a: a.room == mobile.room and a is not mobile and a is not target),
-					b2['room'], [mobile, target])
-
-			if mobile.linkdead > 0 and not mobile.isAffectedBy('nervousness'):
-				# Only decrement linkdead if a player is not nervous to prevent timing out in combat
-				mobile.linkdead -= self.interval
-				if mobile.linkdead <= 0:
-					print ('{name} timed out from linkdead.'.format(name=mobile.name))
-					mobile.leaveGame()
-
-		for mobile in self.mobiles:
-			if self.clock % 3 * self.interval == 0:
-				if mobile.combatBuffer:
-					mobile.appendEnemyConditionToBuffer()
-					mobile.sendToClient(mobile.combatBuffer)
-					mobile.clearBuffer()
+		combat.doGlobalRound(self)
 
 		Timer(self.interval, self.updateGame).start()
 
@@ -128,15 +101,6 @@ class Game:
 					sendCount += 1
 					if sendCount >= max:
 						return found
-		return found
-
-	def sendToBufferCondition(self, condition, message, lookers=None):
-		lookers = lookers if lookers else []
-		found = False
-		for mobile in self.mobiles:
-			if condition(mobile):
-				mobile.sendToBuffer(message.format(*[sender.getName(mobile) for sender in lookers]))
-				found = True
 		return found
 
 	def getPlayerById(self, playerId):
@@ -169,6 +133,7 @@ class Game:
 
 			newMobile = Mobile(name, self, {'stats': {'charClass': 'warrior'}})
 			newMobile.client = client
+			newMobile.is_player = True
 			self.mobiles.append(newMobile)
 
 			newMobile.id = playerId
@@ -272,21 +237,4 @@ class Game:
 		for room in self.rooms:
 			room.area = midgaard
 
-		"""
-		self.rooms[0].items.append(
-			Item({'name': 'a Bashball Bat', 'keywords': ['bashball', 'bat'], 'wear': 'weapon', 'noun': 'bash', 'roll': 7, 'stats': {}}))
-		self.rooms[0].items.append(
-			Item({'name': 'the Second Hand', 'keywords': ['second', 'hand', 'sword'], 'wear': 'weapon', 'noun': 'stab', 'roll': 10, 'stats': {}}))
-		self.rooms[1].items.append(
-			Item({'name': 'a kitten named Ruby', 'keywords': ['kitten', 'cat', 'ruby'], 'stats': {}}))
-		
-
-		self.mobiles.append(Mobile('a Fungusaur', self, {'keywords': ['fungusaur', 'monster']}))
-		self.mobiles.append(Mobile('a Fungusaur', self, {'keywords': ['fungusaur', 'monster']}))
-		self.mobiles.append(Mobile('a Fungusaur', self, {'keywords': ['fungusaur', 'monster']}))
-
-		self.mobiles[0].room = self.rooms[0]
-		self.mobiles[1].room = self.rooms[1]
-		self.mobiles[2].room = self.rooms[1]
-		"""
 		craftingInit(self)

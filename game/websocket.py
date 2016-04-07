@@ -102,6 +102,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 		return ''
 
 	def on_message(self, message):
+		print 'Command received: ' + message
 		if not self.player:
 			success = self.loadPlayer(message)
 			return

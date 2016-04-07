@@ -30,8 +30,6 @@ class Flee(Command):
 		sender = config['sender']
 		aggro = sender.combat
 
-		aggro.sendToClient('{name} has fled!'.format(name=sender.getName(aggro)))
-		sender.sendToClient('You flee from combat!')
 		sender.setLag(3)
 		sender.combat = None
 		sender.position = Position.standing
@@ -39,18 +37,27 @@ class Flee(Command):
 			aggro.combat = None
 			aggro.position = Position.standing
 
+		aggro.sendToClient('{name} has fled!'.format(name=sender.getName(aggro)))
+		sender.sendToClient('You flee from combat!')
+
 
 class Kill(Command):
 	def __init__(self, game):
 		super(Kill, self).__init__(game, 'kill')
-		self.canTarget = True
-		self.requireTarget = True
-		self.targetSelf = False
-		self.useWhileJustDied = False
 
 	def execute(self, args, config):
 		sender = config['sender']
-		target = config['target']
+
+		targets = [ mobile for mobile in self.game.mobiles if mobile.room == sender.room and utility.match( args[0], mobile.getName() ) ]
+		if not targets:
+			sender.sendToClient('You can\'t find them.')
+			return
+		else:
+			target = targets[0]
+
+		if target == sender:
+			sender.sendToClient('Suicide is a mortal sin.')
+			return
 
 		sender.combat = target
 		sender.position = Position.fighting
@@ -62,18 +69,10 @@ class Kill(Command):
 			yell = Yell(self.game)
 			yell.execute(['Help! I am being attacked by {sender}!'.format(sender=sender.getName())], {'sender': target})
 			# sender does one full round against target
-			b2, target = combat.doCombat(sender)
-
-			sender.sendToBuffer(b2['sender'].format(target=target.getName(sender)))
-			target.sendToBuffer(b2['target'].format(name=sender.getName(target)))
-			sender.game.sendToBufferCondition(
-				(lambda a: a.room == sender.room and a is not sender and a is not target), b2['room'], [sender, target])
-
-			for mobile in self.game.mobiles:
-				if mobile.combatBuffer:
-					mobile.appendEnemyConditionToBuffer()
-					mobile.sendToClient(mobile.combatBuffer)
-					mobile.clearBuffer()
+			combatBuffer = {}
+			combatBuffer = combat.doSingleRound(sender.game, sender, combatBuffer=combatBuffer)
+			combat.appendConditionsToCombatBuffer(combatBuffer)
+			combat.sendCombatBuffer(self.game, combatBuffer)
 
 
 class North(Command):

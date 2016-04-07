@@ -25,7 +25,6 @@ class Test(Command):
 	def execute(self, args, config):
 		sender = config['sender']
 		sender.setStat('charges', max(0, sender.getStat('charges') - 1) )
-		sender.sendToClient('You lose a charge.')
 		affect.Affect.factory('Blind', sender, sender, 500)
 
 commandList = [Test]

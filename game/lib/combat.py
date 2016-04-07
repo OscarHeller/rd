@@ -1,4 +1,5 @@
 import math
+import random
 
 damageDecorators = [
 	['miss', 'misses', 'clumsy', ''],
@@ -28,101 +29,127 @@ minDamage = 0.0
 maxDamage = 200.0
 
 
-def doCombat(sender):
-	fighting = sender.combat
+def doGlobalRound(game):
+	# Initialize a dictionary of all in-combat mobiles and an empty buffer. This will get
+	# passed around and filled in as the combat round progresses.
 
-	if not fighting:
-		return None, None
-	else:
-		sender.becomeNervous(fighting)
-		buf = {'sender': '', 'room': '', 'target': ''}
-		b2 = {}
-		for i in range(0, sender.getStat('attackSpeed')):
-			b2 = doHit(sender)
-			if 'sender' in b2:
-				buf['sender'] += b2['sender']
-			if 'room' in b2:
-				buf['room'] += b2['room']
-			if 'target' in b2:
-				buf['target'] += b2['target']
+	fighters = [mobile for mobile in game.mobiles if mobile.combat]
+	combatBuffer = {}
 
-		return (buf, fighting)
+	for fighter in fighters:
+		combatBuffer = doSingleRound(game, fighter, combatBuffer=combatBuffer)
+
+	# Append conditions for everyone who's in combat.
+	combatBuffer = appendConditionsToCombatBuffer(combatBuffer)
+
+	sendCombatBuffer(game, combatBuffer)
+
+def doSingleRound(game, fighter, combatBuffer=None):
+	combatBuffer = {} if not combatBuffer else combatBuffer
+
+	target = fighter.combat
+
+	for i in range(0, fighter.getStat('attackSpeed')):
+		combatBuffer = doHit(game, fighter, combatBuffer=combatBuffer)
+
+	return combatBuffer
 
 
-def doHit(sender):
-	if not sender.combat:
-		return {}
+def doHit(game, fighter, combatBuffer=None):
 
-	if 'weapon' in sender.equipment and sender.equipment['weapon'] and sender.equipment['weapon'].noun:
-		noun = sender.equipment['weapon'].getNoun()
+	if 'weapon' in fighter.equipment and fighter.equipment['weapon'] and fighter.equipment['weapon'].noun:
+		noun = fighter.equipment['weapon'].getNoun()
 	else:
 		noun = 'punch'
 
-	if 'weapon' in sender.equipment and sender.equipment['weapon'] and sender.equipment['weapon'].roll:
-		roll = sender.equipment['weapon'].getRoll()
+	if 'weapon' in fighter.equipment and fighter.equipment['weapon'] and fighter.equipment['weapon'].roll:
+		roll = fighter.equipment['weapon'].getRoll()
 	else:
 		roll = 0
 
-	damage = sender.getStat('damage')
-	hitroll = sender.getStat('hitroll')
+	damage = fighter.getStat('damage')
+	hitroll = fighter.getStat('hitroll')
+	enemyDefense = fighter.getStat('defense')
 
-	enemyDefense = sender.getStat('defense')
-
-	import random
-	if (random.randint(0, 100) < 10 * hitroll - 10 * enemyDefense):
-		return doDamage(sender, damage + random.randint(roll / 2, roll), noun)
+	if random.randint(0, 100) < ( ( 10 * hitroll ) - ( 10 * enemyDefense ) ):
+		combatBuffer = doDamage(game, fighter, damage + random.randint(roll / 2, roll), noun, target=fighter.combat, combatBuffer=combatBuffer)
 	else:
-		return doDamage(sender, 0, noun)
+		combatBuffer = doDamage(game, fighter, 0, noun, target=fighter.combat, combatBuffer=combatBuffer)
+
+	return combatBuffer
 
 
-def doDamage(sender, amount, noun='hit', target=None):
-	buf = {'sender': 'BUG: doDamage called without a specific target for player not in combat.', 'room': '', 'target': ''}
+def doDamage(game, fighter, amount, noun='hit', target=None, combatBuffer=None):
+	combatBuffer = {} if not combatBuffer else combatBuffer
 
 	if not target:
-		# If no target is supplied, try to use sender.combat
-		if sender.combat:
-			target = sender.combat
-		else:
-			return buf
+		return combatBuffer
 
 	decorators = decorateDamage(amount)
-	if amount > 0:
-		buf['sender'] = 'Your {adj} {noun} {vplural} {{target}}{tag}. ({damage})\n\r'.format(
-			noun=noun, adj=decorators[2], vplural=decorators[1], tag=decorators[3], damage=amount)
 
-		buf['target'] = '{{name}}\'s {adj} {noun} {vplural} you{tag}. ({damage})\n\r'.format(
-			noun=noun, adj=decorators[2], vplural=decorators[1], tag=decorators[3], damage=amount)
+	message = 'Your {adj} {noun} {vplural} {target}{tag}. ({damage})'.format(
+		noun=noun, adj=decorators[2], vplural=decorators[1], tag=decorators[3], damage=amount, target=target.getName(fighter))
 
-		buf['room'] = '{{0}}\'s {adj} {noun} {vplural} {{1}}{tag}. ({damage})\n\r'.format(
-			noun=noun, adj=decorators[2], vplural=decorators[1], tag=decorators[3], damage=amount)
+	combatBuffer = appendToCombatBuffer(fighter, message, combatBuffer)
 
-		#target.stats['hitpoints'] -= sender.getStat('damage')
-		target.stats['hitpoints'] -= amount
-		if target.getStat('hitpoints') <= 0:
-			exp = target.level * 500
-			target.die()
-			buf['sender'] += '@rYou have killed {target}!@x\n\r'
-			buf['target'] += '@r{name} has killed you.@x\n\r'
-			buf['room'] += '@r{0} killed {1}.@x\n\r'
-			buf['sender'] += '@gYou gain {experience} experience points!@x\n\r'.format(experience=exp)
-			sender.experience += exp
-			if (sender.experience >= 1000 * sender.level):
-				sender.experience = sender.experience - 1000 * sender.level
-				sender.level += 1
-				buf['sender'] += '@yYou are now level {level}!@x\n\r'.format(level=sender.level)
-	else:
-		buf['sender'] = 'Your {adj} {noun} {vplural} {{target}}{tag}! ({damage})\n\r'.format(
-			noun=noun, adj=decorators[2], vplural=decorators[1], tag=decorators[3], damage=amount)
+	message = '{fighter}\'s {adj} {noun} {vplural} you{tag}. ({damage})'.format(
+		noun=noun, adj=decorators[2], vplural=decorators[1], tag=decorators[3], damage=amount, fighter=fighter.getName(target))
 
-		buf['target'] = '{{name}}\'s {adj} {noun} {vplural} you{tag}. ({damage})\n\r'.format(
-			noun=noun, adj=decorators[2], vplural=decorators[1], tag=decorators[3], damage=amount)
+	combatBuffer = appendToCombatBuffer(target, message, combatBuffer)
 
-		buf['room'] = '{{0}}\'s {adj} {noun} {vplural} {{1}}{tag} ({damage}).\n\r'.format(
-			noun=noun, adj=decorators[2], vplural=decorators[1], tag=decorators[3], damage=amount)
+	for mobile in [mobile for mobile in game.mobiles if mobile != fighter and mobile != target and mobile.room == target.room]:
+		message = '{fighter}\'s {adj} {noun} {vplural} {target}{tag}. ({damage})'.format(
+			fighter=fighter.getName(mobile), target=target.getName(mobile), noun=noun, adj=decorators[2], vplural=decorators[1],
+			tag=decorators[3], damage=amount)
 
-	return buf
+		combatBuffer = appendToCombatBuffer(mobile, message, combatBuffer)
+
+	target.stats['hitpoints'] -= amount
+	if target.getStat('hitpoints') <= 0:
+		target.die()
+
+		message = 'You have killed {target}!'.format(target=target.getName(fighter))
+		combatBuffer = appendToCombatBuffer(fighter, message, combatBuffer)
+
+		message = 'You have been killed!'
+		combatBuffer = appendToCombatBuffer(target, message, combatBuffer)
+
+		for mobile in [mobile for mobile in game.mobiles if mobile != fighter and mobile != target and mobile.room == target.room]:
+			message = '{fighter} killed {target}!'.format(fighter=fighter.getName(mobile), target=target.getName(mobile))
+			combatBuffer = appendToCombatBuffer(mobile, message, combatBuffer)
+
+		if target.is_player:
+			for mobile in [mobile for mobile in game.mobiles]:
+				message = '@r{target}@x suffers defeat at the hands of @r{fighter}@x.'.format(target=target.getName(mobile), fighter=fighter.getName(mobile))
+				combatBuffer = appendToCombatBuffer(mobile, message, combatBuffer)
+
+	return combatBuffer
 
 
 def decorateDamage(amount):
 	length = len(damageDecorators) - 1
 	return damageDecorators[min(length, int(math.ceil(length * amount / maxDamage)))]
+
+
+def appendToCombatBuffer(key, string, combatBuffer):
+	if key in combatBuffer:
+		combatBuffer[key].append(string)
+	else:
+		combatBuffer[key] = [string,]
+
+	return combatBuffer
+
+
+def sendCombatBuffer(game, combatBuffer):
+	for mobile, bufferList in combatBuffer.iteritems():
+		bufferString = '\n\r'.join( bufferList )
+
+		mobile.sendToClient( bufferString )
+
+
+def appendConditionsToCombatBuffer(combatBuffer):
+	for mobile in combatBuffer:
+		if mobile.combat:
+			combatBuffer[mobile].append(mobile.combat.getCondition(looker=mobile))
+
+	return combatBuffer

@@ -17,13 +17,13 @@ class Mobile:
 		self.game = game
 		self.linkdead = 0
 		self.combat = None
-		self.combatBuffer = ''
+		self.is_player = False
 		self.stats = {
 			'attackSpeed': 4,
 			'damage': 10,
 			'hitroll': 5,
-			'hitpoints': 900,
-			'maxhitpoints': 1000,
+			'hitpoints': 1,
+			'maxhitpoints': 1,
 			'defense': 1,
 			'charges': 2,
 			'maxcharges': 3,
@@ -68,30 +68,28 @@ class Mobile:
 	def getCommandInterpreters(self):
  		return self.commandInterpreters
 
-	def appendEnemyConditionToBuffer(self):
-		if self.combat:
-			self.combatBuffer += self.combat.getCondition().format(name=self.combat.getName())
-
-	def getCondition(self):
+	def getCondition(self, looker=None):
 		hp = self.stats['hitpoints']
 		maxhp = self.stats['maxhitpoints']
 
 		percentage = math.floor(float(hp) / float(maxhp) * 100)
 
 		if percentage == 100:
-			return '{name} is in excellent condition.'
+			condition = '{name} is in excellent condition.'
 		elif percentage >= 80:
-			return '{name} has some small wounds and bruises.'
+			condition =  '{name} has some small wounds and bruises.'
 		elif percentage >= 60:
-			return '{name} has quite a few wounds.'
+			condition =  '{name} has quite a few wounds.'
 		elif percentage >= 40:
-			return '{name} has some big nasty wounds and scratches.'
+			condition =  '{name} has some big nasty wounds and scratches.'
 		elif percentage >= 20:
-			return '{name} is pretty hurt.'
+			condition =  '{name} is pretty hurt.'
 		elif percentage > 0:
-			return '{name} is in awful condition.'
+			condition =  '{name} is in awful condition.'
 		else:
-			return 'BUG: {name} is mortally wounded and should be dead..'
+			condition =  'BUG: {name} is mortally wounded and should be dead.'
+
+		return condition.format(name=self.getName(looker))
 
 	def heal(self, healAmount):
 		self.stats['hitpoints'] = min(self.stats['maxhitpoints'], self.stats['hitpoints'] + healAmount)
@@ -197,7 +195,6 @@ class Mobile:
 		else:
 			# Capitalize first letter of message
 			if len(message) > 0:
-				message.format(*[sender.getName(self) for sender in names])
 				message = message[0].capitalize() + message[1:]
 			data = {}
 
@@ -238,14 +235,6 @@ class Mobile:
 			}
 
 			self.client.sendToClient(data)
-
-	def sendToBuffer(self, message):
-		if len(message) > 0:
-			message = message[0].capitalize() + message[1:]
-		self.combatBuffer += message
-
-	def clearBuffer(self):
-		self.combatBuffer = ''
 
 	def goLinkdead(self, timer=10):
 		print('{name} has gone linkdead.'.format(name=self.name))

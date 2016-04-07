@@ -25,7 +25,11 @@ class PlayerCreateHandler(BaseHandler):
 		object_user_id = ObjectId(user_id)
 
 		if not self.validate_name(name):
-			flash = Flash('The name ' + name + ' is already in use.', css_class='alert-danger')
+			flash = Flash('The name ' + name + ' is already in use or does not meet our naming guidelines.', css_class='alert-danger')
+			self.set_flash(flash, 'validation')
+			self.redirect('/player/create')
+		elif not self.validate_class(charClass):
+			flash = Flash('Illegal class.', css_class='alert-danger')
 			self.set_flash(flash, 'validation')
 			self.redirect('/player/create')
 		else:

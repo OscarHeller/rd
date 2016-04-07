@@ -86,6 +86,10 @@ class BaseHandler(tornado.web.RequestHandler):
 
 		return True
 
+	def validate_class(self, charClass):
+		doc = self.db.classes.find_one({'name': charClass})
+		return bool(doc)
+
 	"""
 	Extends Tornado's RequestHandler by adding flash functionality.
 	"""

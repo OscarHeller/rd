@@ -59,6 +59,7 @@ class CommandInterpreter:
 	def executeCommand(self, commandObject, args):
 		config = {}
 		config['sender'] = self.mobile
+		target = None
 
 		sender = self.mobile
 
@@ -75,7 +76,7 @@ class CommandInterpreter:
 			return
 
 		# Check for nervous
-		if sender.isAffectedBy('just died') and not commandObject.useWhileJustDied:
+		if sender.isAffectedBy('just died') and commandObject.aggro:
 			sender.sendToClient('You died too recently to do that.')
 			return
 
@@ -121,10 +122,8 @@ class CommandInterpreter:
 			# Now we have a target
 			config['target'] = target
 
-		commandObject.execute(args, config)
-
 		# If it's an aggressive command, start combat if necessary
-		if commandObject.aggro:
+		if target and commandObject.aggro:
 			sender.becomeNervous(sender)
 			target.becomeNervous(sender)
 			if not sender.combat:
@@ -133,3 +132,5 @@ class CommandInterpreter:
 			if not target.combat:
 				target.combat = sender
 				target.position = Position.fighting
+
+		commandObject.execute(args, config)

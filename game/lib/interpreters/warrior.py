@@ -156,11 +156,12 @@ class Kick(Command):
 		target = config['target']
 
 		damage = sender.level + random.randint(1, 10)
-		buf = combat.doDamage(sender, damage, 'kick', target)
-		sender.sendToClient(buf['sender'].format(target=target.getName(sender)))
-		sender.game.sendCondition(
-			(lambda a: a.room == sender.room and a is not sender and a is not target), buf['room'], [sender, target])
-		target.sendToClient(buf['target'].format(name=sender.getName(target)))
+
+		combatBuffer = {}
+		combatBuffer = combat.doDamage(self.game, sender, damage, noun='kick', target=target, combatBuffer=combatBuffer)
+		combat.appendConditionsToCombatBuffer(combatBuffer)
+		combat.sendCombatBuffer(self.game, combatBuffer)
+
 		sender.setLag(3)
 
 

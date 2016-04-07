@@ -22,8 +22,8 @@ class Mobile:
 			'attackSpeed': 4,
 			'damage': 10,
 			'hitroll': 5,
-			'hitpoints': 1,
-			'maxhitpoints': 1,
+			'hitpoints': 1000,
+			'maxhitpoints': 1000,
 			'defense': 1,
 			'charges': 2,
 			'maxcharges': 3,
@@ -122,10 +122,11 @@ class Mobile:
 	def getAffectList(self):
 		affectList = {}
 
-		for affect in self.affects:
+		for affect in [affect for affect in self.affects if affect.visible]:
 			affectList[affect.name] = {
 				'duration' : affect.duration,
-				'friendly' : affect.friendly
+				'friendly' : affect.friendly,
+				'name' : affect.name
 			}
 
 		return affectList

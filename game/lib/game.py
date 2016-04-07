@@ -48,7 +48,7 @@ class Game:
 
 		for potentialTarget in potentialTargets:
 			for keyword in potentialTarget.keywords:
-				if keyword.startswith(targetName):
+				if keyword.lower().startswith(targetName.lower()):
 					targets.append(potentialTarget)
 					continue
 
@@ -120,8 +120,10 @@ class Game:
 				print '{name} has reconnected.'.format(name=candidatePlayer.name)
 				candidatePlayer.client = client
 				candidatePlayer.sendToClient('Reconnecting.')
-				candidatePlayer.processCommand('look')
 				candidatePlayer.linkdead = 0
+
+				for mobile in [mobile for mobile in self.mobiles if mobile is not candidatePlayer]:
+					mobile.sendToClient('@g{name} has reconnected.@x'.format(name=candidatePlayer.getName(mobile)))
 
 				# And return candidatePlayer to attach to the browser
 				return candidatePlayer
@@ -147,6 +149,10 @@ class Game:
 					newMobile.stats[stat] = playerData['stats'][stat]
 
 			newMobile.sendToClient('@uWelcome to Redemption, {name}@x.'.format(name=newMobile.name))
+
+			for mobile in [mobile for mobile in self.mobiles if mobile is not newMobile]:
+				mobile.sendToClient('@g{name} has entered the world.@x'.format(name=newMobile.getName(mobile)))
+
 			return newMobile
 
 	def checkName(self, name):

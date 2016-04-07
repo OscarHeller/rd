@@ -3,6 +3,7 @@ from lib.interpreters.command import Command
 from lib.interpreters.constants import Position, Range
 from comm import Yell
 import lib.combat as combat
+import random
 
 
 """
@@ -30,20 +31,42 @@ class Flee(Command):
 		sender = config['sender']
 		aggro = sender.combat
 
-		sender.setLag(3)
-		sender.combat = None
-		sender.position = Position.standing
-		if aggro.combat == sender:
-			aggro.combat = None
-			aggro.position = Position.standing
+		exits = sender.room.exits
 
-		aggro.sendToClient('{name} has fled!'.format(name=sender.getName(aggro)))
-		sender.sendToClient('You flee from combat!')
+		if random.randrange(0,100) > 75 or len(exits) == 0:
+			sender.sendToClient('PANIC! You can\'t escape!')
+			sender.setLag(1)
+
+			for mobile in [ mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender ]:
+				mobile.sendToClient('{sender} tries to flee, but fails.'.format(sender=sender.getName(mobile)))
+
+			return
+		else:
+			exit = random.choice(exits)
+			newRoom = exit.destination
+			oldRoom = sender.room
+			direction = exit.key
+
+			combat.endCombatForPlayersByTarget(self.game, sender)
+
+			sender.setLag(3)
+			sender.combat = None
+			sender.position = Position.standing
+			sender.room = newRoom
+
+			sender.sendToClient('You flee from combat!\n\r')
+
+			for mobile in [ mobile for mobile in self.game.mobiles if mobile.room == oldRoom and mobile != sender ]:
+				mobile.sendToClient( '{name} has fled!\n\r{name} leaves {direction}.'.format(name=sender.getName(mobile),direction=direction))
+			for mobile in [ mobile for mobile in self.game.mobiles if mobile.room == newRoom and mobile != sender ]:
+				mobile.sendToClient( '{name} has arrived.'.format(name=sender.getName(mobile)))
+
 
 
 class Kill(Command):
 	def __init__(self, game):
 		super(Kill, self).__init__(game, 'kill')
+		self.aggro = True
 
 	def execute(self, args, config):
 		sender = config['sender']
@@ -57,6 +80,10 @@ class Kill(Command):
 
 		if target == sender:
 			sender.sendToClient('Suicide is a mortal sin.')
+			return
+
+		if target.isAffectedBy('just died'):
+			sender.sendToClient('They died too recently to attack them.')
 			return
 
 		sender.combat = target

@@ -405,12 +405,16 @@ body {
   color: orange;
 }
 
-.lightred {
+.red {
 	color: red;
 }
 
 .magenta {
 	color: magenta;
+}
+
+.green {
+	color: green;
 }
 
 /* Commands Info Panel */

@@ -8,7 +8,6 @@ class Command(object):
 		self.canTarget = False
 		self.requireTarget = False
 		self.useInCombat = False
-		self.useWhileJustDied = True
 		self.targetSelf = True
 		self.range = Range.room
 		self.minPosition = Position.standing

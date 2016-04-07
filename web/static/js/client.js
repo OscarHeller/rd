@@ -236,7 +236,7 @@ function parseServerResponse(data) {
   if( data.hasOwnProperty('affects') ) {
     $('.affects > ul').empty();
     $.each(data.affects, function(key, value) {
-      $('.affects > ul').append('<li class="affect affect-name-' + key + ' affect-friendly-' + value.friendly + '"><span>' + value.duration + 's</span></li>');
+      $('.affects > ul').append('<li title="' + value.name + '" class="affect affect-name-' + key + ' affect-friendly-' + value.friendly + '"><span>' + value.duration + 's</span></li>');
     });
   }
 

@@ -1,5 +1,6 @@
 import math
 import random
+from lib.interpreters.constants import Position
 
 damageDecorators = [
 	['miss', 'misses', 'clumsy', ''],
@@ -106,6 +107,7 @@ def doDamage(game, fighter, amount, noun='hit', target=None, combatBuffer=None):
 
 	target.stats['hitpoints'] -= amount
 	if target.getStat('hitpoints') <= 0:
+		endCombatForPlayersByTarget(game, target)
 		target.die()
 
 		message = 'You have killed {target}!'.format(target=target.getName(fighter))
@@ -124,6 +126,16 @@ def doDamage(game, fighter, amount, noun='hit', target=None, combatBuffer=None):
 				combatBuffer = appendToCombatBuffer(mobile, message, combatBuffer)
 
 	return combatBuffer
+
+
+def endCombatForPlayersByTarget(game, target):
+	target.position = Position.standing
+	target.combat = None
+
+	for mobile in [mobile for mobile in game.mobiles if mobile.combat == target]:
+		print 'ending combat for ' + mobile.getName()
+		mobile.combat = None
+		mobile.position = Position.standing
 
 
 def decorateDamage(amount):

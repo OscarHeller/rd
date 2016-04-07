@@ -94,15 +94,16 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 		if code == '@y':
 			return '<span class="lightyellow">'
 		elif code == '@r':
-			return '<span class="lightred">'
+			return '<span class="red">'
 		elif code == '@m':
 			return '<span class="magenta">'
+		elif code == '@g':
+			return '<span class="green">'
 		elif code == '@x':
 			return '</span>'
 		return ''
 
 	def on_message(self, message):
-		print 'Command received: ' + message
 		if not self.player:
 			success = self.loadPlayer(message)
 			return

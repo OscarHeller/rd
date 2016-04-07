@@ -37,7 +37,7 @@ class Get(Command):
 				sender.inventory.append(item)
 				sender.sendToClient('You get {item}.'.format(item=item.getName(sender)))
 				sender.game.sendCondition(
-					(lambda a: a.room == sender.room and a is not sender), '{0} gets {1}', [sender, item])
+					(lambda a: a.room == sender.room and a is not sender), '{0} gets {1}.', [sender, item])
 				return
 
 		sender.sendToClient('You don\'t see that here.')
@@ -59,7 +59,7 @@ class Drop(Command):
 				sender.room.items.append(item)
 				sender.sendToClient('You drop {item}.'.format(item=item.getName(sender)))
 				sender.game.sendCondition(
-					(lambda a: a.room == sender.room and a is not sender), '{0} drops {1}', [sender, item])
+					(lambda a: a.room == sender.room and a is not sender), '{0} drops {1}.', [sender, item])
 				return
 		sender.sendToClient('You don\'t have that.')
 

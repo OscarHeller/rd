@@ -4,8 +4,11 @@ NOT_REFRESHABLE = False
 FRIENDLY = True
 NOT_FRIENDLY = False
 
+VISIBLE = True
+NOT_VISIBLE = False
+
 class Affect(object):
-	def __init__(self, name, caster, target, duration, refreshable, friendly):
+	def __init__(self, name, caster, target, duration, refreshable, friendly, visible=VISIBLE):
 		if not target:
 			assert 0, 'Affect must have target.'
 
@@ -15,6 +18,7 @@ class Affect(object):
 		self.game = target.game
 		self.refreshable = refreshable
 		self.friendly = friendly
+		self.visible = visible
 
 		# Convert duration (in seconds) to duration (in game cycles)
 		self.duration = duration / self.game.interval
@@ -37,6 +41,9 @@ class Affect(object):
 		self.target.sendToClient('{caster} refreshes your {name}.'.format(caster=self.caster.getName(self.target), name=self.name))
 
 	def apply(self):
+		if not self.visible:
+			return
+
 		self.target.affects.append(self)
 		self.target.sendToClient('You are affected by {name}.'.format(name=self.name))
 		self.target.game.sendCondition(
@@ -44,6 +51,9 @@ class Affect(object):
 			'{{0}} is affected by {name}.'.format(name=self.name), [self.target])
 
 	def wear(self):
+		if not self.visible:
+			return
+
 		self.target.affects.remove(self)
 		self.target.sendToClient('!{name}!'.format(name=self.name))
 		self.target.game.sendCondition(
@@ -126,6 +136,7 @@ class DirtKick(Affect):
 class Nervous(Affect):
 	def __init__(self, caster, target, duration):
 		super(Nervous, self).__init__('nervousness', caster, target, duration, REFRESHABLE, NOT_FRIENDLY)
+		# super(Nervous, self).__init__('nervousness', caster, target, duration, REFRESHABLE, NOT_FRIENDLY, visible=NOT_VISIBLE)
 
 
 class Stun(Affect):
@@ -136,6 +147,7 @@ class Stun(Affect):
 class JustDied(Affect):
 	def __init__(self, caster, target, duration):
 		super(JustDied, self).__init__('just died', caster, target, duration, REFRESHABLE, NOT_FRIENDLY)
+		# super(JustDied, self).__init__('just died', caster, target, duration, REFRESHABLE, NOT_FRIENDLY, visible=NOT_VISIBLE)
 
 
 class Sneak(Affect):
@@ -144,4 +156,4 @@ class Sneak(Affect):
 
 	def wear(self):
 		self.target.affects.remove(self)
-		self.target.sendToClient('You no longer fear so stealthy. ')
+		self.target.sendToClient('You no longer feel so stealthy. ')

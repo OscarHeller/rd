@@ -239,6 +239,10 @@ class Mobile:
 
 	def goLinkdead(self, timer=10):
 		print('{name} has gone linkdead.'.format(name=self.name))
+
+		for mobile in [mobile for mobile in self.game.mobiles if mobile is not self]:
+			mobile.sendToClient('@r{name} has gone linkdead.@x'.format(name=self.getName(mobile)))
+
 		self.linkdead = timer
 
 	def isLinkdead(self):
@@ -249,6 +253,10 @@ class Mobile:
 
 	def leaveGame(self):
 		print('{name} has turned themself into line noise.'.format(name=self.name))
+
+		for mobile in [mobile for mobile in self.game.mobiles if mobile is not self]:
+			mobile.sendToClient('@r{name} has disconnected.@x'.format(name=self.getName(mobile)))
+
 		self.game.mobiles.remove(self)
 
 	def die(self):
@@ -289,6 +297,12 @@ class Mobile:
 	def update(self, amount):
 		self.unLag(amount)
 		self.updateAffects(amount)
+
+		if self.linkdead > 0:
+			self.linkdead -= 1
+			if self.linkdead <= 0:
+				self.leaveGame()
+
 
 	def updateAffects(self, amount):
 		for affect in self.affects:

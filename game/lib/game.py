@@ -151,7 +151,7 @@ class Game:
 			newMobile.sendToClient('@uWelcome to Redemption, {name}@x.'.format(name=newMobile.name))
 
 			for mobile in [mobile for mobile in self.mobiles if mobile is not newMobile]:
-				mobile.sendToClient('@g{name} has entered the world.@x'.format(name=newMobile.getName(mobile)))
+				mobile.sendToClient('@g{name} has connected.@x'.format(name=newMobile.getName(mobile)))
 
 			return newMobile
 

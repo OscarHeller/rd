@@ -1,15 +1,22 @@
-.navbar {
-	margin-bottom: 0;
+@font-face {
+	font-family: HeadingFont;
+	src: url('../media/fonts/Plane Crash.ttf');
 }
 
-.hero-unit {
-	background-image: url('../media/soulblade.jpg');
+body {
+	background-image: url('../media/sunset.png');
 	background-size: cover;
 	background-position: top;
-	color: white;
-	height: 500px;
-	text-align: center;
-	padding-top: 100px;
+	font-family: Roboto, sans-serif;
+}
+
+h1 {
+	font-family: HeadingFont, serif;
+	text-transform: lowercase;
+}
+
+.navbar {
+	margin-bottom: 0;
 }
 
 .single-character {

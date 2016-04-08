@@ -5,69 +5,75 @@ from lib.interpreters.constants import Position, Range
 
 class Say(Command):
 	def __init__(self, game):
-		super(Say, self).__init__(game, 'say')
-		self.useInCombat = True
-		self.minPosition = Position.resting
+		super(Say, self).__init__(game, 'say', comm=True)
 
-	def execute(self, args, config):
-		sender = config['sender']
+	def execute(self, args, sender):
+		try:
+			# Preliminary checks
+			self.checkPosition(sender, [Position.standing, Position.resting, Position.fighting])
 
-		saying = ' '.join(args)
-		message = '@y{name} says \'{saying}\'@x'
+			saying = ' '.join(args)
 
-		# I had to replace game.sendCondition with a list comprehension so I could have each separate mobile make their own call to getName
-		targets = [mobile.sendToClient(message.format(
-			name=sender.getName(mobile), saying=saying), comm=True) for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]
+			for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]:
+				msg = '@y{name} says \'{saying}\'@x'.format(name=sender.getName(mobile),saying=saying)
+				self.appendToCommandBuffer(mobile, msg)
 
-		sender.sendToClient('@yYou say \'{saying}\'@x'.format(saying=saying), comm=True)
+			msg = '@yYou say \'{saying}\'@x'.format(saying=saying)
+			self.appendToCommandBuffer(sender, msg)
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 
 class Yell(Command):
 	def __init__(self, game):
-		super(Yell, self).__init__(game, 'yell')
-		self.useInCombat = True
-		self.minPosition = Position.resting
-		self.range = Range.area
+		super(Yell, self).__init__(game, 'yell', comm=True)
 
-	def execute(self, args, config):
-		sender = config['sender']
+	def execute(self, args, sender):
+		try:
+			# Preliminary checks
+			self.checkPosition(sender, [Position.standing, Position.resting, Position.fighting])
 
-		yelling = ' '.join(args)
-		message = '@r{name} yells \'{yelling}\'@x'
+			saying = ' '.join(args)
 
-		targets = [mobile.sendToClient(message.format(
-			name=sender.getName(mobile), yelling=yelling), comm=True) for mobile in self.game.mobiles if mobile.room.area == sender.room.area and mobile != sender]
+			for mobile in [mobile for mobile in self.game.mobiles if mobile.room.area == sender.room.area and mobile != sender]:
+				msg = '@r{name} yells \'{saying}\'@x'.format(name=sender.getName(mobile),saying=saying)
+				self.appendToCommandBuffer(mobile, msg)
 
-		# self.game.sendCondition(
-		# 	(lambda a: a is not sender and a.room.area is sender.room.area),
-		# 	'@r{{0}} yells \'{args}\'@x'.format(args=' '.join(args)), [sender])
-
-		sender.sendToClient('@rYou yell \'{yelling}\'@x'.format(yelling=yelling), comm=True)
+			msg = '@rYou yell \'{saying}\'@x'.format(saying=saying)
+			self.appendToCommandBuffer(sender, msg)
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 
 class Tell(Command):
 	def __init__(self, game):
-		super(Tell, self).__init__(game, 'tell')
-		self.useInCombat = True
-		self.minPosition = Position.resting
+		super(Tell, self).__init__(game, 'tell', comm=True)
 
-	def execute(self, args, config):
-		sender = config['sender']
+	def execute(self, args, sender):
+		try:
+			# Preliminary checks
+			self.checkPosition(sender, [Position.standing, Position.resting, Position.fighting])
 
-		message = args[1:]
+			target = self.getTargetFromListByName(args[0], [mobile for mobile in self.game.mobiles if mobile.is_player])
 
-		if not message:
-			sender.sendToClient('What do you want to tell them?')
-			return
+			message = args[1:]
 
-		targets = [ mobile for mobile in self.game.mobiles if mobile.client and utility.match( args[0], mobile.getName() ) ]
-		if not targets:
-			sender.sendToClient('You can\'t find them.')
-			return
-		else:
-			target = targets[0]
+			if not message:
+				self.appendToCommandBuffer(sender, 'What do you want to tell them?')
+				return
 
-		target.sendToClient('@m{name} tells you \'@y{message}@x\'@x'.format(name=sender.getName(target), message=' '.join(message)), comm=True)
-		sender.sendToClient('@mYou tell {name} \'@y{message}@x\'@x'.format(name=target.getName(sender), message=' '.join(message)), comm=True)
+			saying = ' '.join(message)
+
+			msg = '@mYou tell {name} \'@y{saying}@x\'@x'.format(name=target.getName(sender),saying=saying)
+			self.appendToCommandBuffer(sender, msg)
+
+			msg = '@m{name} tells you \'@y{saying}@x\'@x'.format(name=sender.getName(target),saying=saying)
+			self.appendToCommandBuffer(target, msg)
+		except self.TargetNotFoundException as e:
+			msg = 'You can\'t find them.'
+			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 commandList = [Say, Yell, Tell]

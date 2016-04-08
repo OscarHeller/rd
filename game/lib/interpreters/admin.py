@@ -38,7 +38,7 @@ class Goto(Command):
         msg = 'You must choose a valid room index.'
         self.appendToCommandBuffer(sender, msg)
     except self.CommandException as e:
-      pass
+      self.exceptionOccurred = True
 
 class CreateItem(Command):
   def __init__(self, game):
@@ -77,7 +77,7 @@ class CreateItem(Command):
         msg = 'You must choose a valid item index.'
         self.appendToCommandBuffer(sender, msg)
     except self.CommandException as e:
-      pass
+      self.exceptionOccurred = True
 
 class SpawnMobile(Command):
   def __init__(self, game):
@@ -117,7 +117,7 @@ class SpawnMobile(Command):
         msg = 'You must choose a valid mobile index.'
         self.appendToCommandBuffer(sender, msg)
     except self.CommandException as e:
-      pass
+      self.exceptionOccurred = True
 
 class PlayerList(Command):
   def __init__(self, game):
@@ -148,7 +148,7 @@ class PlayerList(Command):
         msg = 'You must choose a valid player index.'
         self.appendToCommandBuffer(sender, msg)
     except self.CommandException as e:
-      pass
+      self.exceptionOccurred = True
 
 class SetStat(Command):
   def __init__(self, game):
@@ -189,7 +189,7 @@ class SetStat(Command):
         msg = 'You must choose a valid player index.'
         self.appendToCommandBuffer(sender, msg)
     except self.CommandException as e:
-      pass
+      self.exceptionOccurred = True
 
 
 class Reload(Command):
@@ -207,7 +207,7 @@ class Reload(Command):
       msg = 'Reload complete.'
       self.appendToCommandBuffer(sender, msg)
     except self.CommandException as e:
-      pass
+      self.exceptionOccurred = True
 
 class Repop(Command):
   def __init__(self, game):
@@ -223,7 +223,7 @@ class Repop(Command):
       msg = 'Repop complete.'
       self.appendToCommandBuffer(sender, msg)
     except self.CommandException as e:
-      pass
+      self.exceptionOccurred = True
 
 class WizInfo(Command):
   def __init__(self, game):
@@ -244,6 +244,6 @@ class WizInfo(Command):
       """
       self.appendToCommandBuffer(sender, buf)
     except self.CommandException as e:
-      pass
+      self.exceptionOccurred = True
 
 commandList = [Goto, CreateItem, SpawnMobile, PlayerList, Reload, Repop, SetStat, WizInfo]

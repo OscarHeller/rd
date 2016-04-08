@@ -3,10 +3,12 @@ import lib.utility as utility
 
 
 class Command(object):
-	def __init__(self, game, key):
+	def __init__(self, game, key, comm=False):
 		self.game = game
 		self.key = key
 		self.commandBuffer = {}
+		self.comm = comm
+		self.exceptionOccurred = False
 
 	class CommandException(Exception):
 		pass
@@ -24,7 +26,7 @@ class Command(object):
 		for mobile, bufferList in self.commandBuffer.iteritems():
 			bufferString = '\n\r'.join( bufferList )
 
-			mobile.sendToClient( bufferString )
+			mobile.sendToClient( bufferString, comm=(self.comm if not self.exceptionOccurred else False) )
 
 	def appendToCommandBuffer(self, key, string):
 		if key in self.commandBuffer:

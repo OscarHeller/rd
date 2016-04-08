@@ -339,7 +339,7 @@ class Mobile:
 				self.equipment[key] = None
 
 	def startCombatWith(self, target):
-		if self.combat == target:
+		if self.combat:
 			return
 		self.combat = target
 		self.position = Position.fighting

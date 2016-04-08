@@ -32,6 +32,9 @@ class Command(object):
 	class IllegalCombatTargetException(CommandException):
 		pass
 
+	class SelfTargetableException(CommandException):
+		pass
+
 	def prepare(self):
 		self.commandBuffer = {}
 
@@ -98,3 +101,8 @@ class Command(object):
 			sender.room = newRoom
 		else:
 			raise self.NoExitsException()
+
+	def notSelfTargetable(self, target, sender):
+		if target == sender:
+			self.appendToCommandBuffer(sender, 'You can\'t target yourself with this command.')
+			raise self.SelfTargetableException()

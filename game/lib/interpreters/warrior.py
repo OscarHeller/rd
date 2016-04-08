@@ -23,6 +23,7 @@ class DirtKick(Command):
 				raise self.TargetNotFoundException()
 
 			# Target checks
+			self.notSelfTargetable(target, sender)
 			self.isLegalCombatTarget(target)
 			self.notAffectedBy(target, ['dirtkick','blind'])
 
@@ -32,16 +33,14 @@ class DirtKick(Command):
 			sender.startCombatWith(target)
 
 			affect.Affect.factory('DirtKick', sender, target, 2)
+
+			self.appendToCommandBuffer(sender, target.getCondition())
+			self.appendToCommandBuffer(target, sender.getCondition())
 		except self.SkillFailedException as e:
-			msg = 'Your clumsy kicked dirt misses {target}.'.format(target=target.getName(sender))
-			self.appendToCommandBuffer(sender, msg)
+			self.commandBuffer = combat.doDamage(self.game, sender, 0, noun='kicked dirt', target=target, combatBuffer=self.commandBuffer)
 
-			msg = '{sender}\'s clumsy kicked dirt misses you.'.format(sender=sender.getName(target))
-			self.appendToCommandBuffer(target, msg)
-
-			for mobile in [mobile for mobile in self.game.mobiles if mobile.room == target.room and mobile != sender and mobile != target]:
-				msg = '{sender}\'s clumsy kicked dirt misses {target}.'.format(sender=sender.getName(mobile),target=target.getName(mobile))
-				self.appendToCommandBuffer(mobile, msg)
+			self.appendToCommandBuffer(sender, target.getCondition())
+			self.appendToCommandBuffer(target, sender.getCondition())
 
 			sender.setLag(2)
 			sender.startCombatWith(target)
@@ -50,7 +49,7 @@ class DirtKick(Command):
 			self.appendToCommandBuffer(sender, msg)
 			self.exceptionOccurred = True
 		except self.TargetNotFoundException as e:
-			msg = 'Dirt kick whom?'
+			msg = 'You get your feet dirty.'
 			self.appendToCommandBuffer(sender, msg)
 			self.exceptionOccurred = True
 		except self.CommandException as e:
@@ -60,32 +59,60 @@ class DirtKick(Command):
 class Trip(Command):
 	def __init__(self, game):
 		super(Trip, self).__init__(game, 'trip')
-		self.canTarget = True
-		self.requireTarget = True
-		self.aggro = True
-		self.useInCombat = True
-		self.useWhileJustDied = False
-		self.targetSelf = False
 
-	def execute(self, args, config):
-		sender = config['sender']
-		target = config['target']
+	def execute(self, args, sender):
+		try:
+			# Simple checks
+			self.checkPosition(sender, [Position.standing,Position.fighting])
 
-		success = True if random.randint(0, 99) > 24 else False
-		if success:
-			senderBuf = 'You trip {target} and they go down.'.format(target=target.getName(sender))
-			targetBuf = '{sender} trips you and you go down.'.format(sender=sender.getName(target))
-			roomBuf = '{0} trips {1} and they go down.'
+			if args:
+				target = self.getTargetFromListByName(args[0], [mobile for mobile in self.game.mobiles if mobile.room == sender.room])
+			elif sender.combat:
+				target = sender.combat
+			else:
+				raise self.TargetNotFoundException()
 
-			affect.Affect.factory('Stun', sender, target, 1)
-		else:
-			senderBuf = 'Your clumsy trip misses {target}.'.format(target=target.getName(sender))
-			targetBuf = '{sender}\'s clumsy trip misses you.'.format(sender=sender.getName(target))
-			roomBuf = '{0}\'s clumsy trip misses {1}.'
+			# Target checks
+			self.notSelfTargetable(target, sender)
+			self.isLegalCombatTarget(target)
 
-		sender.sendToClient(senderBuf)
-		target.sendToClient(targetBuf)
-		sender.game.sendCondition((lambda a: a.room == sender.room and a is not sender and a is not target), roomBuf, [sender, target])
+			self.simpleSuccessCheck(0)
+
+			sender.setLag(2)
+
+			# Messaging
+			msg = 'You trip {target} and they go down.'.format(target=target.getName(sender))
+			self.appendToCommandBuffer(sender, msg)
+
+			msg = '{sender} trips you and you go down.'.format(sender=sender.getName(target))
+			self.appendToCommandBuffer(target, msg)
+
+			for mobile in [mobile for mobile in self.game.mobiles if mobile.room == target.room and mobile != sender and mobile != target]:
+				msg = '{sender} trips {target}.'.format(sender=sender.getName(mobile),target=target.getName(mobile))
+				self.appendToCommandBuffer(mobile, msg)
+
+			self.commandBuffer = combat.doDamage(self.game, sender, random.randint(1,10), noun='trip', target=target, combatBuffer=self.commandBuffer)
+
+			self.appendToCommandBuffer(sender, target.getCondition())
+			self.appendToCommandBuffer(target, sender.getCondition())
+
+			sender.startCombatWith(target)
+		except self.SelfTargetableException as e:
+			self.exceptionOccurred = True
+		except self.SkillFailedException as e:
+			self.commandBuffer = combat.doDamage(self.game, sender, 0, noun='trip', target=target, combatBuffer=self.commandBuffer)
+
+			self.appendToCommandBuffer(sender, target.getCondition())
+			self.appendToCommandBuffer(target, sender.getCondition())
+
+			sender.setLag(2)
+			sender.startCombatWith(target)
+		except self.TargetNotFoundException as e:
+			msg = 'You trip over your own feet.'
+			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 
 class Berserk(Command):

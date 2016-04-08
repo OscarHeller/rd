@@ -29,8 +29,9 @@ class Get(Command):
 		except self.TargetNotFoundException as e:
 			msg = 'You don\'t see that here.'
 			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
 		except self.CommandException as e:
-			return
+			self.exceptionOccurred = True
 
 
 class Drop(Command):
@@ -59,8 +60,9 @@ class Drop(Command):
 		except self.TargetNotFoundException as e:
 			msg = 'You\'re not carrying that.'
 			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
 		except self.CommandException as e:
-			return
+			self.exceptionOccurred = True
 
 
 class Wear(Command):
@@ -96,8 +98,9 @@ class Wear(Command):
 		except self.TargetNotFoundException as e:
 			msg = 'You\'re not carrying that.'
 			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
 		except self.CommandException as e:
-			return
+			self.exceptionOccurred = True
 
 
 class Remove(Command):
@@ -119,7 +122,8 @@ class Remove(Command):
 		except self.TargetNotFoundException as e:
 			msg = 'You\'re not wearing that.'
 			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
 		except self.CommandException as e:
-			return
+			self.exceptionOccurred = True
 
 commandList = [Wear, Get, Drop, Remove]

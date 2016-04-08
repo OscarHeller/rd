@@ -57,80 +57,8 @@ class CommandInterpreter:
 		return self.commandInterpreters + self.mobile.getCommandInterpreters()
 
 	def executeCommand(self, commandObject, args):
-		config = {}
-		config['sender'] = self.mobile
-		target = None
-
 		sender = self.mobile
 
-		# Check for minimum position.
-		currentPosition = sender.position
-
-		if currentPosition < commandObject.minPosition:
-			if currentPosition == Position.sleeping:
-				sender.sendToClient('In your dreams, or what?')
-			elif currentPosition == Position.resting:
-				sender.sendToClient('You are too relaxed.')
-			elif currentPosition == Position.standing:
-				sender.sendToClient('You aren\'t fighting anyone.')
-			return
-
-		# Check for nervous
-		if sender.isAffectedBy('just died') and commandObject.aggro:
-			sender.sendToClient('You died too recently to do that.')
-			return
-
-		# Check if it can be used in combat
-		if sender.combat and not commandObject.useInCombat:
-			sender.sendToClient('You can\'t use that in combat.')
-			return
-
-		# Do target checks here.
-		if commandObject.canTarget:
-			if len(args) <= 0:
-				# No target was supplied.
-				if commandObject.requireTarget:
-					if commandObject.aggro and sender.combat:
-						# It's an aggressive spell and you're in combat. Target the enemy.
-						target = sender.combat
-					elif not commandObject.aggro:
-						# It's a beneficial spell. You're the default target.
-						target = sender
-					else:
-						# It's an aggressive spell that requires a target and you're not in combat.
-						sender.sendToClient('You need a target.')
-						return
-				else:
-					# It doesn't require a target.
-					pass
-			else:
-				# A target was supplied. Find it by name.
-				targetName = args[0]
-
-				# Look for a target in the world
-				# FIX ME: add ability to target items
-				target = self.game.getTargetMobile(sender, targetName, commandObject.range)
-
-				if not target:
-					sender.sendToClient('You can\'t find them.')
-					return
-
-				if target == sender and not commandObject.targetSelf:
-					sender.sendToClient('You can\'t target yourself with that.')
-					return
-
-			# Now we have a target
-			config['target'] = target
-
-		# If it's an aggressive command, start combat if necessary
-		if target and commandObject.aggro:
-			sender.becomeNervous(sender)
-			target.becomeNervous(sender)
-			if not sender.combat:
-				sender.combat = target
-				sender.position = Position.fighting
-			if not target.combat:
-				target.combat = sender
-				target.position = Position.fighting
-
-		commandObject.execute(args, config)
+		commandObject.prepare()
+		commandObject.execute(args, sender)
+		commandObject.output()

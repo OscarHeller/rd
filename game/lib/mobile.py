@@ -330,4 +330,9 @@ class Mobile:
 			return self.name
 		else:
 			return 'someone'
-		
+
+	def removeItem(self, item):
+		for key, equipment in self.equipment.iteritems():
+			if equipment == item:
+				self.inventory.append(equipment)
+				self.equipment[key] = None

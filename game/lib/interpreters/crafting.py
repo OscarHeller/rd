@@ -74,7 +74,7 @@ class Craft(Command):
 			craftingBuffer += 'You receive {newItem}.'.format(newItem=newItem.name)
 			sender.sendToClient(craftingBuffer)
 		except self.CommandException as e:
-			pass
+			self.exceptionOccurred = True
 
 
 class craftingIngredient(lib.item.Item):

@@ -1,165 +1,229 @@
 import lib.utility as utility
 from lib.interpreters.command import Command
+from lib.item import Item
 
 class Goto(Command):
   def __init__(self, game):
     super(Goto, self).__init__(game, 'goto')
 
-  def execute(self, args, config):
-    sender = config['sender']
-    #quick double check here, but only immortals should even have this command
-    if len(args) <= 0:
-      # show available rooms & their 'vnum'?
-        buf = ""
-        for i in range(0, len(self.game.rooms)):
-          buf += str(i) + ": " + self.game.rooms[i].name + "\n\r"
-        sender.sendToClient(buf)
-    elif args[0].isdigit():
-      vnum = int(args[0])
-      if self.game.rooms[vnum]:
-        r = sender.room
-        sender.room = self.game.rooms[vnum]
-        sender.sendToClient("You vanish in a burst of flame.\n\rYou arrive in a burst of flame.")
-        [mobile.sendToClient(sender.name + " vanishes in a burst of flame.") for mobile in self.game.mobiles if mobile.room == r and mobile != sender]
-        [mobile.sendToClient(sender.name + " arrives in a burst of flame.") for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]
+  def execute(self, args, sender):
+    try:
+      # Preliminary checks
+
+      # Manual targeting
+      if len(args) <= 0:
+        # show available rooms & their 'vnum'?
+          buf = ""
+          for i in range(0, len(self.game.rooms)):
+            buf += str(i) + ": " + self.game.rooms[i].name + "\n\r"
+
+          self.appendToCommandBuffer(sender, buf)
+      elif args[0].isdigit():
+        vnum = int(args[0])
+        if self.game.rooms[vnum]:
+          oldRoom = sender.room
+          sender.room = self.game.rooms[vnum]
+
+          msg = 'You vanish in a flash of flame.'
+          self.appendToCommandBuffer(sender, msg)
+
+          for mobile in [mobile for mobile in self.game.mobiles if mobile.room == oldRoom and mobile != sender]:
+            msg = '{sender} vanishes in a flash of flame.'.format(sender=sender.getName(mobile))
+            self.appendToCommandBuffer(mobile, msg)
+
+          for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]:
+            msg = '{sender} appears in a flash of flame.'.format(sender=sender.getName(mobile))
+            self.appendToCommandBuffer(mobile, msg)
+      else:
+        msg = 'You must choose a valid room index.'
+        self.appendToCommandBuffer(sender, msg)
+    except self.CommandException as e:
+      pass
 
 class CreateItem(Command):
   def __init__(self, game):
     super(CreateItem, self).__init__(game, 'createitem')
 
-  def execute(self, args, config):
-    sender = config['sender']
-    if len(args) <= 0:
-      # show available rooms & their 'vnum'?
-      i_keys = self.game.items.keys()
-      buf = ""
-      for i in range(0, len(i_keys)):
-        item = self.game.items[i_keys[i]]
-        buf += str(i) + ": " + item['name'] + "\n\r"
-      sender.sendToClient(buf)
-    elif args[0].isdigit():
-      from lib.item import Item
+  def execute(self, args, sender):
+    try:
+      # Preliminary checks
 
-      i_keys = self.game.items.keys()
-      vnum = int(args[0])
-      key = i_keys[vnum] if vnum < len(i_keys) else "bafdlasdfa"
-      if key in self.game.items:
-        r = sender.room
-        item = Item(self.game.items[key])
-        sender.room.items.append(item)
-        sender.sendToClient("You create a " + item.name)
-        [mobile.sendToClient(sender.name + " creates a " + item.name) for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]
+      if len(args) <= 0:
+        # show available rooms & their 'vnum'?
+        i_keys = self.game.items.keys()
+        buf = ""
+        for i in range(0, len(i_keys)):
+          item = self.game.items[i_keys[i]]
+          buf += str(i) + ": " + item['name'] + "\n\r"
+
+        self.appendToCommandBuffer(sender, buf)
+      elif args[0].isdigit():
+
+        i_keys = self.game.items.keys()
+        vnum = int(args[0])
+        key = i_keys[vnum] if vnum < len(i_keys) else "bafdlasdfa"
+        if key in self.game.items:
+          r = sender.room
+          item = Item(self.game.items[key])
+          sender.room.items.append(item)
+
+          msg = 'You create {item}.'.format(item=item.getName(sender))
+          self.appendToCommandBuffer(sender, msg)
+
+          for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]:
+            msg = '{sender} creates {item}.'.format(sender=sender.getName(mobile),item=item.getName(mobile))
+            self.appendToCommandBuffer(mobile, msg)
+      else:
+        msg = 'You must choose a valid item index.'
+        self.appendToCommandBuffer(sender, msg)
+    except self.CommandException as e:
+      pass
 
 class SpawnMobile(Command):
   def __init__(self, game):
     super(SpawnMobile, self).__init__(game, 'spawnmobile')
 
-  def execute(self, args, config):
-    sender = config['sender']
-    #quick double check here, but only immortals should even have this command
-    if len(args) <= 0:
-      # show available rooms & their 'vnum'?
-      i_keys = self.game.mobile_list.keys()
-      buf = ""
-      for i in range(0, len(i_keys)):
-        mobile = self.game.mobile_list[i_keys[i]]
-        buf += str(i) + ": " + mobile["name"] + "\n\r"
-      sender.sendToClient(buf)
-    elif args[0].isdigit():
-      from lib.mobile import Mobile
+  def execute(self, args, sender):
+    try:
+      #quick double check here, but only immortals should even have this command
+      if len(args) <= 0:
+        # show available rooms & their 'vnum'?
+        i_keys = self.game.mobile_list.keys()
+        buf = ""
+        for i in range(0, len(i_keys)):
+          mobile = self.game.mobile_list[i_keys[i]]
+          buf += str(i) + ": " + mobile["name"] + "\n\r"
 
-      i_keys = self.game.mobile_list.keys()
-      vnum = int(args[0])
-      key = i_keys[vnum] if vnum < len(i_keys) else "bafdlasdfa"
-      if key in self.game.mobile_list:
-        i = self.game.mobile_list[key]
-        m = Mobile(i['name'], self.game, i)
-        m.room = sender.room
-        self.game.mobiles.append(m)
-        sender.sendToClient("You spawn a " + m.name)
-        [mobile.sendToClient(sender.name + " spawn a " + m.name) for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]
+        self.appendToCommandBuffer(sender, buf)
+      elif args[0].isdigit():
+        from lib.mobile import Mobile
+
+        i_keys = self.game.mobile_list.keys()
+        vnum = int(args[0])
+        key = i_keys[vnum] if vnum < len(i_keys) else "bafdlasdfa"
+        if key in self.game.mobile_list:
+          i = self.game.mobile_list[key]
+          m = Mobile(i['name'], self.game, i)
+          m.room = sender.room
+          self.game.mobiles.append(m)
+
+          msg = "You spawn {mobile}.".format(mobile=m.getName(sender))
+          self.appendToCommandBuffer(sender, msg)
+
+          for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]:
+            msg = "{sender} spawns {mobile}.".format(sender=sender.getName(mobile),mobile=m.getName(mobile))
+            self.appendToCommandBuffer(mobile, msg)
+      else:
+        msg = 'You must choose a valid mobile index.'
+        self.appendToCommandBuffer(sender, msg)
+    except self.CommandException as e:
+      pass
 
 class PlayerList(Command):
   def __init__(self, game):
     super(PlayerList, self).__init__(game, 'playerlist')
 
-  def execute(self, args, config):
-    sender = config['sender']
-    #quick double check here, but only immortals should even have this command
-    if len(args) <= 0:
-      buf = "Players: \n\r"
-      players = [mobile for mobile in self.game.mobiles if mobile.client]
-      for i in range(0, len(players)):
-        buf += str(i) + ": " + players[i].name + "\n\r"
-      sender.sendToClient(buf)
-    elif args[0].isdigit():
-      players = [mobile for mobile in self.game.mobiles if mobile.client]
-      vnum = int(args.pop(0))
-      #args.remove(0)
-      if vnum < len(players):
-        player = players[vnum]
-        if len(args) == 0:
-          sender.sendToClient(player.name)
-        else:
-          player.processCommand(" ".join(args))
+  def execute(self, args, sender):
+    try:
+      #quick double check here, but only immortals should even have this command
+      if len(args) <= 0:
+        buf = "Players: \n\r"
+        players = [mobile for mobile in self.game.mobiles if mobile.client]
+        for i in range(0, len(players)):
+          buf += str(i) + ": " + players[i].name + "\n\r"
+
+        self.appendToCommandBuffer(sender, buf)
+      elif args[0].isdigit():
+        players = [mobile for mobile in self.game.mobiles if mobile.client]
+        vnum = int(args.pop(0))
+        #args.remove(0)
+        if vnum < len(players):
+          player = players[vnum]
+          if len(args) == 0:
+            msg = '{player}'.format(player=player.getName(sender))
+            self.appendToCommandBuffer(sender, msg)
+          else:
+            player.processCommand(" ".join(args))
+      else:
+        msg = 'You must choose a valid player index.'
+        self.appendToCommandBuffer(sender, msg)
+    except self.CommandException as e:
+      pass
 
 class SetStat(Command):
   def __init__(self, game):
     super(SetStat, self).__init__(game, 'setstat')
 
-  def execute(self, args, config):
-    sender = config['sender']
-    #quick double check here, but only immortals should even have this command
-    if len(args) <= 0:
-      buf = "Players: \n\r"
-      players = [mobile for mobile in self.game.mobiles if mobile.client]
-      for i in range(0, len(players)):
-        buf += str(i) + ": " + players[i].name + "\n\r"
-      sender.sendToClient(buf)
-    elif args[0].isdigit():
-      players = [mobile for mobile in self.game.mobiles if mobile.client]
-      vnum = int(args.pop(0))
-      #args.remove(0)
-      if vnum < len(players):
-        player = players[vnum]
-        if len(args) >= 2:
-          if args[0] in player.stats:
-            player.stats[args[0]] = args[1]
-        else:
-          sender.sendToClient("Stats:\n\r" + "\n\r".join([str(key) + ": " + str(value) for key, value in player.stats.iteritems()]))
+  def execute(self, args, sender):
+    try:
+      #quick double check here, but only immortals should even have this command
+      if len(args) <= 0:
+        buf = "Players: \n\r"
+        players = [mobile for mobile in self.game.mobiles if mobile.is_player]
+        for i in range(0, len(players)):
+          buf += str(i) + ": " + players[i].name + "\n\r"
+
+        self.appendToCommandBuffer(sender, buf)
+      elif args[0].isdigit():
+        players = [mobile for mobile in self.game.mobiles if mobile.is_player]
+        vnum = int(args.pop(0))
+        #args.remove(0)
+        if vnum < len(players):
+          player = players[vnum]
+          if len(args) >= 2:
+            if args[0] in player.stats:
+              player.stats[args[0]] = args[1]
+
+              msg = 'You set {player}\'s {stat} to {value}.'.format(player=player.getName(sender),stat=args[0],value=args[1])
+              self.appendToCommandBuffer(sender, msg)
+
+              msg = '{sender} set your {stat} to {value}.'.format(sender=sender.getName(player),stat=args[0],value=args[1])
+              self.appendToCommandBuffer(player, msg)
+            else:
+              msg = 'That\'s not a valid stat.'
+              self.appendToCommandBuffer(sender, msg)
+          else:
+            msg = "Stats:\n\r" + "\n\r".join([str(key) + ": " + str(value) for key, value in player.stats.iteritems()])
+            self.appendToCommandBuffer(sender, msg)
+      else:
+        msg = 'You must choose a valid player index.'
+        self.appendToCommandBuffer(sender, msg)
+    except self.CommandException as e:
+      pass
 
 
 class Reload(Command):
   def __init__(self, game):
     super(Reload, self).__init__(game, 'reload')
 
-  def execute(self, args, config):
-    sender = config['sender']
-    sender.sendToClient('reloading...')
-    #[mobile.sendToClient('reloading objects... started') for mobile in self.game.mobiles]
+  def execute(self, args, sender):
+    msg = 'Reload started.'
+    self.appendToCommandBuffer(sender, msg)
+
     self.game.loadItems()
     self.game.loadMobiles()
-    sender.sendToClient('...done!')
-    #[mobile.sendToClient('reloading objects... done') for mobile in self.game.mobiles]    
+
+    msg = 'Reload complete.'
+    self.appendToCommandBuffer(sender, msg)
 
 class Repop(Command):
   def __init__(self, game):
     super(Repop, self).__init__(game, 'repop')
 
-  def execute(self, args, config):
-    sender = config['sender']
-    #[mobile.sendToClient('repopulating rooms... started') for mobile in self.game.mobiles]
-    sender.sendToClient('reloading...')
+  def execute(self, args, sender):
+    msg = 'Repop started.'
+    self.appendToCommandBuffer(sender, msg)
+
     self.game.repopulate()
-    sender.sendToClient('...done')
-    #[mobile.sendToClient('repopulating rooms... done') for mobile in self.game.mobiles]
+
+    msg = 'Repop complete.'
+    self.appendToCommandBuffer(sender, msg)
 
 class WizInfo(Command):
   def __init__(self, game):
     super(WizInfo, self).__init__(game, 'wizinfo')
 
-  def execute(self, args, config):
-    sender = config['sender']
+  def execute(self, args, sender):
     buf = """
       <b>Commands</b>: (1) (2) (...) description (with 1) (with 2) (...)\n\r
       -----------------------------------------------------\n\r
@@ -171,6 +235,6 @@ class WizInfo(Command):
       <b>Repop</b>: repopulate rooms with items/npcs/exits as defined in database\n\r
       <b>WizInfo</b>: you're looking at it
     """
-    sender.sendToClient(buf)
+    self.appendToCommandBuffer(sender, buf)
 
 commandList = [Goto, CreateItem, SpawnMobile, PlayerList, Reload, Repop, SetStat, WizInfo]

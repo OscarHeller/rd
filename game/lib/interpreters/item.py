@@ -1,7 +1,6 @@
 import lib.utility as utility
 from lib.interpreters.command import Command
 from lib.interpreters.constants import Position
-import lib.interpreters.helper as helper
 
 
 class Get(Command):

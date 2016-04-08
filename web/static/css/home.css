@@ -53,7 +53,7 @@ a, a:visited, a:hover {
 
 .menus h1 {
 	position: absolute;
-	bottom: 0;
+	bottom: 10px;
 }
 
 .menus a:last-child h1 {

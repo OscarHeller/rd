@@ -22,9 +22,11 @@ class Test(Command):
 	def __init__(self, game):
 		super(Test, self).__init__(game, 'test')
 
-	def execute(self, args, config):
-		sender = config['sender']
-		sender.setStat('charges', max(0, sender.getStat('charges') - 1) )
-		affect.Affect.factory('Blind', sender, sender, 500)
+	def execute(self, args, sender):
+		try:
+			sender.setStat('charges', max(0, sender.getStat('charges') - 1) )
+			affect.Affect.factory('Blind', sender, sender, 500)
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 commandList = [Test]

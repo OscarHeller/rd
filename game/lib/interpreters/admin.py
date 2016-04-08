@@ -197,44 +197,53 @@ class Reload(Command):
     super(Reload, self).__init__(game, 'reload')
 
   def execute(self, args, sender):
-    msg = 'Reload started.'
-    self.appendToCommandBuffer(sender, msg)
+    try:
+      msg = 'Reload started.'
+      self.appendToCommandBuffer(sender, msg)
 
-    self.game.loadItems()
-    self.game.loadMobiles()
+      self.game.loadItems()
+      self.game.loadMobiles()
 
-    msg = 'Reload complete.'
-    self.appendToCommandBuffer(sender, msg)
+      msg = 'Reload complete.'
+      self.appendToCommandBuffer(sender, msg)
+    except self.CommandException as e:
+      pass
 
 class Repop(Command):
   def __init__(self, game):
     super(Repop, self).__init__(game, 'repop')
 
   def execute(self, args, sender):
-    msg = 'Repop started.'
-    self.appendToCommandBuffer(sender, msg)
+    try:
+      msg = 'Repop started.'
+      self.appendToCommandBuffer(sender, msg)
 
-    self.game.repopulate()
+      self.game.repopulate()
 
-    msg = 'Repop complete.'
-    self.appendToCommandBuffer(sender, msg)
+      msg = 'Repop complete.'
+      self.appendToCommandBuffer(sender, msg)
+    except self.CommandException as e:
+      pass
 
 class WizInfo(Command):
   def __init__(self, game):
     super(WizInfo, self).__init__(game, 'wizinfo')
 
   def execute(self, args, sender):
-    buf = """
-      <b>Commands</b>: (1) (2) (...) description (with 1) (with 2) (...)\n\r
-      -----------------------------------------------------\n\r
-      <b>Goto</b>: (i) display list of rooms (go to room by i)\n\r
-      <b>CreateItem</b>: (i) display list of items (create item by i)\n\r
-      <b>SpawnMobile</b>: (i) display list of npc mobiles (create mobile by i)\n\r
-      <b>PlayerList</b>: (i) (c) display list of players (player info by i) (player[i] execute 'c')\n\r
-      <b>Reload</b>: reload item/mobile lists from database\n\r
-      <b>Repop</b>: repopulate rooms with items/npcs/exits as defined in database\n\r
-      <b>WizInfo</b>: you're looking at it
-    """
-    self.appendToCommandBuffer(sender, buf)
+    try:
+      buf = """
+        <b>Commands</b>: (1) (2) (...) description (with 1) (with 2) (...)\n\r
+        -----------------------------------------------------\n\r
+        <b>Goto</b>: (i) display list of rooms (go to room by i)\n\r
+        <b>CreateItem</b>: (i) display list of items (create item by i)\n\r
+        <b>SpawnMobile</b>: (i) display list of npc mobiles (create mobile by i)\n\r
+        <b>PlayerList</b>: (i) (c) display list of players (player info by i) (player[i] execute 'c')\n\r
+        <b>Reload</b>: reload item/mobile lists from database\n\r
+        <b>Repop</b>: repopulate rooms with items/npcs/exits as defined in database\n\r
+        <b>WizInfo</b>: you're looking at it
+      """
+      self.appendToCommandBuffer(sender, buf)
+    except self.CommandException as e:
+      pass
 
 commandList = [Goto, CreateItem, SpawnMobile, PlayerList, Reload, Repop, SetStat, WizInfo]

@@ -121,6 +121,8 @@ class North(Command):
 
 	def execute(self, args, sender):
 		try:
+			self.checkPosition(sender, [Position.standing,])
+
 			oldRoom = sender.room
 
 			self.move(sender, 'north')
@@ -152,6 +154,8 @@ class South(Command):
 
 	def execute(self, args, sender):
 		try:
+			self.checkPosition(sender, [Position.standing,])
+
 			oldRoom = sender.room
 
 			self.move(sender, 'south')
@@ -183,6 +187,8 @@ class East(Command):
 
 	def execute(self, args, sender):
 		try:
+			self.checkPosition(sender, [Position.standing,])
+
 			oldRoom = sender.room
 
 			self.move(sender, 'east')
@@ -214,6 +220,8 @@ class West(Command):
 
 	def execute(self, args, sender):
 		try:
+			self.checkPosition(sender, [Position.standing,])
+
 			oldRoom = sender.room
 
 			self.move(sender, 'west')
@@ -245,6 +253,8 @@ class Up(Command):
 
 	def execute(self, args, sender):
 		try:
+			self.checkPosition(sender, [Position.standing,])
+
 			oldRoom = sender.room
 
 			self.move(sender, 'up')
@@ -276,6 +286,8 @@ class Down(Command):
 
 	def execute(self, args, sender):
 		try:
+			self.checkPosition(sender, [Position.standing,])
+
 			oldRoom = sender.room
 
 			self.move(sender, 'down')

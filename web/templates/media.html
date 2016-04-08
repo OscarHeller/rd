@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block head %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+{% end %}
+{% block body %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-4">
+      <h1>Select & Upload</h1>
+      <form class='' enctype="multipart/form-data" method="post">
+        <label for="" class="control-label">File:</label> <input class='form-control' type="file" name="filearg" /><br /><br />
+        <input type="submit" value="upload" class='btn btn-primary' />
+      </form>
+    </div>
+  </div>
+</div>
+
+{% end %}

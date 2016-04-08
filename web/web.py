@@ -4,8 +4,7 @@ import tornado.web
 from pymongo import MongoClient
 import os
 
-from handlers import home, client, authlogin, authlogout, authcreate, playercreate, editor, error
-
+from handlers import home, client, authlogin, authlogout, authcreate, playercreate, editor, error, media
 
 class Application(tornado.web.Application):
 	def __init__(self):
@@ -22,7 +21,8 @@ class Application(tornado.web.Application):
 			(r'/auth/logout', authlogout.AuthLogoutHandler, {'db': self.db}),
 			(r'/auth/create', authcreate.AuthCreateHandler, {'db': self.db}),
 			(r'/player/create', playercreate.PlayerCreateHandler, {'db': self.db}),
-			(r'/editor', editor.EditorHandler, {'db': self.db})
+			(r'/editor', editor.EditorHandler, {'db': self.db}),
+			(r'/media', media.MediaHandler, {'db': self.db})
 		]
 
 		settings = dict(

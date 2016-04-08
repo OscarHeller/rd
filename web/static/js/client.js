@@ -150,6 +150,9 @@ function parseServerResponse(data) {
     if ( data.room.hasOwnProperty('desc') ) {
       $('.room-desc').html( data.room.desc );
     }
+    if ( data.room.hasOwnProperty('exits') ) {
+      $('.room-exits').html( "[ " + data.room.exits.join(" ") + " ]" );
+    }
 
     if ( data.room.hasOwnProperty('bg') && data.room.bg ) {
       console.log('Background image found: ' + data.room.bg);
@@ -157,16 +160,16 @@ function parseServerResponse(data) {
     }
 
     if ( data.room.hasOwnProperty('mobiles') ) {
-      $('.room > .room-info > ul').empty();
+      $('.room-objects').empty();
       $.each(data.room.mobiles, function(key, value) {
-        $('.room > .room-info > ul').append('<li>' + value + '</li>');
+        $('.room-objects').append('<li>' + value + '</li>');
       });
     }
 
     if ( data.room.hasOwnProperty('items') ) {
-      $('.room > .room-info > ul').append('<br>');
+      $('.room-objects').append('<br>');
       $.each(data.room.items, function(key, value) {
-        $('.room > .room-info > ul').append('<li>' + value + '</li>');
+        $('.room-objects').append('<li>' + value + '</li>');
       });
     }
   }

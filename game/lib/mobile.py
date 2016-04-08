@@ -225,7 +225,8 @@ class Mobile:
 				'desc' : self.room.desc,
 				'mobiles' : inroom_mobiles,
 				'items' : inroom_items,
-				'bg' : self.room.bg
+				'bg' : self.room.bg,
+				'exits': [exit.key for exit in self.room.exits]
 			}
 
 			data['player'] = {

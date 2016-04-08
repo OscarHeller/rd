@@ -140,6 +140,7 @@ class North(Command):
 			sender.setLag(1)
 		except self.NoExitsException as e:
 			msg = 'You can\'t go that way.'
+			self.exceptionOccurred = True
 			self.appendToCommandBuffer(sender, msg)
 		except self.CommandException as e:
 			self.exceptionOccurred = True
@@ -170,6 +171,7 @@ class South(Command):
 			sender.setLag(1)
 		except self.NoExitsException as e:
 			msg = 'You can\'t go that way.'
+			self.exceptionOccurred = True
 			self.appendToCommandBuffer(sender, msg)
 		except self.CommandException as e:
 			self.exceptionOccurred = True
@@ -200,6 +202,7 @@ class East(Command):
 			sender.setLag(1)
 		except self.NoExitsException as e:
 			msg = 'You can\'t go that way.'
+			self.exceptionOccurred = True
 			self.appendToCommandBuffer(sender, msg)
 		except self.CommandException as e:
 			self.exceptionOccurred = True
@@ -230,6 +233,7 @@ class West(Command):
 			sender.setLag(1)
 		except self.NoExitsException as e:
 			msg = 'You can\'t go that way.'
+			self.exceptionOccurred = True
 			self.appendToCommandBuffer(sender, msg)
 		except self.CommandException as e:
 			self.exceptionOccurred = True
@@ -261,6 +265,7 @@ class Up(Command):
 		except self.NoExitsException as e:
 			msg = 'You can\'t go that way.'
 			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
 		except self.CommandException as e:
 			self.exceptionOccurred = True
 
@@ -291,6 +296,7 @@ class Down(Command):
 		except self.NoExitsException as e:
 			msg = 'You can\'t go that way.'
 			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
 		except self.CommandException as e:
 			self.exceptionOccurred = True
 

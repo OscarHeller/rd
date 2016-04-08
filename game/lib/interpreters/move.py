@@ -95,8 +95,10 @@ class Kill(Command):
 				self.appendToCommandBuffer(sender, msg)
 				return
 
-			sender.setLag(3)			
+			sender.setLag(3)
 			sender.startCombatWith(target)
+			if target.is_player:
+				target.processCommand('yell Help! I am being attacked by {sender}!'.format(sender=sender.getName(target)))
 
 			# sender does one full round against target
 			combatBuffer = {}

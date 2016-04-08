@@ -6,50 +6,55 @@ from lib.interpreters.command import Command
 from lib.interpreters.constants import Position
 
 
-"""
-Command Attributes;
-attribute (default): description
-
-aggro				(False)				: does it start combat?
-canTarget			(False)				: can it take an automatic single target?
-requireTarget		(False)				: does it require a target?
-useInCombat			(False)				: can you use it in combat?
-useWhileJustDied	(True)				: can you use it immediately after dying?
-targetSelf			(True)				: can you target yourself?
-Range				(Range.room)		: for skills that canTarget, what is the range of potential targets?
-minPosition			(Position.standing)	: what is the minimum position as defined in constants.py?
-"""
-
-
 class DirtKick(Command):
 	def __init__(self, game):
 		super(DirtKick, self).__init__(game, 'dirtkick')
-		self.canTarget = True
-		self.requireTarget = True
-		self.aggro = True
-		self.useInCombat = True
-		self.useWhileJustDied = False
-		self.targetSelf = False
 
-	def execute(self, args, config):
-		sender = config['sender']
-		target = config['target']
+	def execute(self, args, sender):
+		try:
+			# Simple checks
+			self.checkPosition(sender, [Position.standing,Position.fighting])
 
-		if target.isAffectedBy('dirtkick') or target.isAffectedBy('blind'):
-			sender.sendToClient('They are already blinded.')
-			return
+			if args:
+				target = self.getTargetFromListByName(args[0], [mobile for mobile in self.game.mobiles if mobile.room == sender.room])
+			elif sender.combat:
+				target = sender.combat
+			else:
+				raise self.TargetNotFoundException()
 
-		success = True if random.randint(0, 99) > 50 else False
-		if success:
+			# Target checks
+			self.isLegalCombatTarget(target)
+			self.notAffectedBy(target, ['dirtkick','blind'])
+
+			self.simpleSuccessCheck(50)
+
+			sender.setLag(2)
+			sender.startCombatWith(target)
+
 			affect.Affect.factory('DirtKick', sender, target, 2)
-		else:
-			senderBuf = 'Your clumsy kicked dirt misses {target}.'.format(target=target.getName(sender))
-			targetBuf = '{sender}\'s clumsy kicked dirt misses you.'.format(sender=sender.getName(sender))
-			roomBuf = '{0}\'s clumsy kicked dirt misses {1}.'
+		except self.SkillFailedException as e:
+			msg = 'Your clumsy kicked dirt misses {target}.'.format(target=target.getName(sender))
+			self.appendToCommandBuffer(sender, msg)
 
-			sender.sendToClient(senderBuf)
-			target.sendToClient(targetBuf)
-			sender.game.sendCondition((lambda a: a.room == sender.room and a is not sender and a is not target), roomBuf, [sender, target])
+			msg = '{sender}\'s clumsy kicked dirt misses you.'.format(sender=sender.getName(target))
+			self.appendToCommandBuffer(target, msg)
+
+			for mobile in [mobile for mobile in self.game.mobiles if mobile.room == target.room and mobile != sender and mobile != target]:
+				msg = '{sender}\'s clumsy kicked dirt misses {target}.'.format(sender=sender.getName(mobile),target=target.getName(mobile))
+				self.appendToCommandBuffer(mobile, msg)
+
+			sender.setLag(2)
+			sender.startCombatWith(target)
+		except self.AffectException as e:
+			msg = 'They are already blinded.'
+			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
+		except self.TargetNotFoundException as e:
+			msg = 'Dirt kick whom?'
+			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 
 class Trip(Command):

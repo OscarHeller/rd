@@ -26,6 +26,12 @@ class Command(object):
 	class NoArgumentsException(CommandException):
 		pass
 
+	class AffectException(CommandException):
+		pass
+
+	class IllegalCombatTargetException(CommandException):
+		pass
+
 	def prepare(self):
 		self.commandBuffer = {}
 
@@ -75,6 +81,15 @@ class Command(object):
 	def hasAtLeastOneArgument(self, args):
 		if not args:
 			raise self.NoArgumentsException()
+
+	def notAffectedBy(self, target, affects):
+		for affect in affects:
+			if affect in target.affects:
+				raise AffectException()
+
+	def isLegalCombatTarget(self, target):
+		if target.isAffectedBy('just died'):
+			raise self.IllegalCombatTargetException()
 
 	def move(self, sender, direction):
 		newRoom = next((exit.destination for exit in sender.room.exits if exit.key == direction), None)

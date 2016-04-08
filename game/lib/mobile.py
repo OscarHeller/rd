@@ -339,11 +339,10 @@ class Mobile:
 				self.equipment[key] = None
 
 	def startCombatWith(self, target):
+		if self.combat == target:
+			return
 		self.combat = target
 		self.position = Position.fighting
 		if target.combat is None:
 			target.combat = self
 			target.position = Position.fighting
-			# if target.client:
-		if target.is_player:
-			target.processCommand('yell Help! I am being attacked by {sender}!'.format(sender=self.getName(target)))

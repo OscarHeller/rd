@@ -53,6 +53,7 @@ class Tell(Command):
 		try:
 			# Preliminary checks
 			self.checkPosition(sender, [Position.standing, Position.resting, Position.fighting])
+			self.hasAtLeastOneArgument(args)
 
 			target = self.getTargetFromListByName(args[0], [mobile for mobile in self.game.mobiles if mobile.is_player])
 
@@ -69,6 +70,10 @@ class Tell(Command):
 
 			msg = '@m{name} tells you \'@y{saying}@x\'@x'.format(name=sender.getName(target),saying=saying)
 			self.appendToCommandBuffer(target, msg)
+		except self.NoArgumentsException as e:
+			msg = 'Whom do you want to talk to?'
+			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
 		except self.TargetNotFoundException as e:
 			msg = 'You can\'t find them.'
 			self.appendToCommandBuffer(sender, msg)

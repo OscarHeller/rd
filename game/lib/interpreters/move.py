@@ -1,7 +1,6 @@
 import lib.utility as utility
 from lib.interpreters.command import Command
 from lib.interpreters.constants import Position, Range
-from comm import Yell
 import lib.combat as combat
 import random
 
@@ -24,24 +23,19 @@ minPosition			(Position.standing)	: what is the minimum position as defined in c
 class Flee(Command):
 	def __init__(self, game):
 		super(Flee, self).__init__(game, 'flee')
-		self.minPosition = Position.fighting
-		self.useInCombat = True
 
-	def execute(self, args, config):
-		sender = config['sender']
-		aggro = sender.combat
+	def execute(self, args, sender):
+		try:
+			# Preliminary checks
+			self.checkPosition(sender, [Position.fighting,])
 
-		exits = sender.room.exits
+			aggro = sender.combat
+			exits = sender.room.exits
 
-		if random.randrange(0,100) > 75 or len(exits) == 0:
-			sender.sendToClient('PANIC! You can\'t escape!')
-			sender.setLag(1)
+			# Complex checks
+			self.areThereAnyExits(sender.room)
+			self.simpleSuccessCheck(25)
 
-			for mobile in [ mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender ]:
-				mobile.sendToClient('{sender} tries to flee, but fails.'.format(sender=sender.getName(mobile)))
-
-			return
-		else:
 			exit = random.choice(exits)
 			newRoom = exit.destination
 			oldRoom = sender.room
@@ -54,128 +48,250 @@ class Flee(Command):
 			sender.position = Position.standing
 			sender.room = newRoom
 
-			sender.sendToClient('You flee from combat!\n\r')
+			msg = 'You flee from combat!'
+			self.appendToCommandBuffer(sender, msg)
 
 			for mobile in [ mobile for mobile in self.game.mobiles if mobile.room == oldRoom and mobile != sender ]:
-				mobile.sendToClient( '{name} has fled!\n\r{name} leaves {direction}.'.format(name=sender.getName(mobile),direction=direction))
+				msg = '{name} has fled!\n\r{name} leaves {direction}.'.format(name=sender.getName(mobile),direction=direction)
+				self.appendToCommandBuffer(mobile, msg)
 			for mobile in [ mobile for mobile in self.game.mobiles if mobile.room == newRoom and mobile != sender ]:
-				mobile.sendToClient( '{name} has arrived.'.format(name=sender.getName(mobile)))
+				msg = '{name} has arrived.'.format(name=sender.getName(mobile))
+				self.appendToCommandBuffer(mobile, msg)
+		except (self.SkillFailedException, self.NoExitsException) as e:
+			msg = 'PANIC! You can\'t escape!'
+			self.appendToCommandBuffer(sender, msg)
+
+			sender.setLag(1)
+
+			for mobile in [ mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender ]:
+				msg = '{sender} tries to flee, but fails.'.format(sender=sender.getName(mobile))
+				self.appendToCommandBuffer(mobile, msg)
+		except self.CommandException as e:
+			self.exceptionOccurred = True
+
 
 
 
 class Kill(Command):
 	def __init__(self, game):
 		super(Kill, self).__init__(game, 'kill')
-		self.aggro = True
 
-	def execute(self, args, config):
-		sender = config['sender']
+	def execute(self, args, sender):
+		try:
+			# Preliminary checks
+			self.checkPosition(sender, [Position.standing,])
+			self.hasAtLeastOneArgument(args)
 
-		targets = [ mobile for mobile in self.game.mobiles if mobile.room == sender.room and utility.match( args[0], mobile.getName() ) ]
-		if not targets:
-			sender.sendToClient('You can\'t find them.')
-			return
-		else:
-			target = targets[0]
+			# Automatic targeting
+			target = self.getTargetFromListByName(args[0], [mobile for mobile in self.game.mobiles if mobile.room == sender.room])
 
-		if target == sender:
-			sender.sendToClient('Suicide is a mortal sin.')
-			return
+			if target == sender:
+				msg = 'Suicide is a mortal sin.'
+				self.appendToCommandBuffer(sender, msg)
+				return
 
-		if target.isAffectedBy('just died'):
-			sender.sendToClient('They died too recently to attack them.')
-			return
+			if target.isAffectedBy('just died'):
+				msg = 'They died too recently to attack them.'
+				self.appendToCommandBuffer(sender, msg)
+				return
 
-		sender.combat = target
-		sender.position = Position.fighting
-		sender.setLag(3)
-		if target.combat is None:
-			target.combat = sender
-			target.position = Position.fighting
-			# if target.client:
-			yell = Yell(self.game)
-			yell.execute(['Help! I am being attacked by {sender}!'.format(sender=sender.getName())], {'sender': target})
+			sender.setLag(3)			
+			sender.startCombatWith(target)
+
 			# sender does one full round against target
 			combatBuffer = {}
 			combatBuffer = combat.doSingleRound(sender.game, sender, combatBuffer=combatBuffer)
 			combat.appendConditionsToCombatBuffer(combatBuffer)
 			combat.sendCombatBuffer(self.game, combatBuffer)
+		except self.TargetNotFoundException as e:
+			msg = 'You can\'t find them.'
+			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
+		except self.NoArgumentsException as e:
+			msg = 'Kill whom?'
+			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 
 class North(Command):
 	def __init__(self, game):
 		super(North, self).__init__(game, 'north')
 
-	def execute(self, args, config):
-		sender = config['sender']
+	def execute(self, args, sender):
+		try:
+			oldRoom = sender.room
 
-		move(self.game, 'north', sender)
+			self.move(sender, 'north')
+
+			msg = 'You leave north.'
+			self.appendToCommandBuffer(sender, msg)
+
+			if not sender.isAffectedBy('sneak'):
+				for mobile in [mobile for mobile in self.game.mobiles if mobile.room == oldRoom]:
+					msg = '{sender} leaves north.'.format(sender=sender)
+					self.appendToCommandBuffer(mobile, msg)
+
+				for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]:
+					msg = '{sender} has arrived.'.format(sender=sender)
+					self.appendToCommandBuffer(mobile, msg)
+
+			sender.setLag(1)
+		except self.NoExitsException as e:
+			msg = 'You can\'t go that way.'
+			self.appendToCommandBuffer(sender, msg)
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 
 class South(Command):
 	def __init__(self, game):
 		super(South, self).__init__(game, 'south')
 
-	def execute(self, args, config):
-		sender = config['sender']
+	def execute(self, args, sender):
+		try:
+			oldRoom = sender.room
 
-		move(self.game, 'south', sender)
+			self.move(sender, 'south')
+
+			msg = 'You leave south.'
+			self.appendToCommandBuffer(sender, msg)
+
+			if not sender.isAffectedBy('sneak'):
+				for mobile in [mobile for mobile in self.game.mobiles if mobile.room == oldRoom]:
+					msg = '{sender} leaves south.'.format(sender=sender)
+					self.appendToCommandBuffer(mobile, msg)
+
+				for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]:
+					msg = '{sender} has arrived.'.format(sender=sender)
+					self.appendToCommandBuffer(mobile, msg)
+
+			sender.setLag(1)
+		except self.NoExitsException as e:
+			msg = 'You can\'t go that way.'
+			self.appendToCommandBuffer(sender, msg)
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 
 class East(Command):
 	def __init__(self, game):
 		super(East, self).__init__(game, 'east')
 
-	def execute(self, args, config):
-		sender = config['sender']
+	def execute(self, args, sender):
+		try:
+			oldRoom = sender.room
 
-		move(self.game, 'east', sender)
+			self.move(sender, 'east')
+
+			msg = 'You leave east.'
+			self.appendToCommandBuffer(sender, msg)
+
+			if not sender.isAffectedBy('sneak'):
+				for mobile in [mobile for mobile in self.game.mobiles if mobile.room == oldRoom]:
+					msg = '{sender} leaves east.'.format(sender=sender)
+					self.appendToCommandBuffer(mobile, msg)
+
+				for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]:
+					msg = '{sender} has arrived.'.format(sender=sender)
+					self.appendToCommandBuffer(mobile, msg)
+
+			sender.setLag(1)
+		except self.NoExitsException as e:
+			msg = 'You can\'t go that way.'
+			self.appendToCommandBuffer(sender, msg)
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 
 class West(Command):
 	def __init__(self, game):
 		super(West, self).__init__(game, 'west')
 
-	def execute(self, args, config):
-		sender = config['sender']
+	def execute(self, args, sender):
+		try:
+			oldRoom = sender.room
 
-		move(self.game, 'west', sender)
+			self.move(sender, 'west')
+
+			msg = 'You leave west.'
+			self.appendToCommandBuffer(sender, msg)
+
+			if not sender.isAffectedBy('sneak'):
+				for mobile in [mobile for mobile in self.game.mobiles if mobile.room == oldRoom]:
+					msg = '{sender} leaves west.'.format(sender=sender)
+					self.appendToCommandBuffer(mobile, msg)
+
+				for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]:
+					msg = '{sender} has arrived.'.format(sender=sender)
+					self.appendToCommandBuffer(mobile, msg)
+
+			sender.setLag(1)
+		except self.NoExitsException as e:
+			msg = 'You can\'t go that way.'
+			self.appendToCommandBuffer(sender, msg)
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 
 class Up(Command):
 	def __init__(self, game):
 		super(Up, self).__init__(game, 'up')
 
-	def execute(self, args, config):
-		sender = config['sender']
+	def execute(self, args, sender):
+		try:
+			oldRoom = sender.room
 
-		move(self.game, 'up', sender)
+			self.move(sender, 'up')
+
+			msg = 'You leave up.'
+			self.appendToCommandBuffer(sender, msg)
+
+			if not sender.isAffectedBy('sneak'):
+				for mobile in [mobile for mobile in self.game.mobiles if mobile.room == oldRoom]:
+					msg = '{sender} leaves up.'.format(sender=sender)
+					self.appendToCommandBuffer(mobile, msg)
+
+				for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]:
+					msg = '{sender} has arrived.'.format(sender=sender)
+					self.appendToCommandBuffer(mobile, msg)
+
+			sender.setLag(1)
+		except self.NoExitsException as e:
+			msg = 'You can\'t go that way.'
+			self.appendToCommandBuffer(sender, msg)
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 
 class Down(Command):
 	def __init__(self, game):
-		super(Down, self).__init__(game, 'up')
+		super(Down, self).__init__(game, 'down')
 
-	def execute(self, args, config):
-		sender = config['sender']
+	def execute(self, args, sender):
+		try:
+			oldRoom = sender.room
 
-		move(self.game, 'down', sender)
+			self.move(sender, 'down')
 
+			msg = 'You leave down.'
+			self.appendToCommandBuffer(sender, msg)
 
-def move(game, direction, sender):
-	newRoom = next((exit.destination for exit in sender.room.exits if exit.key == direction), None)
-	if newRoom:
-		oldRoom = sender.room
-		sender.room = newRoom
-		if not sender.isAffectedBy('sneak'):
-			game.sendCondition(
-				(lambda a: a.room == oldRoom and a is not sender), '{{0}} leaves {direction}.'.format(direction=direction), [sender])
-		buf = 'You leave {direction}.'.format(name=sender.name, oldRoom=sender.room.name, newRoom=newRoom.name, direction=direction)
-		sender.sendToClient(buf)
-		if not sender.isAffectedBy('sneak'):
-			game.sendCondition((lambda a: a.room == newRoom and a is not sender), '{0} has arrived.', [sender])
-		sender.setLag(1)
-	else:
-		sender.sendToClient('You can\'t go that way.'.format(name=sender.name, oldRoom=sender.room.name, direction=direction))
+			if not sender.isAffectedBy('sneak'):
+				for mobile in [mobile for mobile in self.game.mobiles if mobile.room == oldRoom]:
+					msg = '{sender} leaves down.'.format(sender=sender)
+					self.appendToCommandBuffer(mobile, msg)
+
+				for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]:
+					msg = '{sender} has arrived.'.format(sender=sender)
+					self.appendToCommandBuffer(mobile, msg)
+
+			sender.setLag(1)
+		except self.NoExitsException as e:
+			msg = 'You can\'t go that way.'
+			self.appendToCommandBuffer(sender, msg)
+		except self.CommandException as e:
+			self.exceptionOccurred = True
 
 commandList = [North, South, East, West, Up, Down, Kill, Flee]

@@ -1,5 +1,6 @@
 from lib.interpreters.constants import Position
 import lib.utility as utility
+import random
 
 
 class Command(object):
@@ -14,6 +15,15 @@ class Command(object):
 		pass
 
 	class TargetNotFoundException(CommandException):
+		pass
+
+	class NoExitsException(CommandException):
+		pass
+
+	class SkillFailedException(CommandException):
+		pass
+
+	class NoArgumentsException(CommandException):
 		pass
 
 	def prepare(self):
@@ -39,15 +49,37 @@ class Command(object):
 			if sender.position == Position.sleeping:
 				self.appendToCommandBuffer(sender, 'In your dreams, or what?')
 			elif sender.position == Position.resting:
-				sender.appendToCommandBuffer(sender, 'You are too relaxed.')
+				self.appendToCommandBuffer(sender, 'You are too relaxed.')
+			elif sender.position == Position.fighting:
+				self.appendToCommandBuffer(sender, 'You can\'t do that in combat.')
 			elif sender.position == Position.standing:
-				sender.appendToCommandBuffer(sender, 'You can\'t do that in combat.')
-			elif sender.position == Position.standing:
-				sender.appendToCommandBuffer(sender, 'You aren\'t fighting anyone.')
+				self.appendToCommandBuffer(sender, 'You aren\'t fighting anyone.')
 			raise self.CommandException()
 
 	def getTargetFromListByName(self, needle, haystack):
+		if not haystack:
+			raise self.TargetNotFoundException()
 		for candidate in haystack:
 			if utility.matchList(needle, candidate.keywords):
 				return candidate
 		raise self.TargetNotFoundException()
+
+	def areThereAnyExits(self, room):
+		if len(room.exits) == 0:
+			raise self.NoExitsException()
+
+	def simpleSuccessCheck(self, percentage):
+		if random.randint(0,100) >= percentage:
+			raise self.SkillFailedException()
+
+	def hasAtLeastOneArgument(self, args):
+		if not args:
+			raise self.NoArgumentsException()
+
+	def move(self, sender, direction):
+		newRoom = next((exit.destination for exit in sender.room.exits if exit.key == direction), None)
+		if newRoom:
+			oldRoom = sender.room
+			sender.room = newRoom
+		else:
+			raise self.NoExitsException()

@@ -171,8 +171,9 @@ class Mobile:
 		return commands
 
 	def getWhoDesc(self, looker=None):
-		return '[{level:2} {charRace:10} {charClass:>10}] [ {clan} ] {linkdead}{name} {title}\n\r'.format(
+		return '[{level:2} {charRace:10} {charClass:>10}] [ {clan} ] {player} {linkdead}{name} {title}\n\r'.format(
 				level=self.level,
+				player=('[M]' if not self.is_player else '[P]'),
 				charRace=self.charRace.capitalize(),
 				charClass=self.getStat('charClass').capitalize(),
 				clan=self.clan,
@@ -212,7 +213,7 @@ class Mobile:
 			
 			data['equipment'] = self.getEquipmentList()
 			data['inventory'] = [item.name for item in self.inventory]
-			data['who'] = [mobile.getWhoDesc() for mobile in self.game.mobiles if mobile.client is not None]
+			data['who'] = [mobile.getWhoDesc() for mobile in self.game.mobiles if mobile.is_player]
 			data['time'] = datetime.datetime.utcnow().isoformat()
 			data['message'] = message
 			data['affects'] = self.getAffectList()
@@ -340,4 +341,18 @@ class Mobile:
 			return self.name
 		else:
 			return 'someone'
-		
+
+	def removeItem(self, item):
+		for key, equipment in self.equipment.iteritems():
+			if equipment == item:
+				self.inventory.append(equipment)
+				self.equipment[key] = None
+
+	def startCombatWith(self, target):
+		if self.combat:
+			return
+		self.combat = target
+		self.position = Position.fighting
+		if target.combat is None:
+			target.combat = self
+			target.position = Position.fighting

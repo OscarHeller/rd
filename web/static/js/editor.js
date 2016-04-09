@@ -164,6 +164,15 @@ app.controller('mapCtrl', function ($scope) {
   $scope.removeExit = function (exit) {
     delete($scope.newRoom.exits[exit.direction]);
   }
+  $scope.addRoomStat = function () {
+    if (!$scope.newRoom.stats) $scope.newRoom.stats = {};
+    $scope.newRoom.stats[$scope.newRoomStat.field] = $scope.newRoomStat.val;
+    $scope.newRoomStat = {};
+  }
+  $scope.removeRoomStat = function (field) {
+    delete $scope.newNPC.stats[field];
+  }
+
 
   $scope.setNewNPC = function () {
     $scope.newNPC = {};

@@ -64,6 +64,14 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 		import re
 		import itertools
 
+		# sanitize here, because why not?
+
+		TAG_RE = re.compile(r'<[^>]+>')
+
+		data = TAG_RE.sub('', data)
+
+		# colorize!
+
 		open_spans = 0
 		closed_spans = 0
 		# Switch out all the colors for spans

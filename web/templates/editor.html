@@ -104,6 +104,30 @@ td .content {
                 <option  ng-repeat="i in images" value="/static/media/assets/{{! (i['filename']) }}">{{! i['filename'] }}</option>
               </select>
             </div>
+            <!-- Room stats -->
+              <div class="row">
+                <div class="col-xs-2">
+                  <span class='h5'>Add Stats</span>
+                </div>
+                <div class="col-xs-4">
+                  <input type="text" class="form-control" id="roomStatField" ng-model="newRoomStat.field">
+                </div>
+                <div class="col-xs-4">
+                  <input type="text" class="form-control" id="roomStatValue" ng-model="newRoomStat.val">
+                </div>              
+                <div class="col-xs-1">
+                  <a href="" class="glyphicon glyphicon-plus btn btn-warning" ng-click="addRoomStat();"></a>
+                </div>
+              </div>
+              <ul class="list-inline">
+                <li>Stats:</li>
+                <li ng-repeat="(field, value) in newRoom.stats">
+                  <div class="label label-success"><strong>{{! field }}:</strong> {{! value }}
+                    <a href="" class="glyphicon glyphicon-remove" ng-click="removeRoomStat(stat);"></a>
+                  </div>
+                </li>
+              </ul>
+              <!-- Room exits -->
               <div class="row">
                 <div class="col-xs-2">
                   <span class='h5'>Add Exits</span>

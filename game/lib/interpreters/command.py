@@ -91,7 +91,9 @@ class Command(object):
 				raise AffectException()
 
 	def isLegalCombatTarget(self, target):
-		if target.isAffectedBy('just died'):
+		if target.room.getStat('no_combat'):
+			raise self.IllegalCombatTargetException()
+		elif target.isAffectedBy('just died'):
 			raise self.IllegalCombatTargetException()
 
 	def move(self, sender, direction):

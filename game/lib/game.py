@@ -132,8 +132,9 @@ class Game:
 		else:
 			# Make a new mobile
 			name = playerData['name']
+			stats = playerData['stats'] if 'stats' in playerData else {}
 
-			newMobile = Mobile(name, self, {'stats': {'charClass': 'warrior'}})
+			newMobile = Mobile(name, self, {'stats': stats})
 			newMobile.client = client
 			newMobile.is_player = True
 			self.mobiles.append(newMobile)
@@ -180,6 +181,9 @@ class Game:
 			else:
 				newRoom = Room(self, rooms[i])
 				newRoom.id = rooms[i]['id']
+
+			if newRoom.bg:
+				print "Has a background!", newRoom.bg
 
 			newRoom.items = []
 			newRoom.exits = []

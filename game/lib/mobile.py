@@ -42,6 +42,7 @@ class Mobile:
 
 		self.position = Position.standing
 		self.affects = []
+		self.behaviors = []
 		self.inventory = self.loadInventory(config['inventory'] if 'inventory' in config else [])
 		self.equipment = self.loadEquipment(config['equipment'] if 'equipment' in config else {})
 
@@ -55,15 +56,21 @@ class Mobile:
 		self.title = config['title'] if 'title' in config else 'the Default Character'
 
 		self.commandInterpreters = []
-		if 'charClass' in self.stats and self.stats['charClass'] == 'warrior':
+		if self.checkClass('warrior'):
 			self.commandInterpreters.extend(warrior.commandList)
 
-		#if 'charClass' in self.stats and self.stats['charClass'] == 'immortal':
+		if self.checkClass('immortal'):
 		# FIX ME: not working properly, for some reason class isn't being set at the right place
-		self.commandInterpreters.extend(admin.commandList)
-#			print 'what the actual hell'
+			self.commandInterpreters.extend(admin.commandList)
+
+		if self.checkClass('herald'):
+			from behavior import Herald
+			self.behaviors.append(Herald(self))
 		# DON'T FORGET to load in a command interpreter
 		self.commandInterpreter = CommandInterpreter(self.game, self)
+
+	def checkClass(self, charClass):
+		return ('charClass' in self.stats and self.stats['charClass'] == charClass)
 
 	def getCommandInterpreters(self):
  		return self.commandInterpreters
@@ -298,6 +305,8 @@ class Mobile:
 	def update(self, amount):
 		self.unLag(amount)
 		self.updateAffects(amount)
+		for behavior in self.behaviors:
+			behavior.doUpdate(amount)
 
 		if self.linkdead > 0:
 			self.linkdead -= 1

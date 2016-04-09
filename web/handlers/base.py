@@ -1,7 +1,7 @@
 import tornado.web
 from flash import Flash
 import pickle
-
+import os
 
 class BaseHandler(tornado.web.RequestHandler):
 	def initialize(self, db=None):
@@ -13,6 +13,13 @@ class BaseHandler(tornado.web.RequestHandler):
 			self.render('errors/404.html', page=None)
 		else:
 			self.render('errors/unknown.html', page=None)
+
+	def get_images(self):
+		print [image for image in self.db.assets.find()]
+		return self.db.assets.find()
+
+	def add_image(self, filename):
+		self.db.assets.insert_one(filename)
 
 	def get_rooms(self):
 		return self.db.rooms.find()

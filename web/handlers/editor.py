@@ -14,7 +14,8 @@ class EditorHandler(BaseHandler):
         rooms = [room for room in self.get_rooms()]
         items = [item for item in self.get_items()]
         npcs = [npc for npc in self.get_npcs()]
-        result = {'rooms': rooms, 'items': items, 'npcs': npcs}
+        images = [image for image in self.get_images()]
+        result = {'rooms': rooms, 'items': items, 'npcs': npcs, 'images': images}
         from bson.json_util import dumps
         self.write(dumps(result))
 

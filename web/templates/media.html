@@ -15,6 +15,19 @@
         <input type="submit" value="upload" class='btn btn-primary' />
       </form>
     </div>
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+      <ul class="list-group">
+        {% for image in images %}
+          <li class="list-group-item">
+            <a target="_blank" href="{{ static_url('media/assets/' + image['filename']) }}">
+            <img src="{{ static_url('media/assets/' + image['filename']) }}" class="img-thumbnail" width="100%">
+              {{ image['filename'] }}
+            </a>
+          </li>
+        {% end %}
+      </ul>
+    </div>
   </div>
 </div>
 

@@ -16,6 +16,7 @@ app.controller('mapCtrl', function ($scope) {
     $scope.rooms = {};
     $scope.items = [];
     $scope.npcs = [];
+    $scope.images = [];
 
     $scope.setNewRoom();
     $scope.setNewExit();
@@ -32,6 +33,7 @@ app.controller('mapCtrl', function ($scope) {
       var room_response = response['rooms'];
       var item_response = response['items'];
       var npc_response = response['npcs'];
+      var image_response = response['images'];
 
       for (var i = 0; i < room_response.length; i++) {
         $oid = room_response[i]['_id']['$oid'];
@@ -46,6 +48,10 @@ app.controller('mapCtrl', function ($scope) {
 
       for (var i = 0; i < npc_response.length; i++) {
         $scope.npcs.push(npc_response[i]);
+      }
+
+      for (let i = 0; i < image_response.length; i++) {
+        $scope.images.push(image_response[i]);
       }
 
       $scope.$digest();

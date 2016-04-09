@@ -6,6 +6,7 @@ import os
 
 from handlers import home, client, authlogin, authlogout, authcreate, playercreate, editor, error, media
 
+
 class Application(tornado.web.Application):
 	def __init__(self):
 

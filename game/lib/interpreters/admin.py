@@ -172,7 +172,7 @@ class SetStat(Command):
           player = players[vnum]
           if len(args) >= 2:
             if args[0] in player.stats:
-              player.stats[args[0]] = args[1]
+              player.setStat(args[0], args[1])
 
               msg = 'You set {player}\'s {stat} to {value}.'.format(player=player.getName(sender),stat=args[0],value=args[1])
               self.appendToCommandBuffer(sender, msg)

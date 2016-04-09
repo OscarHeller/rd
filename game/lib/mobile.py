@@ -3,6 +3,7 @@ import affect
 from lib.interpreters.constants import Position
 import math
 import datetime
+from item import Item
 
 # classes!
 from lib.interpreters import warrior
@@ -45,6 +46,9 @@ class Mobile:
 		self.behaviors = []
 		self.inventory = self.loadInventory(config['inventory'] if 'inventory' in config else [])
 		self.equipment = self.loadEquipment(config['equipment'] if 'equipment' in config else {})
+
+		print self.inventory, self.name
+		print config['inventory'] if 'inventory' in config else self.name
 
 		self.keywords = config['keywords'] if 'keywords' in config else [self.name]
 		self.level = config['level'] if 'level' in config else 51
@@ -301,7 +305,10 @@ class Mobile:
 
 	def setStat(self, stat, value):
 		if stat in self.stats:
-			self.stats[stat] = value
+			if type(self.stats[stat]) is int:
+				self.stats[stat] = int(value)
+			else:
+				self.stats[stat] = str(value)
 
 	def update(self, amount):
 		self.unLag(amount)

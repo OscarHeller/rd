@@ -107,6 +107,14 @@ def doDamage(game, fighter, amount, noun='hit', target=None, combatBuffer=None):
 
 	target.stats['hitpoints'] -= amount
 	if target.getStat('hitpoints') <= 0:
+		# looting, can probably move elsewhere when it become more sophisticated -> only loots from inventory at the moment
+		fighter.inventory.extend(target.inventory)
+		if len(target.inventory) > 0:
+			message = "You loot " + ", ".join([str(item.name) for item in target.inventory]) + " from " + target.getName(fighter) + "'s' dead body."
+		else:
+			message = target.getName(fighter) + " wasn't carrying anything."
+		combatBuffer = appendToCombatBuffer(fighter, message, combatBuffer)
+		target.inventory = []
 		endCombatForPlayersByTarget(game, target)
 		target.die()
 

@@ -41,7 +41,7 @@ td .content {
           </div>
           <div class="panel-collapse collapse" id="collapse1">
             <ul class="list-group">
-              <li class="list-group-item {{! isDeleted(g) }}" ng-repeat="g in rooms">
+              <li class="list-group-item {{! isDeleted(g) }}" ng-repeat="g in rooms track by $index">
                 <div class="row">
                   <div class="col-xs-8" ng-click="editRoom(g);">{{! g.name }}</div>
                   <div class="col-xs-4 text-right"><a href="" class="btn btn-danger btn-sm glyphicon glyphicon-remove" ng-click="removeRoom(g)"></a></div>
@@ -56,7 +56,7 @@ td .content {
           </div>
           <div class="panel-collapse collapse" id="collapse2">
             <ul class="list-group">
-              <li class="list-group-item {{! isDeleted(i) }}" ng-repeat="i in items">
+              <li class="list-group-item {{! isDeleted(i) }}" ng-repeat="i in items track by $index">
                 <div class="row">
                   <div class="col-xs-8">
                     <span class="" ng-click="editItem(i);">{{! i.name }}</span>
@@ -73,7 +73,7 @@ td .content {
           </div>
           <div class="panel-collapse collapse" id="collapse3">
             <ul class="list-group">
-              <li class="list-group-item {{! isDeleted(npc) }}" ng-repeat="npc in npcs">
+              <li class="list-group-item {{! isDeleted(npc) }}" ng-repeat="npc in npcs track by $index">
                 <div class="row">
                   <div class="col-xs-8">
                     <span class="" ng-click="editNPC(npc);">{{! npc.name }}</span>
@@ -101,7 +101,7 @@ td .content {
             <div class="form-group">
               <label for="roomBG">Background Image:</label>
               <select id="" class="form-control" ng-model="newRoom.bg" >
-                <option  ng-repeat="i in images" value="/static/media/assets/{{! (i['filename']) }}">{{! i['filename'] }}</option>
+                <option  ng-repeat="i in images track by $index" value="/static/media/assets/{{! (i['filename']) }}">{{! i['filename'] }}</option>
               </select>
             </div>
             <!-- Room stats -->
@@ -159,43 +159,45 @@ td .content {
                   </div>
                 </li>
               </ul>
+              <!-- Room items -->
               <div class="row">
                 <div class="col-xs-2">
                   <span class='h5'>Add Item</span>
                 </div>
                 <div class="col-xs-4">
-                  <select class="form-control" ng-model="newItemKey">
-                    <option ng-repeat="item in items" value="{{! item['_id']['$oid'] }}">{{! item['name'] }}</option>
+                  <select class="form-control" ng-model="newItemRoomKey">
+                    <option ng-repeat="item in items track by $index" value="{{! item['_id']['$oid'] }}">{{! item['name'] }}</option>
                   </select>
                 </div>
                 <div class="col-xs-2">
-                  <a href="" class="btn btn-warning glyphicon glyphicon-plus" ng-click="addItemKey();"></a>
+                  <a href="" class="btn btn-warning glyphicon glyphicon-plus" ng-click="addItemToRoom();"></a>
                 </div>
               </div>
               <ul class="list-inline">
                 <li>Items:</li>
-                <li ng-repeat="item in newRoom.items">
+                <li ng-repeat="item in newRoom.items track by $index">
                   <div class="label label-info">{{! findItem(item) }}
                     <a href="" class="glyphicon glyphicon-remove" ng-click="removeItemFromRoom(item);"></a>
                   </div>
                 </li>
               </ul>
+              <!-- Room NPCs -->
               <div class="row">
                 <div class="col-xs-2">
                   <span class='h5'>Add NPC</span>
                 </div>
                 <div class="col-xs-4">
                   <select class="form-control" ng-model="newNPCKey">
-                    <option ng-repeat="npc in npcs" value="{{! npc['_id']['$oid'] }}">{{! npc['name'] }}</option>
+                    <option ng-repeat="npc in npcs track by $index" value="{{! npc['_id']['$oid'] }}">{{! npc['name'] }}</option>
                   </select>
                 </div>
                 <div class="col-xs-2">
-                  <a href="" class="btn btn-warning glyphicon glyphicon-plus" ng-click="addNPCKey();"></a>
+                  <a href="" class="btn btn-warning glyphicon glyphicon-plus" ng-click="addNPCToRoom();"></a>
                 </div>
               </div>
               <ul class="list-inline">
-                <li>Items:</li>
-                <li ng-repeat="npc in newRoom.npcs">
+                <li>NPCs:</li>
+                <li ng-repeat="npc in newRoom.npcs track by $index">
                   <div class="label label-info">{{! findNPC(npc) }}
                     <a href="" class="glyphicon glyphicon-remove" ng-click="removeNPCFromRoom(npc);"></a>
                   </div>
@@ -205,6 +207,7 @@ td .content {
             <a href="" class="btn btn-default" ng-click="setNewRoom()">Cancel</a>
           </div>
         </div>
+        <!-- NPCS -->
         <div class="panel panel-warning">
           <div class="panel-heading" href="#collapseAddNPC" data-toggle="collapse">
             <h3 class="h3 panel-title">Add/Edit NPC</h3>
@@ -214,6 +217,7 @@ td .content {
               <div class="col-xs-3"><label for="npcName">Name:</label></div>
               <div class="col-xs-9"><input type="text" id="npcName" ng-model="newNPC.name" class='form-control'></div>
             </div>
+            <!-- NPC keywords -->
             <div class="form-group">
               <div class="col-xs-3">
                 <label for="npcKeyword">Add Keyword: </label>
@@ -226,13 +230,14 @@ td .content {
               </div>
               <ul class="list-inline">
                 <li>Keywords:</li>
-                <li ng-repeat="keyword in newNPC.keywords">
+                <li ng-repeat="keyword in newNPC.keywords track by $index">
                   <div class="label label-warning">{{! keyword }}
                     <a href="" class="glyphicon glyphicon-remove" ng-click="removeNPCKeyword(keyword);"></a>
                   </div>
                 </li>
               </ul>
             </div>
+            <!-- NPC stats -->
             <div class="form-group">
               <div class="col-xs-2">
                 <label for="npcStatField">Add Stat: </label>
@@ -251,6 +256,28 @@ td .content {
                 <li ng-repeat="(field, value) in newNPC.stats">
                   <div class="label label-success"><strong>{{! field }}:</strong> {{! value }}
                     <a href="" class="glyphicon glyphicon-remove" ng-click="removeNPCStat(stat);"></a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <!-- NPC inventory -->
+            <div class="form-group">
+              <div class="col-xs-2">
+                <label for="npcItemField">Add Item to Inventory: </label>
+              </div>
+              <div class="col-xs-4">
+                <select class="form-control" ng-model="newItemNPCKey">
+                  <option ng-repeat="item in items track by $index" value="{{! item['_id']['$oid'] }}">{{! item['name'] }}</option>
+                </select>              
+              </div>           
+              <div class="col-xs-1">
+                <a href="" class="glyphicon glyphicon-plus btn btn-warning" ng-click="addItemToNPC();"></a>
+              </div>
+              <ul class="list-inline">
+                <li>Items:</li>
+                <li ng-repeat="item in newNPC.inventory track by $index">
+                  <div class="label label-info">{{! findItem(item) }}
+                    <a href="" class="glyphicon glyphicon-remove" ng-click="removeItemFromNPC(item);"></a>
                   </div>
                 </li>
               </ul>
@@ -292,7 +319,7 @@ td .content {
               </div>
               <ul class="list-inline">
                 <li>Keywords:</li>
-                <li ng-repeat="keyword in newItem.keywords">
+                <li ng-repeat="keyword in newItem.keywords track by $index">
                   <div class="label label-warning">{{! keyword }}
                     <a href="" class="glyphicon glyphicon-remove" ng-click="removeItemKeyword(keyword);"></a>
                   </div>

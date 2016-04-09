@@ -22,7 +22,8 @@ app.controller('mapCtrl', function ($scope) {
     $scope.setNewExit();
     $scope.setNewItem();
     $scope.setNewNPC();
-    $scope.newItemKey = "";
+    $scope.newItemRoomKey = "";
+    $scope.newItemNPCKey = "";
     $scope.newItemKeyword = "";
 
     var request = new XMLHttpRequest();
@@ -90,7 +91,7 @@ app.controller('mapCtrl', function ($scope) {
   }
 
   $scope.setNewItem = function () {
-    $scope.newItemKey = "";
+    $scope.newItemRoomKey = "";
     $scope.newItemKeyword = "";
     $scope.newItem = {};
   }
@@ -104,12 +105,12 @@ app.controller('mapCtrl', function ($scope) {
       item['delete'] = 1;
     }
   };
-  $scope.addItemKey = function () {
+  $scope.addItemToRoom = function () {
     if (!$scope.newRoom.items) $scope.newRoom.items = [];
-    $scope.newRoom.items.push($scope.newItemKey);
-    $scope.newItemKey = "";
+    $scope.newRoom.items.push($scope.newItemRoomKey);
+    $scope.newItemRoomKey = "";
   }
-  $scope.addNPCKey = function () {
+  $scope.addNPCToRoom = function () {
     if (!$scope.newRoom.npcs) $scope.newRoom.npcs = [];
     $scope.newRoom.npcs.push($scope.newNPCKey);
     $scope.newNPCKey = "";
@@ -211,6 +212,16 @@ app.controller('mapCtrl', function ($scope) {
   $scope.removeNPCStat = function (field) {
     delete $scope.newNPC.stats[field];
   }
+  $scope.addItemToNPC = function () {
+    if (!$scope.newNPC.inventory) $scope.newNPC.inventory = [];
+    $scope.newNPC.inventory.push($scope.newItemNPCKey);
+    $scope.newItemNPCKey = "";
+  }
+  $scope.removeItemFromNPC = function (item) {
+    var i = $scope.newNPC.inventory.indexOf(item);
+    $scope.newNPC.inventory.splice(i, 1);
+  }
+
 
   $scope.save = function () {
     var roomData = [];

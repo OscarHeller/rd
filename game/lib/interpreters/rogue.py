@@ -10,12 +10,9 @@ class Sneak(Command):
 		super(Sneak, self).__init__(game, 'sneak')
 
 	def executeFunction(self, args, sender):
-		try:
-			msg = 'You attempt to move more silently.'
-			self.appendToCommandBuffer(sender, msg)
-			Affect.factory('Sneak', sender, sender, 60 * sender.level)
-		except self.CommandException as e:
-			self.exceptionOccurred = True
+		msg = 'You attempt to move more silently.'
+		self.appendToCommandBuffer(sender, msg)
+		Affect.factory('Sneak', sender, sender, 60 * sender.level)
 
 
 commandList = [Sneak]

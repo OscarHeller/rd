@@ -62,6 +62,15 @@ class Command(object):
 		raise self.CommandException('You don\'t see them here.')
 
 
+	def getItemFromListByName(self, needle, haystack):
+		if not haystack:
+			raise self.CommandException('You don\'t see that here.')
+		for candidate in haystack:
+			if utility.matchList(needle, candidate.keywords):
+				return candidate
+		raise self.CommandException('You don\'t see that here.')
+
+
 	def getTargetFromListByName(self, needle, haystack):
 		if not haystack:
 			raise self.CommandException('DEPRECATED: You don\'t see them here.')

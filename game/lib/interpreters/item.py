@@ -8,30 +8,24 @@ class Get(Command):
 		super(Get, self).__init__(game, 'get')
 
 	def execute(self, args, sender):
-		try:
-			# Preliminary checks
-			self.checkPosition(sender, [Position.standing, Position.resting, Position.fighting])
+		# Preliminary checks
+		self.test(self.checkPosition, (sender, [Position.standing, Position.resting, Position.fighting]))
+		self.test(self.hasAtLeastOneArgument, args, override='Get what?')
 
-			# Automatic targeting
-			item = self.getTargetFromListByName(args[0], sender.room.items)
+		# Automatic targeting
+		item = self.test(self.getItemFromListByName, (args[0], sender.room.items))
 
-			# Game manipulation
-			sender.room.items.remove(item)
-			sender.inventory.append(item)
+		# Game manipulation
+		sender.room.items.remove(item)
+		sender.inventory.append(item)
 
-			# Messaging
-			msg = 'You get {item}.'.format(item=item.getName(sender))
-			self.appendToCommandBuffer(sender, msg)
+		# Messaging
+		msg = 'You get {item}.'.format(item=item.getName(sender))
+		self.appendToCommandBuffer(sender, msg)
 
-			for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile is not sender]:
-				msg = '{sender} gets {item}.'.format(sender=sender.getName(mobile),item=item.getName(mobile))
-				self.appendToCommandBuffer(mobile, msg)
-		except self.TargetNotFoundException as e:
-			msg = 'You don\'t see that here.'
-			self.appendToCommandBuffer(sender, msg)
-			self.exceptionOccurred = True
-		except self.CommandException as e:
-			self.exceptionOccurred = True
+		for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile is not sender]:
+			msg = '{sender} gets {item}.'.format(sender=sender.getName(mobile),item=item.getName(mobile))
+			self.appendToCommandBuffer(mobile, msg)
 
 
 class Drop(Command):
@@ -39,30 +33,24 @@ class Drop(Command):
 		super(Drop, self).__init__(game, 'drop')
 
 	def execute(self, args, sender):
-		try:
-			# Preliminary checks
-			self.checkPosition(sender, [Position.standing, Position.resting, Position.fighting])
+		# Preliminary checks
+		self.test(self.checkPosition, (sender, [Position.standing, Position.resting, Position.fighting]))
+		self.test(self.hasAtLeastOneArgument, args, override='Drop what?')
 
-			# Automatic targeting
-			item = self.getTargetFromListByName(args[0], sender.inventory)
+		# Automatic targeting
+		item = self.test(self.getItemFromListByName, (args[0], sender.inventory), override='You\'re not carrying that.')
 
-			# Game manipulation
-			sender.inventory.remove(item)
-			sender.room.items.append(item)
+		# Game manipulation
+		sender.inventory.remove(item)
+		sender.room.items.append(item)
 
-			# Messaging
-			msg = 'You drop {item}.'.format(item=item.getName(sender))
-			self.appendToCommandBuffer(sender, msg)
+		# Messaging
+		msg = 'You drop {item}.'.format(item=item.getName(sender))
+		self.appendToCommandBuffer(sender, msg)
 
-			for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile is not sender]:
-				msg = '{sender} drops {item}.'.format(sender=sender.getName(mobile),item=item.getName(mobile))
-				self.appendToCommandBuffer(mobile, msg)
-		except self.TargetNotFoundException as e:
-			msg = 'You\'re not carrying that.'
-			self.appendToCommandBuffer(sender, msg)
-			self.exceptionOccurred = True
-		except self.CommandException as e:
-			self.exceptionOccurred = True
+		for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile is not sender]:
+			msg = '{sender} drops {item}.'.format(sender=sender.getName(mobile),item=item.getName(mobile))
+			self.appendToCommandBuffer(mobile, msg)
 
 
 class Wear(Command):
@@ -70,37 +58,36 @@ class Wear(Command):
 		super(Wear, self).__init__(game, 'wear')
 
 	def execute(self, args, sender):
-		try:
-			# Preliminary checks
-			self.checkPosition(sender, [Position.standing, Position.resting, Position.fighting])
+		# Preliminary checks
+		self.test(self.checkPosition, (sender, [Position.standing, Position.resting, Position.fighting]))
 
-			# Automatic targeting
-			item = self.getTargetFromListByName(args[0], sender.inventory)
+		# Automatic targeting
+		item = self.test(self.getItemFromListByName, (args[0], sender.inventory), override='You\'re not carrying that.')
 
-			if not item.wear:
-				msg = 'You can\'t wear that!'
-				self.appendToCommandBuffer(sender, msg)
-				return
+		if not item.wear:
+			self.error = 'You can\'t wear that!'
 
-			# Game manipulation
-			if item.wear in sender.equipment and sender.equipment[item.wear]:
-				sender.inventory.append(sender.equipment[item.wear])
+		# Game manipulation
+		if item.wear in sender.equipment and sender.equipment[item.wear]:
+			oldItem = sender.equipment[item.wear]
+			sender.removeItem(oldItem)
 
-				msg = 'You stop using {item}.'.format(item=sender.equipment[item.wear].getName(sender))
-				self.appendToCommandBuffer(sender, msg)
-
-			sender.equipment[item.wear] = item
-			sender.inventory.remove(item)
-
-
-			msg = 'You now wear {item}.'.format(item=item.getName(sender))
+			msg = 'You stop using {item}.'.format(item=oldItem.getName(sender))
 			self.appendToCommandBuffer(sender, msg)
-		except self.TargetNotFoundException as e:
-			msg = 'You\'re not carrying that.'
-			self.appendToCommandBuffer(sender, msg)
-			self.exceptionOccurred = True
-		except self.CommandException as e:
-			self.exceptionOccurred = True
+
+			for mobile in sender.inRoomExcept(sender):
+				msg = '{sender} stops using {item}.'.format(sender=sender.getName(mobile),item=oldItem.getName(mobile))
+
+		sender.equipment[item.wear] = item
+		sender.inventory.remove(item)
+
+
+		msg = 'You wear {item}.'.format(item=item.getName(sender))
+		self.appendToCommandBuffer(sender, msg)
+
+		for mobile in sender.inRoomExcept(sender):
+			msg = '{sender} wears {item}.'.format(sender=sender.getName(mobile),item=item.getName(mobile))
+			self.appendToCommandBuffer(mobile, msg)
 
 
 class Remove(Command):
@@ -108,22 +95,19 @@ class Remove(Command):
 		super(Remove, self).__init__(game, 'remove')
 
 	def execute(self, args, sender):
-		try:
-			# Preliminary checks
-			self.checkPosition(sender, [Position.standing, Position.resting, Position.fighting])
+		# Preliminary checks
+		self.test(self.checkPosition, (sender, [Position.standing, Position.resting, Position.fighting]))
 
-			# Automatic targeting
-			item = self.getTargetFromListByName(args[0], sender.equipment.values())
+		# Automatic targeting
+		item = self.test(self.getItemFromListByName, (args[0], sender.equipment.values()), override='You\'re not wearing that.')
 
-			msg = 'You remove {item}.'.format(item=item.getName(sender))
-			self.appendToCommandBuffer(sender, msg)
+		msg = 'You remove {item}.'.format(item=item.getName(sender))
+		self.appendToCommandBuffer(sender, msg)
 
-			sender.removeItem(item)
-		except self.TargetNotFoundException as e:
-			msg = 'You\'re not wearing that.'
-			self.appendToCommandBuffer(sender, msg)
-			self.exceptionOccurred = True
-		except self.CommandException as e:
-			self.exceptionOccurred = True
+		for mobile in sender.inRoomExcept(sender):
+			msg = '{sender} stops wearing {item}.'.format(sender=sender.getName(mobile),item=item.getName(mobile))
+			self.appendToCommandBuffer(mobile, msg)
+
+		sender.removeItem(item)
 
 commandList = [Wear, Get, Drop, Remove]

@@ -363,3 +363,9 @@ class Mobile:
 		if target.combat is None:
 			target.combat = self
 			target.position = Position.fighting
+
+	def inRoomExcept(self, exceptions):
+		if isinstance(exceptions, list):
+			return [mobile for mobile in self.game.mobiles if mobile.room == self.room and mobile not in exceptions]
+		else:
+			return [mobile for mobile in self.game.mobiles if mobile.room == self.room and mobile != exceptions]

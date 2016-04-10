@@ -11,53 +11,23 @@ class DirtKick(Command):
 		super(DirtKick, self).__init__(game, 'dirtkick')
 
 	def execute(self, args, sender):
-		try:
-			# Simple checks
-			self.checkPosition(sender, [Position.standing,Position.fighting])
+		# Simple checks
+		self.test(self.checkPosition, (sender, [Position.standing,Position.fighting]))
 
-			if args:
-				target = self.getTargetFromListByName(args[0], [mobile for mobile in self.game.mobiles if mobile.room == sender.room])
-			elif sender.combat:
-				target = sender.combat
-			else:
-				raise self.DefaultTargetNotFoundException()
+		target = self.test(self.getCombatTargetByArgs, (sender, args))
 
-			# Target checks
-			self.notSelfTargetable(target, sender)
-			self.isLegalCombatTarget(target)
-			self.notAffectedBy(target, ['dirtkick','blind'])
+		# Target checks
+		self.test(self.notSelfTargetable, (target, sender))
+		self.test(self.isLegalCombatTarget, (target))
+		self.test(self.notAffectedBy, (target, ['dirtkick','blind']), override='They are already blinded.')
 
-			# self.simpleSuccessCheck(50)
-			self.simpleSuccessCheck(100)
+		# self.simpleSuccessCheck(50)
+		self.test(self.simpleSuccessCheck, 100)
 
-			# sender.setLag(1)
-			sender.setLag(0)
-			sender.startCombatWith(target)
+		sender.setLag(1)
+		sender.startCombatWith(target)
 
-			affect.Affect.factory('DirtKick', sender, target, 2)
-
-			self.appendToCommandBuffer(sender, target.getCondition())
-			self.appendToCommandBuffer(target, sender.getCondition())
-		except self.SkillFailedException as e:
-			self.commandBuffer = combat.doDamage(self.game, sender, 0, noun='kicked dirt', target=target, combatBuffer=self.commandBuffer)
-
-			self.appendToCommandBuffer(sender, target.getCondition())
-			self.appendToCommandBuffer(target, sender.getCondition())
-
-			sender.setLag(1)
-			sender.startCombatWith(target)
-		except self.AffectException as e:
-			msg = 'They are already blinded.'
-			self.appendToCommandBuffer(sender, msg)
-			self.exceptionOccurred = True
-		except self.TargetNotFoundException as e:
-			self.exceptionOccurred = True
-		except self.DefaultTargetNotFoundException as e:
-			msg = 'Dirt kick who?'
-			self.appendToCommandBuffer(sender, msg)
-			self.exceptionOccurred = True
-		except self.CommandException as e:
-			self.exceptionOccurred = True
+		affect.Affect.factory('DirtKick', sender, target, 2)
 
 
 class Trip(Command):
@@ -65,59 +35,45 @@ class Trip(Command):
 		super(Trip, self).__init__(game, 'trip')
 
 	def execute(self, args, sender):
+		# Simple checks
+		self.test(self.checkPosition, (sender, [Position.standing,Position.fighting]))
+
+		target = self.test(self.getCombatTargetByArgs, (sender, args))
+
+		# Target checks
+		self.test(self.notSelfTargetable, (target, sender))
+		self.test(self.isLegalCombatTarget, (target))
+
 		try:
-			# Simple checks
-			self.checkPosition(sender, [Position.standing,Position.fighting])
-
-			if args:
-				target = self.getTargetFromListByName(args[0], [mobile for mobile in self.game.mobiles if mobile.room == sender.room])
-			elif sender.combat:
-				target = sender.combat
-			else:
-				raise self.TargetNotFoundException()
-
-			# Target checks
-			self.notSelfTargetable(target, sender)
-			self.isLegalCombatTarget(target)
-
-			self.simpleSuccessCheck(0)
-
-			sender.setLag(2)
-
-			# Messaging
-			msg = 'You trip {target} and they go down.'.format(target=target.getName(sender))
-			self.appendToCommandBuffer(sender, msg)
-
-			msg = '{sender} trips you and you go down.'.format(sender=sender.getName(target))
-			self.appendToCommandBuffer(target, msg)
-
-			for mobile in [mobile for mobile in self.game.mobiles if mobile.room == target.room and mobile != sender and mobile != target]:
-				msg = '{sender} trips {target}.'.format(sender=sender.getName(mobile),target=target.getName(mobile))
-				self.appendToCommandBuffer(mobile, msg)
-
-			self.commandBuffer = combat.doDamage(self.game, sender, random.randint(1,10), noun='trip', target=target, combatBuffer=self.commandBuffer)
-
-			self.appendToCommandBuffer(sender, target.getCondition())
-			self.appendToCommandBuffer(target, sender.getCondition())
-
-			sender.startCombatWith(target)
-		except self.SelfTargetableException as e:
-			self.exceptionOccurred = True
-		except self.SkillFailedException as e:
+			self.test(self.simpleSuccessCheck, 0)
+		except self.CommandException as e:
 			self.commandBuffer = combat.doDamage(self.game, sender, 0, noun='trip', target=target, combatBuffer=self.commandBuffer)
 
 			self.appendToCommandBuffer(sender, target.getCondition())
 			self.appendToCommandBuffer(target, sender.getCondition())
 
-			sender.setLag(2)
 			sender.startCombatWith(target)
-		except self.TargetNotFoundException as e:
-			msg = 'You trip over your own feet.'
-			self.appendToCommandBuffer(sender, msg)
-			self.exceptionOccurred = True
-		except self.CommandException as e:
-			self.appendToCommandBuffer(sender, repr(e))
-			self.exceptionOccurred = True
+			return
+
+		sender.setLag(2)
+
+		# Messaging
+		msg = 'You trip {target} and they go down.'.format(target=target.getName(sender))
+		self.appendToCommandBuffer(sender, msg)
+
+		msg = '{sender} trips you and you go down.'.format(sender=sender.getName(target))
+		self.appendToCommandBuffer(target, msg)
+
+		for mobile in sender.inRoomExcept([sender,target]):
+			msg = '{sender} trips {target}.'.format(sender=sender.getName(mobile),target=target.getName(mobile))
+			self.appendToCommandBuffer(mobile, msg)
+
+		self.commandBuffer = combat.doDamage(self.game, sender, random.randint(3,5), noun='trip', target=target, combatBuffer=self.commandBuffer)
+
+		self.appendToCommandBuffer(sender, target.getCondition())
+		self.appendToCommandBuffer(target, sender.getCondition())
+
+		sender.startCombatWith(target)
 
 
 class Berserk(Command):
@@ -137,120 +93,123 @@ class Disarm(Command):
 		super(Disarm, self).__init__(game, 'disarm')
 
 	def execute(self, args, sender):
+		# Automatic checks
+		self.test(self.checkPosition, (sender, [Position.standing,Position.fighting]))
+
+		target = self.test(self.getCombatTargetByArgs, (sender, args))
+
+		# Target checks
+		self.test(self.notSelfTargetable, (target, sender))
+		self.test(self.isLegalCombatTarget, (target))
+
+		# Manual checks
+		if 'weapon' not in target.equipment or not target.equipment['weapon']:
+			self.error('They aren\'t wielding a weapon.')
+
 		try:
-			# Automatic checks
-			self.checkPosition(sender, [Position.fighting, Position.standing])
-
-			# Automatic targeting
-			if args:
-				target = self.getTargetFromListByName(args[0], [mobile for mobile in self.game.mobiles if mobile.room == sender.room])
-			elif sender.combat:
-				target = sender.combat
-			else:
-				raise self.TargetNotFoundException()
-
-			# Target checks
-			self.notSelfTargetable(target, sender)
-			self.isLegalCombatTarget(target)
-
-			# Manual checks
-			if 'weapon' not in target.equipment or not target.equipment['weapon']:
-				msg = ('They aren\'t wielding a weapon.')
-				self.appendToCommandBuffer(sender, msg)
-				return
-
-			self.simpleSuccessCheck(0)
-
-			msg = 'You disarm {target}!'.format(target=target.getName(sender))
+			self.test(self.simpleSuccessCheck, 100)
+		except self.CommandException as e:
+			msg = 'You fail to disarm {target}.'.format(target=target.getName(sender))
 			self.appendToCommandBuffer(sender, msg)
 
-			msg = '{sender} disarms you!'.format(sender=sender.getName(target))
-			self.appendToCommandBuffer(sender, msg)
+			msg = '{sender} tries to disarm you, but fails.'.format(sender=sender.getName(target))
+			self.appendToCommandBuffer(target, msg)
 
-			for mobile in [mobile for mobile in self.game.mobiles if mobile != sender and mobile != target]:
-				msg = '{sender} disarms {target}!'.format(sender=sender.getName(mobile),target=target.getName(mobile))
+			for mobile in sender.inRoomExcept([sender,target]):
+				msg = '{0} tries to disarm {1}, but fails.'
 				self.appendToCommandBuffer(mobile, msg)
 
-			target.removeItem(target.equipment['weapon'])
-		except self.DefaultTargetNotFoundException as e:
-			msg = 'Dirt kick who?'
-			self.appendToCommandBuffer(sender, msg)
-			self.exceptionOccurred = True
-		except TargetNotFoundException as e:
-			self.appendToCommandBuffer()
-			self.exceptionOccurred = True
-		except self.CommandException as e:
-			self.appendToCommandBuffer(sender, repr(e))
-			self.exceptionOccurred = True
-		else:
-			senderBuf = 'You fail to disarm {target}.'.format(target=target.getName(sender))
-			targetBuf = '{sender} tries to disarm you, but fails.'.format(sender=sender.getName(target))
-			roomBuf = '{0} tries to disarm {1}, but fails.'
+			sender.startCombatWith(target)
+			return
 
-		sender.sendToClient(senderBuf)
-		target.sendToClient(targetBuf)
-		sender.game.sendCondition((lambda a: a.room == sender.room and a is not sender and a is not target), roomBuf, [sender, target])
+		msg = 'You disarm {target}!'.format(target=target.getName(sender))
+		self.appendToCommandBuffer(sender, msg)
+
+		msg = '{sender} disarms you!'.format(sender=sender.getName(target))
+		self.appendToCommandBuffer(target, msg)
+
+		for mobile in sender.inRoomExcept([sender,target]):
+			msg = '{sender} disarms {target}!'.format(sender=sender.getName(mobile),target=target.getName(mobile))
+			self.appendToCommandBuffer(mobile, msg)
+
+		sender.startCombatWith(target)
+		target.removeItem(target.equipment['weapon'])
 
 
 class Kick(Command):
 	def __init__(self, game):
 		super(Kick, self).__init__(game, 'kick')
-		self.canTarget = True
-		self.requireTarget = True
-		self.aggro = True
-		self.useInCombat = True
-		self.useWhileJustDied = False
-		self.targetSelf = False
 
-	def execute(self, args, config):
-		sender = config['sender']
-		target = config['target']
+	def execute(self, args, sender):
+		# Automatic checks
+		self.test(self.checkPosition, (sender, [Position.standing,Position.fighting]))
 
-		damage = sender.level + random.randint(1, 10)
+		target = self.test(self.getCombatTargetByArgs, (sender, args))
 
-		combatBuffer = {}
-		combatBuffer = combat.doDamage(self.game, sender, damage, noun='kick', target=target, combatBuffer=combatBuffer)
-		combat.appendConditionsToCombatBuffer(combatBuffer)
-		combat.sendCombatBuffer(self.game, combatBuffer)
+		# Target checks
+		self.test(self.notSelfTargetable, (target, sender))
+		self.test(self.isLegalCombatTarget, (target))
 
-		sender.setLag(3)
+		damage = random.randint(10,25)
+
+		self.commandBuffer = combat.doDamage(self.game, sender, damage, noun='kick', target=target, combatBuffer=self.commandBuffer)
+
+		self.appendToCommandBuffer(sender, target.getCondition())
+		self.appendToCommandBuffer(target, sender.getCondition())
+
+		sender.setLag(1)
+		sender.startCombatWith(target)
 
 
 class Bash(Command):
 	def __init__(self, game):
 		super(Bash, self).__init__(game, 'bash')
-		self.canTarget = True
-		self.requireTarget = True
-		self.aggro = True
-		self.useInCombat = True
-		self.useWhileJustDied = False
-		self.targetSelf = False
 
-	def execute(self, args, config):
-		sender = config['sender']
-		target = config['target']
+	def execute(self, args, sender):
+		# Automatic checks
+		self.test(self.checkPosition, (sender, [Position.standing,Position.fighting]))
 
-		success = True if random.randint(0, 99) > 24 else False
-		if success:
-			senderBuf = 'You send {target} sprawling with a powerful bash!\n\r'.format(target=target.getName(sender))
-			targetBuf = '{sender} sends you sprawling with a powerful bash!\n\r'.format(sender=sender.getName(target))
-			roomBuf = '{0} sends {1} sprawling with a powerful bash!\n\r'
+		target = self.test(self.getCombatTargetByArgs, (sender, args))
 
-			damage = random.randint(10, 20)
-			buf = combat.doDamage(sender, damage, 'bash', target)
+		# Target checks
+		self.test(self.notSelfTargetable, (target, sender))
+		self.test(self.isLegalCombatTarget, (target))
 
-			senderBuf += buf['sender'].format(target=target.getName(sender))
-			targetBuf += buf['target'].format(name=sender.getName(target))
-			roomBuf += buf['room']
-		else:
-			senderBuf = 'You fall flat on your face.'
-			targetBuf = '{sender} falls flat on their face.'.format(sender=sender.getName(target))
-			roomBuf = '{0} falls flat on their face.'
+		try:
+			self.test(self.simpleSuccessCheck, 100)
+		except self.CommandException as e:
+			msg = 'You fall flat on your face.'
+			self.appendToCommandBuffer(sender, msg)
 
-		sender.setLag(6)
+			for mobile in sender.inRoomExcept(sender):
+				msg = '{sender} falls flat on their face.'.format(sender=sender.getName(target))
+				self.appendToCommandBuffer(mobile, msg)
 
-		sender.sendToClient(senderBuf)
-		target.sendToClient(targetBuf)
-		sender.game.sendCondition((lambda a: a.room == sender.room and a is not sender and a is not target), roomBuf, [sender, target])
+			self.appendToCommandBuffer(sender, target.getCondition())
+			self.appendToCommandBuffer(target, sender.getCondition())
+
+			sender.startCombatWith(target)
+			sender.setLag(2)
+			return
+
+		sender.startCombatWith(target)
+		sender.setLag(2)
+
+		msg = 'You send {target} sprawling with a powerful bash!'.format(target=target.getName(sender))
+		self.appendToCommandBuffer(sender, msg)
+
+		msg = '{sender} sends you sprawling with a powerful bash!'.format(sender=sender.getName(target))
+		self.appendToCommandBuffer(target, msg)
+
+		for mobile in sender.inRoomExcept([sender,target]):
+			msg = '{sender} sends {target} sprawling with a powerful bash!'.format(sender=sender.getName(mobile),target=target.getName(mobile))
+			self.appendToCommandBuffer(mobile, msg)
+
+		damage = random.randint(5,10)
+
+		self.combatBuffer = combat.doDamage(self.game, sender, damage, noun='bash', target=target, combatBuffer=self.commandBuffer)
+
+		self.appendToCommandBuffer(sender, target.getCondition())
+		self.appendToCommandBuffer(target, sender.getCondition())
 
 commandList = [Kick, Bash, DirtKick, Trip, Disarm, Berserk]

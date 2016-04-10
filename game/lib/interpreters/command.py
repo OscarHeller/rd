@@ -52,6 +52,11 @@ class Command(object):
 
 		raise self.CommandException(msg)
 
+	def getCombatTargetByArgs(self, sender, args):
+		try:
+			return sender.getCombatTargetByArgs(args)
+		except sender.MobileException as e:
+			raise self.CommandException(str(e))
 
 	def getMobileFromListByName(self, needle, haystack):
 		if not haystack:
@@ -69,7 +74,6 @@ class Command(object):
 			if utility.matchList(needle, candidate.keywords):
 				return candidate
 		raise self.CommandException('You don\'t see that here.')
-
 
 	def getTargetFromListByName(self, needle, haystack):
 		if not haystack:
@@ -135,8 +139,7 @@ class Command(object):
 
 	def notSelfTargetable(self, target, sender):
 		if target == sender:
-			self.appendToCommandBuffer(sender, 'You can\'t target yourself with this command.')
-			raise self.SelfTargetableException()
+			raise self.CommandException('You can\'t target yourself.')
 
 	def test(self, function, args, override=None):
 		if not isinstance(args, tuple):

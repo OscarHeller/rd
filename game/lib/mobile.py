@@ -4,6 +4,7 @@ from lib.interpreters.constants import Position
 import math
 import datetime
 from item import Item
+import lib.utility as utility
 
 # classes!
 from lib.interpreters import warrior
@@ -72,6 +73,21 @@ class Mobile:
 			self.behaviors.append(Herald(self))
 		# DON'T FORGET to load in a command interpreter
 		self.commandInterpreter = CommandInterpreter(self.game, self)
+
+	class MobileException(Exception):
+		pass
+
+	def getCombatTargetByArgs(self, args):
+		if len(args) > 0:
+			key = args[0]
+			for candidate in [mobile for mobile in self.game.mobiles if mobile.room == self.room]:
+				if utility.matchList(key, candidate.keywords):
+					return candidate
+			raise self.MobileException('You don\'t see them here.')
+		elif self.combat:
+			return self.combat
+		raise self.MobileException('No default target.')
+
 
 	def checkClass(self, charClass):
 		return ('charClass' in self.stats and self.stats['charClass'] == charClass)

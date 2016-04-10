@@ -86,7 +86,7 @@ class Command(object):
 
 	def simpleSuccessCheck(self, percentage):
 		if random.randint(0,100) >= percentage:
-			raise self.SkillFailedException()
+			raise self.CommandException('Skill \'{skill}\' failed.'.format(skill=self.key))
 
 	def hasAtLeastOneArgument(self, args):
 		if not args:
@@ -103,17 +103,35 @@ class Command(object):
 
 	def isLegalCombatTarget(self, target):
 		if target.room.getStat('no_combat'):
-			raise self.IllegalCombatTargetException()
+			raise self.CommandException('You can\'t fight in this room.')
 		elif target.isAffectedBy('just died'):
-			raise self.IllegalCombatTargetException()
+			raise self.CommandException('Give them a chance to breathe before fighting again.')
 
 	def move(self, sender, direction):
+		self.test(self.checkPosition, (sender, [Position.standing,]))
+
+		oldRoom = sender.room
+
 		newRoom = next((exit.destination for exit in sender.room.exits if exit.key == direction), None)
 		if newRoom:
 			oldRoom = sender.room
 			sender.room = newRoom
 		else:
-			raise self.NoExitsException()
+			raise self.CommandException('You can\'t go that way.')
+
+		msg = 'You leave {direction}.'.format(direction=direction)
+		self.appendToCommandBuffer(sender, msg)
+
+		if not sender.isAffectedBy('sneak'):
+			for mobile in sender.inRoomExcept(sender,room=oldRoom):
+				msg = '{sender} leaves {direction}.'.format(sender=sender,direction=direction)
+				self.appendToCommandBuffer(mobile, msg)
+
+			for mobile in sender.inRoomExcept(sender):
+				msg = '{sender} has arrived.'.format(sender=sender)
+				self.appendToCommandBuffer(mobile, msg)
+
+		sender.setLag(1)
 
 	def notSelfTargetable(self, target, sender):
 		if target == sender:

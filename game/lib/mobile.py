@@ -364,8 +364,9 @@ class Mobile:
 			target.combat = self
 			target.position = Position.fighting
 
-	def inRoomExcept(self, exceptions):
+	def inRoomExcept(self, exceptions, room=None):
+		room = room if room else self.room
 		if isinstance(exceptions, list):
-			return [mobile for mobile in self.game.mobiles if mobile.room == self.room and mobile not in exceptions]
+			return [mobile for mobile in self.game.mobiles if mobile.room == room and mobile not in exceptions]
 		else:
-			return [mobile for mobile in self.game.mobiles if mobile.room == self.room and mobile != exceptions]
+			return [mobile for mobile in self.game.mobiles if mobile.room == room and mobile != exceptions]

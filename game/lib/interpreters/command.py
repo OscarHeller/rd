@@ -100,10 +100,10 @@ class Command(object):
 		if isinstance(affects, list):
 			for affect in affects:
 				if affect in [affect.name for affect in target.affects]:
-					raise self.AffectException()
+					raise self.CommandException('Target is already affected by {affect}.'.format(affect=affect.name))
 		else:
 			if affects in [affect.name for affect in target.affects]:
-				raise self.AffectException()
+				raise self.CommandException('Target is already affected by {affect}.'.format(affect=affect.name))
 
 	def isLegalCombatTarget(self, target):
 		if target.room.getStat('no_combat'):

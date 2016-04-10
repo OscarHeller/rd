@@ -29,7 +29,9 @@ class Mobile:
 			'defense': 1,
 			'charges': 2,
 			'maxcharges': 3,
-			'charClass': 'warrior'
+			'charClass': 'warrior',
+			'killer': False,
+			'nochan': False
 		}
 
 		if 'stats' in config:
@@ -68,9 +70,16 @@ class Mobile:
 		# FIX ME: not working properly, for some reason class isn't being set at the right place
 			self.commandInterpreters.extend(admin.commandList)
 
+		# fix me: replace this with a 'behavior' list in editor, like stats, items, etc.
 		if self.checkClass('herald'):
 			from behavior import Herald
 			self.behaviors.append(Herald(self))
+		if self.checkClass('guard'):
+			from behavior import Guard
+			self.behaviors.append(Guard(self))
+		if self.checkClass('aggro'):
+			from behavior import Aggressive
+			self.behaviors.append(Aggressive(self))
 		# DON'T FORGET to load in a command interpreter
 		self.commandInterpreter = CommandInterpreter(self.game, self)
 
@@ -193,12 +202,12 @@ class Mobile:
 	def getWhoDesc(self, looker=None):
 		return '[{level:2} {charRace:10} {charClass:>10}] [ {clan} ] {player} {linkdead}{name} {title}\n\r'.format(
 				level=self.level,
-				player=('[M]' if not self.is_player else '[P]'),
+				player=('[M]' if not self.is_player else '[P]') + ('[K]' if self.is_player and self.getStat('killer') else '') + ('[NOCHAN]' if self.is_player and self.getStat('nochan') else ''),
 				charRace=self.charRace.capitalize(),
 				charClass=self.getStat('charClass').capitalize(),
 				clan=self.clan,
 				name=self.getName(looker),  # FIX ME: should the name be visible when you are blinded?  probably not, right?
-				title=self.title,
+				title=self.getTitle(), # FIX ME: should any of this be visible when you are blinded?
 				linkdead='[LINKDEAD] ' if self.isLinkdead() else '')
 
 	def getCraftRecipes(self):
@@ -244,7 +253,7 @@ class Mobile:
 			if not inroom_mobiles:
 				inroom_mobiles = ['Nobody\'s here.']
 
-			inroom_items = [item.getRoomDesc(self) for item in self.room.items]
+			inroom_items = [item.getRoomDesc(self) for item in self.room.items if not item.getStat('invisible')]
 			if not inroom_items:
 				inroom_items = ['No items here.']
 
@@ -365,6 +374,9 @@ class Mobile:
 		else:
 			return 'someone'
 
+	def getTitle(self):
+		return ('@c[Nochan]@x' if self.getStat('nochan') else '') + ('@r[K]@x' if self.getStat('killer') else '') + self.title
+
 	def removeItem(self, item):
 		for key, equipment in self.equipment.iteritems():
 			if equipment == item:
@@ -374,6 +386,9 @@ class Mobile:
 	def startCombatWith(self, target):
 		if self.combat:
 			return
+		if not target.getStat('killer') and self.is_player and target.is_player:
+			self.sendToClient("@rYou are now a killer.@x")
+			self.setStat('killer', True)
 		self.combat = target
 		self.position = Position.fighting
 		if target.combat is None:

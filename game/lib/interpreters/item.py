@@ -15,6 +15,10 @@ class Get(Command):
 		# Automatic targeting
 		item = self.test(self.getItemFromListByName, (args[0], sender.room.items))
 
+		# do I just raise the exception here for picking it up?
+		if item.getStat('no_get'):
+			raise self.CommandException("You can't get that.")
+
 		# Game manipulation
 		sender.room.items.remove(item)
 		sender.inventory.append(item)

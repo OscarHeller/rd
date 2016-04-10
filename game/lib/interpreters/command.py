@@ -52,6 +52,10 @@ class Command(object):
 
 		raise self.CommandException(msg)
 
+	def checkIfCanCommunicate(self, sender):
+		if sender.getStat('nochan'):
+			raise self.CommandException('You have been muted.')
+
 	def getCombatTargetByArgs(self, sender, args):
 		try:
 			return sender.getCombatTargetByArgs(args)

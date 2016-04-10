@@ -17,3 +17,25 @@ class Herald(Behavior):
       self.mobile.processCommand("say " + self.message)
       for mobile in newInRoom:
         self.heard.append(mobile)
+
+class Guard(Behavior):
+
+  def doUpdate(self, amount):
+    if not self.mobile.combat:
+      killers = [mobile for mobile in self.mobile.inRoomExcept(self.mobile) if mobile.getStat('killer')]
+      if len(killers) > 0:
+        import random
+        killer = killers[random.randint(0, len(killers) - 1)]
+        self.mobile.processCommand("yell " + killer.name + " is a killer!  Protect the innocent!!!")
+        self.mobile.startCombatWith(killer)
+
+class Aggressive(Behavior):
+
+  def doUpdate(self, amount):
+    if not self.mobile.combat:
+      targets = [mobile for mobile in self.mobile.inRoomExcept(self.mobile) if mobile.is_player]
+      if len(targets) > 0:
+        import random
+        target = targets[random.randint(0, len(targets) - 1)]
+        self.mobile.processCommand("say You are in the wrong place, " + target.name + ".")
+        self.mobile.startCombatWith(target)

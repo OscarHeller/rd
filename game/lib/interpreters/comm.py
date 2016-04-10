@@ -10,6 +10,7 @@ class Say(Command):
 	def execute(self, args, sender):
 		# Preliminary checks
 		self.test(self.checkPosition, (sender, [Position.standing, Position.resting, Position.fighting]))
+		self.test(self.checkIfCanCommunicate, sender)
 
 		saying = ' '.join(args)
 
@@ -28,6 +29,7 @@ class Yell(Command):
 	def execute(self, args, sender):
 		# Preliminary checks
 		self.checkPosition(sender, [Position.standing, Position.resting, Position.fighting])
+		self.test(self.checkIfCanCommunicate, sender)
 
 		saying = ' '.join(args)
 
@@ -47,7 +49,8 @@ class Tell(Command):
 		# Preliminary checks
 		self.test(self.checkPosition, (sender, [Position.standing, Position.resting, Position.fighting]))
 		self.test(self.hasAtLeastOneArgument, args, override='Whom do you want to talk to?')
-
+		# fix me: can still tell when nochanned - fine?
+		
 		target = self.test(self.getMobileFromListByName, (args[0], [mobile for mobile in self.game.mobiles if mobile.is_player]))
 
 		message = args[1:]

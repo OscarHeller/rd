@@ -171,7 +171,8 @@ app.controller('mapCtrl', function ($scope) {
     $scope.newRoomStat = {};
   }
   $scope.removeRoomStat = function (field) {
-    delete $scope.newNPC.stats[field];
+    // fix me this doesn't seem to work - fix!
+    delete $scope.newRoom.stats[field];
   }
 
 

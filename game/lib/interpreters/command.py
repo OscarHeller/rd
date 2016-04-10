@@ -53,13 +53,23 @@ class Command(object):
 		raise self.CommandException(msg)
 
 
+	def getMobileFromListByName(self, needle, haystack):
+		if not haystack:
+			raise self.CommandException('You don\'t see them here.')
+		for candidate in haystack:
+			if utility.matchList(needle, candidate.keywords):
+				return candidate
+		raise self.CommandException('You don\'t see them here.')
+
+
 	def getTargetFromListByName(self, needle, haystack):
 		if not haystack:
 			raise self.TargetNotFoundException()
 		for candidate in haystack:
 			if utility.matchList(needle, candidate.keywords):
 				return candidate
-		raise self.TargetNotFoundException('You don\'t see them here.')
+		print 'getTargetFromListByName is DEPRECATED, use getMobileFromListByName or getItemFromListByName instead.'
+		raise self.TargetNotFoundException('DEPRECATED: You don\'t see them here.')
 
 	def areThereAnyExits(self, room):
 		if len(room.exits) == 0:
@@ -102,10 +112,17 @@ class Command(object):
 			raise self.SelfTargetableException()
 
 	def test(self, function, args, override=None):
+		if not isinstance(args, tuple):
+			args = (args,)
 		try:
-			function( *args )
+			returnValue = function( *args )
 		except self.CommandException as e:
 			if override:
 				raise self.CommandException(override)
 			else:
 				raise
+
+		return returnValue
+
+	def error(self, message):
+		raise self.CommandException(message)

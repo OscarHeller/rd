@@ -14,27 +14,6 @@ class Command(object):
 	class CommandException(Exception):
 		pass
 
-	class TargetNotFoundException(CommandException):
-		pass
-
-	class NoExitsException(CommandException):
-		pass
-
-	class SkillFailedException(CommandException):
-		pass
-
-	class NoArgumentsException(CommandException):
-		pass
-
-	class AffectException(CommandException):
-		pass
-
-	class IllegalCombatTargetException(CommandException):
-		pass
-
-	class SelfTargetableException(CommandException):
-		pass
-
 	def prepare(self):
 		self.commandBuffer = {}
 
@@ -53,17 +32,26 @@ class Command(object):
 		else:
 			self.commandBuffer[key] = [string,]
 
-	def checkPosition(self, sender, allowedPositions):
-		if sender.position not in allowedPositions:
+	def checkPosition(self, sender, allowedPositions, override=None):
+		if isinstance(allowedPositions, list) and sender.position in allowedPositions:
+			return
+		elif sender.position == allowedPositions:
+			return
+		else:
 			if sender.position == Position.sleeping:
-				self.appendToCommandBuffer(sender, 'In your dreams, or what?')
+				msg = 'In your dreams, or what?'
 			elif sender.position == Position.resting:
-				self.appendToCommandBuffer(sender, 'You are too relaxed.')
+				msg = 'You are too relaxed.'
 			elif sender.position == Position.fighting:
-				self.appendToCommandBuffer(sender, 'You can\'t do that in combat.')
+				msg = 'You can\'t do that in combat.'
 			elif sender.position == Position.standing:
-				self.appendToCommandBuffer(sender, 'You aren\'t fighting anyone.')
-			raise self.CommandException()
+				msg = 'You aren\'t fighting anyone.'
+
+		if override:
+			msg = override
+
+		raise self.CommandException(msg)
+
 
 	def getTargetFromListByName(self, needle, haystack):
 		if not haystack:
@@ -71,7 +59,7 @@ class Command(object):
 		for candidate in haystack:
 			if utility.matchList(needle, candidate.keywords):
 				return candidate
-		raise self.TargetNotFoundException()
+		raise self.TargetNotFoundException('You don\'t see them here.')
 
 	def areThereAnyExits(self, room):
 		if len(room.exits) == 0:
@@ -86,9 +74,13 @@ class Command(object):
 			raise self.NoArgumentsException()
 
 	def notAffectedBy(self, target, affects):
-		for affect in affects:
-			if affect in target.affects:
-				raise AffectException()
+		if isinstance(affects, list):
+			for affect in affects:
+				if affect in [affect.name for affect in target.affects]:
+					raise self.AffectException()
+		else:
+			if affects in [affect.name for affect in target.affects]:
+				raise self.AffectException()
 
 	def isLegalCombatTarget(self, target):
 		if target.room.getStat('no_combat'):
@@ -108,3 +100,12 @@ class Command(object):
 		if target == sender:
 			self.appendToCommandBuffer(sender, 'You can\'t target yourself with this command.')
 			raise self.SelfTargetableException()
+
+	def test(self, function, args, override=None):
+		try:
+			function( *args )
+		except self.CommandException as e:
+			if override:
+				raise self.CommandException(override)
+			else:
+				raise

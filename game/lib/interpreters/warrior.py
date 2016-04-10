@@ -20,16 +20,18 @@ class DirtKick(Command):
 			elif sender.combat:
 				target = sender.combat
 			else:
-				raise self.TargetNotFoundException()
+				raise self.DefaultTargetNotFoundException()
 
 			# Target checks
 			self.notSelfTargetable(target, sender)
 			self.isLegalCombatTarget(target)
 			self.notAffectedBy(target, ['dirtkick','blind'])
 
-			self.simpleSuccessCheck(50)
+			# self.simpleSuccessCheck(50)
+			self.simpleSuccessCheck(100)
 
-			sender.setLag(2)
+			# sender.setLag(1)
+			sender.setLag(0)
 			sender.startCombatWith(target)
 
 			affect.Affect.factory('DirtKick', sender, target, 2)
@@ -42,14 +44,16 @@ class DirtKick(Command):
 			self.appendToCommandBuffer(sender, target.getCondition())
 			self.appendToCommandBuffer(target, sender.getCondition())
 
-			sender.setLag(2)
+			sender.setLag(1)
 			sender.startCombatWith(target)
 		except self.AffectException as e:
 			msg = 'They are already blinded.'
 			self.appendToCommandBuffer(sender, msg)
 			self.exceptionOccurred = True
 		except self.TargetNotFoundException as e:
-			msg = 'You get your feet dirty.'
+			self.exceptionOccurred = True
+		except self.DefaultTargetNotFoundException as e:
+			msg = 'Dirt kick who?'
 			self.appendToCommandBuffer(sender, msg)
 			self.exceptionOccurred = True
 		except self.CommandException as e:
@@ -112,57 +116,72 @@ class Trip(Command):
 			self.appendToCommandBuffer(sender, msg)
 			self.exceptionOccurred = True
 		except self.CommandException as e:
+			self.appendToCommandBuffer(sender, repr(e))
 			self.exceptionOccurred = True
 
 
 class Berserk(Command):
 	def __init__(self, game):
 		super(Berserk, self).__init__(game, 'berserk')
-		self.useInCombat = True
-		self.useWhileJustDied = False
 
-	def execute(self, args, config):
-		sender = config['sender']
+	def execute(self, args, sender):
+		self.test(self.checkPosition, (sender, [Position.sleeping, Position.standing]))
+		self.test(self.notAffectedBy, (sender, 'berserk'), override='You can\'t get any angrier.')
 
-		if sender.isAffectedBy('berserk'):
-			sender.sendToClient('You can\'t get any angrier!')
-			return
-
-		# success = True if random.randint(0, 99) > 24 else False
-		success = True
-		if success:
-			sender.heal(25)
-			affect.Affect.factory('Berserk', sender, sender, 5)
-		else:
-			sender.sendToClient('You fail to get mad.')
+		sender.heal(25)
+		affect.Affect.factory('Berserk', sender, sender, 5)
 
 
 class Disarm(Command):
 	def __init__(self, game):
 		super(Disarm, self).__init__(game, 'disarm')
-		self.canTarget = True
-		self.requireTarget = True
-		self.aggro = True
-		self.useInCombat = True
-		self.useWhileJustDied = False
-		self.targetSelf = False
 
-	def execute(self, args, config):
-		sender = config['sender']
-		target = config['target']
+	def execute(self, args, sender):
+		try:
+			# Automatic checks
+			self.checkPosition(sender, [Position.fighting, Position.standing])
 
-		if not target.equipment['weapon']:
-			sender.sendToClient('They aren\'t wielding a weapon.')
-			return
+			# Automatic targeting
+			if args:
+				target = self.getTargetFromListByName(args[0], [mobile for mobile in self.game.mobiles if mobile.room == sender.room])
+			elif sender.combat:
+				target = sender.combat
+			else:
+				raise self.TargetNotFoundException()
 
-		success = True if random.randint(0, 99) > 24 else False
-		if success:
-			senderBuf = 'You disarm {target}!'.format(target=target.getName(sender))
-			targetBuf = '{sender} disarms you!'.format(sender=sender.getName(target))
-			roomBuf = '{0} disarms {1}!'
+			# Target checks
+			self.notSelfTargetable(target, sender)
+			self.isLegalCombatTarget(target)
 
-			target.inventory.append(target.equipment['weapon'])
-			target.equipment['weapon'] = None
+			# Manual checks
+			if 'weapon' not in target.equipment or not target.equipment['weapon']:
+				msg = ('They aren\'t wielding a weapon.')
+				self.appendToCommandBuffer(sender, msg)
+				return
+
+			self.simpleSuccessCheck(0)
+
+			msg = 'You disarm {target}!'.format(target=target.getName(sender))
+			self.appendToCommandBuffer(sender, msg)
+
+			msg = '{sender} disarms you!'.format(sender=sender.getName(target))
+			self.appendToCommandBuffer(sender, msg)
+
+			for mobile in [mobile for mobile in self.game.mobiles if mobile != sender and mobile != target]:
+				msg = '{sender} disarms {target}!'.format(sender=sender.getName(mobile),target=target.getName(mobile))
+				self.appendToCommandBuffer(mobile, msg)
+
+			target.removeItem(target.equipment['weapon'])
+		except self.DefaultTargetNotFoundException as e:
+			msg = 'Dirt kick who?'
+			self.appendToCommandBuffer(sender, msg)
+			self.exceptionOccurred = True
+		except TargetNotFoundException as e:
+			self.appendToCommandBuffer()
+			self.exceptionOccurred = True
+		except self.CommandException as e:
+			self.appendToCommandBuffer(sender, repr(e))
+			self.exceptionOccurred = True
 		else:
 			senderBuf = 'You fail to disarm {target}.'.format(target=target.getName(sender))
 			targetBuf = '{sender} tries to disarm you, but fails.'.format(sender=sender.getName(target))

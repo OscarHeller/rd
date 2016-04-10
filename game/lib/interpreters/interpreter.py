@@ -1,4 +1,4 @@
-from lib.interpreters import move, comm, item, saveload, status, crafting, rogue, test
+from lib.interpreters import move, comm, item, saveload, status, crafting, rogue, test, admin
 import lib.utility
 from lib.interpreters.constants import Range, Position
 
@@ -21,6 +21,7 @@ class CommandInterpreter:
 		self.commandInterpreters.extend(status.commandList)
 		self.commandInterpreters.extend(crafting.commandList)
 		self.commandInterpreters.extend(test.commandList)
+		self.commandInterpreters.extend(admin.commandList)
 
 		# Import the appropriate class interpreter
 
@@ -59,6 +60,10 @@ class CommandInterpreter:
 	def executeCommand(self, commandObject, args):
 		sender = self.mobile
 
-		commandObject.prepare()
-		commandObject.execute(args, sender)
-		commandObject.output()
+		try:
+			commandObject.prepare()
+			commandObject.execute(args, sender)
+			commandObject.output()
+		except commandObject.CommandException as e:
+			sender.sendToClient(str(e))
+

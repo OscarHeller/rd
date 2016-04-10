@@ -17,7 +17,6 @@ class PlayerCreateHandler(BaseHandler):
 	def post(self):
 		name = self.get_argument('name')
 		charClass = self.get_argument('charClass')
-		favoriteColor = self.get_argument('favoriteColor')
 		user_id = self.get_current_user()
 
 		from bson.objectid import ObjectId
@@ -33,6 +32,6 @@ class PlayerCreateHandler(BaseHandler):
 			self.set_flash(flash, 'validation')
 			self.redirect('/player/create')
 		else:
-			config = {'user_id': object_user_id, 'name': name, 'charClass': charClass, 'stats': {'favoriteColor': favoriteColor, 'charClass': charClass }}
+			config = {'user_id': object_user_id, 'name': name, 'charClass': charClass, 'stats': {'charClass': charClass }}
 			self.db.mobiles.insert_one(config)
 			self.redirect('/')

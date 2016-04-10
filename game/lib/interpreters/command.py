@@ -64,12 +64,12 @@ class Command(object):
 
 	def getTargetFromListByName(self, needle, haystack):
 		if not haystack:
-			raise self.TargetNotFoundException()
+			raise self.CommandException('DEPRECATED: You don\'t see them here.')
 		for candidate in haystack:
 			if utility.matchList(needle, candidate.keywords):
 				return candidate
 		print 'getTargetFromListByName is DEPRECATED, use getMobileFromListByName or getItemFromListByName instead.'
-		raise self.TargetNotFoundException('DEPRECATED: You don\'t see them here.')
+		raise self.CommandException('DEPRECATED: You don\'t see them here.')
 
 	def areThereAnyExits(self, room):
 		if len(room.exits) == 0:
@@ -81,7 +81,7 @@ class Command(object):
 
 	def hasAtLeastOneArgument(self, args):
 		if not args:
-			raise self.NoArgumentsException()
+			raise self.CommandException('You need at least one argument to use this command.')
 
 	def notAffectedBy(self, target, affects):
 		if isinstance(affects, list):

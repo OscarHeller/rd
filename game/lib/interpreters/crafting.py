@@ -10,71 +10,61 @@ class Craft(Command):
 		super(Craft, self).__init__(game, 'craft')
 
 	def execute(self, args, sender):
-		try:
-			# Preliminary checks
-			self.checkPosition(sender, [Position.standing,])
+		# Preliminary checks
+		self.test(self.checkPosition, (sender, [Position.standing,]))
+		self.test(self.hasAtLeastOneArgument, args, override='What do you want to craft?')
 
-			if not args:
-				msg = 'What do you want to craft?'
-				self.appendToCommandBuffer(sender, msg)
-				return
+		recipeName = args[0]
 
-			recipeName = args[0]
+		# Does the recipe exist?
+		recipe = next((r for r in self.game.recipes if r.name == recipeName), None)
 
-			# Does the recipe exist?
-			recipe = next((r for r in self.game.recipes if r.name == recipeName), None)
+		if not recipe:
+			self.error('That recipe doesn\'t exist.')
 
-			if not recipe:
-				msg = 'That recipe doesn\'t exist.'
-				self.appendToCommandBuffer(sender, msg)
-				return
+		# Do you have the ingredients? Go ingredient by ingredient, get the count, then loop through your inventory to count
+		for ingredient in recipe.ingredients:
+			ingredientName = str(ingredient)
 
-			# Do you have the ingredients? Go ingredient by ingredient, get the count, then loop through your inventory to count
-			for ingredient in recipe.ingredients:
-				ingredientName = str(ingredient)
+			numberNeeded = recipe.ingredients[ingredient]
+			numberYouHave = 0
 
-				numberNeeded = recipe.ingredients[ingredient]
-				numberYouHave = 0
+			for item in sender.inventory:
+				if item.name == ingredientName:
+					numberYouHave += 1
 
-				for item in sender.inventory:
-					if item.name == ingredientName:
-						numberYouHave += 1
+			if numberNeeded > numberYouHave:
+				self.error('You don\'t have enough {ingredient}. You need {number}.'.format(ingredient=ingredient, number=numberNeeded))
 
-				if numberNeeded > numberYouHave:
-					sender.sendToClient('You don\'t have enough {ingredient}. You need {number}.'.format(ingredient=ingredient, number=numberNeeded))
-					return
+		# You have enough of each. Take them out of your inventory and give you the recipe result
 
-			# You have enough of each. Take them out of your inventory and give you the recipe result
+		craftingBuffer = ''
 
-			craftingBuffer = ''
+		tempInventory = copy.copy(sender.inventory)
+		for ingredient in recipe.ingredients:
+			ingredientName = str(ingredient)
+			numberNeeded = recipe.ingredients[ingredient]
 
-			tempInventory = copy.copy(sender.inventory)
-			for ingredient in recipe.ingredients:
-				ingredientName = str(ingredient)
-				numberNeeded = recipe.ingredients[ingredient]
+			# Get the object associated with that name (REFACTOR: should be ID)
 
-				# Get the object associated with that name (REFACTOR: should be ID)
+			for item in sender.inventory:
+				if item.name == ingredientName:
+					tempInventory.remove(item)
+					numberNeeded -= 1
+					craftingBuffer += '{name} is consumed.\n\r'.format(name=item.name)
 
-				for item in sender.inventory:
-					if item.name == ingredientName:
-						tempInventory.remove(item)
-						numberNeeded -= 1
-						craftingBuffer += '{name} is consumed.\n\r'.format(name=item.name)
+					if numberNeeded <= 0:
+						break
 
-						if numberNeeded <= 0:
-							break
+		sender.inventory = tempInventory
 
-			sender.inventory = tempInventory
+		# Give them the recipe result
 
-			# Give them the recipe result
+		newItem = copy.deepcopy(recipe.result)
+		sender.inventory.append(newItem)
 
-			newItem = copy.deepcopy(recipe.result)
-			sender.inventory.append(newItem)
-
-			craftingBuffer += 'You receive {newItem}.'.format(newItem=newItem.name)
-			sender.sendToClient(craftingBuffer)
-		except self.CommandException as e:
-			self.exceptionOccurred = True
+		craftingBuffer += 'You receive {newItem}.'.format(newItem=newItem.name)
+		sender.sendToClient(craftingBuffer)
 
 
 class craftingIngredient(lib.item.Item):

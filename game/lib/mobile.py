@@ -217,14 +217,12 @@ class Mobile:
 			ingredients = []
 
 			for ingredient in recipe.ingredients:
-				ingredients.append({
-					'count' : recipe.ingredients[ingredient],
-					'name' : ingredient
-					})
+				ingredients.append({'count': 1, 'name': ingredient['name']})
 
 			craft[recipe.name] = ingredients
 
 		return craft
+
 
 	def sendToClient(self, message, names=None, comm=False):
 		names = names if names else []
@@ -375,7 +373,7 @@ class Mobile:
 			return 'someone'
 
 	def getTitle(self):
-		return ('@c[Nochan]@x' if self.getStat('nochan') else '') + ('@r[K]@x' if self.getStat('killer') else '') + self.title
+		return self.title
 
 	def removeItem(self, item):
 		for key, equipment in self.equipment.iteritems():

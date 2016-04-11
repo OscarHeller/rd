@@ -31,9 +31,25 @@ class BaseHandler(tornado.web.RequestHandler):
 				if 'delete' in room and room['delete'] == 1:
 					self.db.rooms.delete_one({'_id': room['_id']})
 				else:
+					print 'rom', room
 					self.db.rooms.update_one({'_id': room['_id']}, {'$set': room}, True)
 			else:
 				self.db.rooms.insert_one(room)
+
+	def get_recipes(self):
+		return self.db.recipes.find()
+
+	def set_recipes(self, recipes):
+		for i in range(0, len(recipes)):
+			recipe = recipes[i]
+			if '_id' in recipe:
+				if 'delete' in recipe and recipe['delete'] == 1:
+					self.db.recipes.delete_one({'_id': recipe['_id']})
+				else:
+					print "htm", recipe
+					self.db.recipes.update_one({'_id': recipe['_id']}, {'$set': recipe}, True)
+			else:
+				self.db.recipes.insert_one(recipe)
 
 	def get_items(self):
 		return self.db.items.find()

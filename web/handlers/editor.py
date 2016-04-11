@@ -15,7 +15,8 @@ class EditorHandler(BaseHandler):
         items = [item for item in self.get_items()]
         npcs = [npc for npc in self.get_npcs()]
         images = [image for image in self.get_images()]
-        result = {'rooms': rooms, 'items': items, 'npcs': npcs, 'images': images}
+        recipes = [recipe for recipe in self.get_recipes()]
+        result = {'rooms': rooms, 'items': items, 'npcs': npcs, 'images': images, 'recipes': recipes}
         from bson.json_util import dumps
         self.write(dumps(result))
 
@@ -27,6 +28,7 @@ class EditorHandler(BaseHandler):
         newRoomData = data['rooms']
         newItemData = data['items']
         newNPCData = data['npcs']
+        newRecipeData = data['recipes']
         #newRoomData = self.get_argument('rooms')
         #newItemData = self.get_argument('items')
         #newNPCData = self.get_argument('npcs')
@@ -35,3 +37,4 @@ class EditorHandler(BaseHandler):
         self.set_rooms(newRoomData)
         self.set_items(newItemData)
         self.set_npcs(newNPCData)
+        self.set_recipes(newRecipeData)

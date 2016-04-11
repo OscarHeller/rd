@@ -19,6 +19,24 @@ Range				(Range.room)		: for skills that canTarget, what is the range of potenti
 minPosition			(Position.standing)	: what is the minimum position as defined in constants.py?
 """
 
+class Recall(Command):
+	def __init__(self, game):
+		super(Recall, self).__init__(game, 'recall')
+
+	def execute(self, args, sender):
+		# Preliminary checks
+		self.test(self.checkPosition, (sender, [Position.standing]))
+		if sender.room.getStat('no_recall'):
+			raise self.CommandException("You can't recall from this room.")
+		self.appendToCommandBuffer(sender, "You pray for transportation.")
+		for mobile in sender.inRoomExcept(sender):
+			self.appendToCommandBuffer(mobile, sender.getName(mobile) + " prays for transportation.")
+		self.test(self.simpleSuccessCheck, 65, override='You failed!')
+
+		self.appendToCommandBuffer(sender, "You vanish!")
+		for mobile in sender.inRoomExcept(sender):
+			self.appendToCommandBuffer(mobile, sender.getName(mobile) + " vanishes!")
+		sender.room = self.game.rooms[0] # FIX ME: some way of specifying which room to recall to
 
 class Flee(Command):
 	def __init__(self, game):
@@ -133,4 +151,4 @@ class Down(Command):
 	def execute(self, args, sender):
 		self.move(sender, 'down')
 
-commandList = [North, South, East, West, Up, Down, Kill, Flee]
+commandList = [North, South, East, West, Up, Down, Kill, Flee, Recall]

@@ -17,14 +17,17 @@ app.controller('mapCtrl', function ($scope) {
     $scope.items = [];
     $scope.npcs = [];
     $scope.images = [];
+    $scope.recipes = [];
 
     $scope.setNewRoom();
     $scope.setNewExit();
     $scope.setNewItem();
     $scope.setNewNPC();
+    $scope.setNewRecipe();
     $scope.newItemRoomKey = "";
     $scope.newItemNPCKey = "";
     $scope.newItemKeyword = "";
+    $scope.newRecipeIngredient = "";
 
     var request = new XMLHttpRequest();
     request.open('POST', '/editor', true);
@@ -35,6 +38,7 @@ app.controller('mapCtrl', function ($scope) {
       var item_response = response['items'];
       var npc_response = response['npcs'];
       var image_response = response['images'];
+      var recipe_response = response['recipes'];
 
       for (var i = 0; i < room_response.length; i++) {
         $oid = room_response[i]['_id']['$oid'];
@@ -53,6 +57,10 @@ app.controller('mapCtrl', function ($scope) {
 
       for (let i = 0; i < image_response.length; i++) {
         $scope.images.push(image_response[i]);
+      }
+
+      for (let i = 0; i < recipe_response.length; i++) {
+        $scope.recipes.push(recipe_response[i]);
       }
 
       $scope.$digest();
@@ -176,6 +184,32 @@ app.controller('mapCtrl', function ($scope) {
   }
 
 
+  $scope.setNewRecipe = function () {
+    $scope.newRecipe = {};
+  }
+  $scope.submitRecipe = function () {
+    $scope.recipes.push($scope.newRecipe);
+    $scope.setNewRecipe();
+    $scope.save();
+  }
+  $scope.removeRecipe = function (recipe) { 
+    if (window.confirm("Are you sure you want to delete this npc?")) {
+      recipe['delete'] = 1;
+    }
+  }
+  $scope.editRecipe = function (recipe) {
+    $scope.newRecipe = recipe;
+  };
+  $scope.addRecipeIngredient = function () {
+    if (!$scope.newRecipe.ingredients) $scope.newRecipe.ingredients = [];
+    $scope.newRecipe.ingredients.push($scope.newRecipeIngredient);
+    $scope.newRecipeIngredient = "";
+  }
+  $scope.removeRecipeIngredient = function (recipe) {
+    var i = $scope.newRecipe.ingredients.indexOf(recipe);
+    $scope.newRecipe.ingredients.splice(i, 1);
+  }
+
   $scope.setNewNPC = function () {
     $scope.newNPC = {};
   };
@@ -212,6 +246,7 @@ app.controller('mapCtrl', function ($scope) {
   }
   $scope.removeNPCStat = function (field) {
     delete $scope.newNPC.stats[field];
+    console.log('here!', $scope.newNPC.stats, field);
   }
   $scope.addItemToNPC = function () {
     if (!$scope.newNPC.inventory) $scope.newNPC.inventory = [];
@@ -234,7 +269,7 @@ app.controller('mapCtrl', function ($scope) {
     //var npcs = angular.toJson($scope.npcs);
 
     var data = {
-      rooms: $scope.rooms, items: $scope.items, npcs: $scope.npcs
+      rooms: $scope.rooms, items: $scope.items, npcs: $scope.npcs, recipes: $scope.recipes
     };
 
     //var data = 'rooms=' + rooms + '&items=' + items + '&npcs=' + npcs;

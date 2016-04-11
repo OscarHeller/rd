@@ -22,50 +22,33 @@ class Craft(Command):
 		if not recipe:
 			self.error('That recipe doesn\'t exist.')
 
+		ingredients = [ingredient['_id'] for ingredient in recipe.ingredients]
+		quantities = {ingredient: ingredients.count(ingredient) for ingredient in set(ingredients)}
 		# Do you have the ingredients? Go ingredient by ingredient, get the count, then loop through your inventory to count
-		for ingredient in recipe.ingredients:
-			ingredientName = str(ingredient)
+		print quantities
 
-			numberNeeded = recipe.ingredients[ingredient]
+		for field, value in quantities.iteritems():
+			numberNeeded = value
 			numberYouHave = 0
 
 			for item in sender.inventory:
-				if item.name == ingredientName:
+				print item.id, field
+				if item.id == field:
+					print "got one!"
 					numberYouHave += 1
 
 			if numberNeeded > numberYouHave:
-				self.error('You don\'t have enough {ingredient}. You need {number}.'.format(ingredient=ingredient, number=numberNeeded))
+				self.error('You don\'t have all the ingredients - double check your recipe!')
 
-		# You have enough of each. Take them out of your inventory and give you the recipe result
+		for field, value in quantities.iteritems():
+			matching = [item for item in sender.inventory if item.id == field]
+			for i in range(0, value):
+				sender.inventory.remove(matching[i])
+				self.appendToCommandBuffer(sender, "Using one '{item}'...".format(item=matching[i].name))
 
-		craftingBuffer = ''
-
-		tempInventory = copy.copy(sender.inventory)
-		for ingredient in recipe.ingredients:
-			ingredientName = str(ingredient)
-			numberNeeded = recipe.ingredients[ingredient]
-
-			# Get the object associated with that name (REFACTOR: should be ID)
-
-			for item in sender.inventory:
-				if item.name == ingredientName:
-					tempInventory.remove(item)
-					numberNeeded -= 1
-					craftingBuffer += '{name} is consumed.\n\r'.format(name=item.name)
-
-					if numberNeeded <= 0:
-						break
-
-		sender.inventory = tempInventory
-
-		# Give them the recipe result
-
-		newItem = copy.deepcopy(recipe.result)
-		sender.inventory.append(newItem)
-
-		craftingBuffer += 'You receive {newItem}.'.format(newItem=newItem.name)
-		sender.sendToClient(craftingBuffer)
-
+		product = lib.item.Item(recipe.product)
+		sender.inventory.append(product)
+		self.appendToCommandBuffer(sender, "You have crafted a brand new {product}!".format(product=product.name))
 
 class craftingIngredient(lib.item.Item):
 	def __init__(self, config):
@@ -78,7 +61,7 @@ class craftingIngredient(lib.item.Item):
 
 class craftingRecipe:
 	def __init__(self, name):
-		self.ingredients = {}
+		self.ingredients = []
 		self.name = name
 
 

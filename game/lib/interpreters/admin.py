@@ -109,6 +109,46 @@ class SpawnMobile(Command):
       msg = 'You must choose a valid mobile index.'
       self.appendToCommandBuffer(sender, msg)
 
+class MovePlayer(Command):
+  def __init__(self, game):
+    super(MovePlayer, self).__init__(game, 'moveplayer')
+
+  def execute(self, args, sender):
+    #quick double check here, but only immortals should even have this command
+    if len(args) <= 0:
+      buf = "Players: \n\r"
+      players = [mobile for mobile in self.game.mobiles if mobile.client]
+      for i in range(0, len(players)):
+        buf += str(i) + ": " + players[i].name + "\n\r"
+
+      self.appendToCommandBuffer(sender, buf)
+    elif args[0].isdigit():
+      players = [mobile for mobile in self.game.mobiles if mobile.client]
+      vnum = int(args[0])
+      #args.remove(0)
+      if vnum < len(players):
+        player = players[vnum]
+        rooms = self.game.rooms
+        if len(args) <= 1:
+          buf = "Rooms: \n\r"
+          for i in range(0, len(rooms)):
+            buf += '{index}: {name}\n\r'.format(index=i, name=rooms[i].name)
+          self.appendToCommandBuffer(sender, buf)
+        elif args[1].isdigit() and int(args[1]) < len(rooms):
+          room_id = int(args[1])
+          self.appendToCommandBuffer(sender, "You move {player} to {room}".format(player=player.name, room=rooms[room_id].name))
+          self.appendToCommandBuffer(player, "You find yourself suddenly in {room}".format(room=rooms[room_id].name))
+          player.room = rooms[room_id]
+          # FIX ME: should force save for player that has been moved, so they can't relog quickly to escape!
+        else:
+          self.appendToCommandBuffer(sender, "Invalid Room Id")
+      else:
+        msg = 'You must choose a valid player index.'
+        self.appendToCommandBuffer(sender, msg)        
+    else:
+      msg = 'You must choose a valid player index.'
+      self.appendToCommandBuffer(sender, msg)
+
 class PlayerList(Command):
   def __init__(self, game):
     super(PlayerList, self).__init__(game, 'playerlist')
@@ -220,4 +260,4 @@ class WizInfo(Command):
     """
     self.appendToCommandBuffer(sender, buf)
 
-commandList = [Goto, CreateItem, SpawnMobile, PlayerList, Reload, Repop, SetStat, WizInfo]
+commandList = [Goto, CreateItem, SpawnMobile, PlayerList, Reload, Repop, SetStat, WizInfo, MovePlayer]

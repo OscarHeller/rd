@@ -5,7 +5,7 @@ from exit import Exit
 from area import Area
 from item import Item
 from mobile import Mobile
-from interpreters.crafting import craftingInit
+from interpreters.crafting import craftingRecipe
 from lib.interpreters.constants import Range
 import utility
 
@@ -172,6 +172,17 @@ class Game:
 		for i in range(0, len(items)):
 			self.items[str(items[i]['_id'])] = items[i]
 
+	def loadRecipes(self):
+		recipes = [recipe for recipe in self.db.recipes.find()]
+		self.recipes = []
+		for recipe in recipes:
+			newRecipe = craftingRecipe(recipe['name'])
+			newRecipe.product = self.items[recipe['product']] if recipe['product'] in self.items else None
+			for ingredient in recipe['ingredients']:
+				if ingredient in self.items:
+					newRecipe.ingredients.append(self.items[ingredient])
+			self.recipes.append(newRecipe)
+
 	def loadRooms(self):
 		rooms = self.db.rooms.find()
 		for i in range(0, rooms.count()):   # default is zero
@@ -221,6 +232,7 @@ class Game:
 		self.loadItems() # loads item 'prototypes'
 		self.loadMobiles()
 		self.loadRooms()
+		self.loadRecipes()
 		"""
 		self.rooms.append(Room(self, 'The Temple of Bosco'))
 		self.rooms.append(Room(self, 'Temple Square'))
@@ -247,4 +259,4 @@ class Game:
 		for room in self.rooms:
 			room.area = midgaard
 
-		craftingInit(self)
+		#craftingInit(self)

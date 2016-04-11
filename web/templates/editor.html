@@ -84,6 +84,23 @@ td .content {
             </ul>
           </div>
         </div>
+        <div class="panel panel-default">
+          <div class="panel-heading" href="#collapse4" data-toggle="collapse">
+              <h4 class="h4 panel-title">Recipes:<span class="glyphicon glyphicon-chevron-down pull-right"></span></h4>
+          </div>
+          <div class="panel-collapse collapse" id="collapse4">
+            <ul class="list-group">
+              <li class="list-group-item {{! isDeleted(recipe) }}" ng-repeat="recipe in recipes track by $index">
+                <div class="row">
+                  <div class="col-xs-8">
+                    <span class="" ng-click="editRecipe(recipe);">{{! findItem(recipe.product) }}</span>
+                  </div>
+                  <div class="col-xs-4 text-right"><a href="" class="btn btn-danger btn-sm glyphicon glyphicon-remove" ng-click="removeRecipe(recipe)"></a></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>        
         <div class="well"><a href="/media" class="btn btn-primary">Upload Images</a></div>
       </div>
       <div class="col-sm-8">
@@ -255,7 +272,7 @@ td .content {
                 <li>Stats:</li>
                 <li ng-repeat="(field, value) in newNPC.stats">
                   <div class="label label-success"><strong>{{! field }}:</strong> {{! value }}
-                    <a href="" class="glyphicon glyphicon-remove" ng-click="removeNPCStat(stat);"></a>
+                    <a href="" class="glyphicon glyphicon-remove" ng-click="removeNPCStat(field);"></a>
                   </div>
                 </li>
               </ul>
@@ -286,6 +303,7 @@ td .content {
             <a href="" class="btn btn-default" ng-click="setNewNPC()">Cancel</a>             
           </div>
         </div>
+        <!-- ITEMS -->
         <div class="panel panel-info">
           <div class="panel-heading" href="#collapseAddItem" data-toggle="collapse">
             <h3 class="h3 panel-title">Add/Edit Item</h3>
@@ -352,7 +370,55 @@ td .content {
             <a href="" class="btn btn-default" ng-click="setNewItem()">Cancel</a>             
           </div>
         </div>
-      <a ng-click='save();' class='btn btn-lg btn-primary'>Save!</a>    
+        <!-- RECIPES -->
+        <div class="panel panel-danger">
+          <div class="panel-heading" href="#collapseAddRecipe" data-toggle="collapse">
+            <h3 class="h3 panel-title">Add/Edit Recipe</h3>
+          </div>
+          <div class="panel-body panel-collapse collapse" id="collapseAddRecipe">
+            <div class="form-group row">
+              <div class="col-xs-3">
+                <label for="itemName">Product: </label>
+              </div>
+              <div class="col-xs-9">
+                <select class="form-control" ng-model="newRecipe.product">
+                  <option ng-repeat="item in items track by $index" value="{{! item['_id']['$oid'] }}">{{! item['name'] }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-xs-3"><label>Name: </label></div>
+              <div class="col-xs-9"><input type="text" class="form-control" ng-model="newRecipe.name"></div>
+            </div>
+            <div class="form-group row">
+              <div class="col-xs-3">
+                <label for="itemName">Ingredients: </label>
+              </div>
+              <div class="col-xs-4">
+                <select class="form-control" ng-model="newRecipeIngredient">
+                  <option ng-repeat="item in items track by $index" value="{{! item['_id']['$oid'] }}">{{! item['name'] }}</option>
+                </select>
+              </div>
+              <div class="col-xs-2"><a ng-click="addRecipeIngredient();" class="btn btn-warning glyphicon glyphicon-plus"></a></div>
+            </div>
+            <div class="row">
+              <ul class="list-group">
+                <li ng-repeat="ingredient in newRecipe.ingredients track by $index" class="list-group-item">
+                  <div class="label label-success">{{! findItem(ingredient) }}
+                    <a href="" class="glyphicon glyphicon-remove" ng-click="removeRecipeIngredient(ingredient);"></a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="row">
+              <div class="col-xs-12">
+                <a href="" class="btn btn-primary" ng-click="submitRecipe()">Submit</a>
+                <a href="" class="btn btn-default" ng-click="setNewRecipe()">Cancel</a>             
+              </div>
+            </div>
+          </div>
+        </div>
+        <a ng-click='save();' class='btn btn-lg btn-primary'>Save!</a>    
       </div>
     </div>
   </div>

@@ -38,7 +38,7 @@ class Affect(object):
 	def refresh(self):
 		existingAffect = self.target.isAffectedBy(self.name)
 		existingAffect.duration = self.duration
-		self.target.sendToClient('{caster} refreshes your {name}.'.format(caster=self.caster.getName(self.target), name=self.name))
+		#self.target.sendToClient('{caster} refreshes your {name}.'.format(caster=self.caster.getName(self.target), name=self.name))
 
 	def apply(self):
 		if not self.visible:

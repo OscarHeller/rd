@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html>
-  <head>
-  	<meta charset="UTF-8">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-	<link href="{{ static_url('css/home.css') }}" type="text/css" rel="stylesheet" />
-  </head>
-  <body>
+{% extends "base.html" %}
+
+{% block head %}
+{% end %}
+
+{% block body %}
   {% if current_user %}
-	{% include partials/characters.html %}
+		{% include partials/characters.html %}
 	{% else %}
-	{% include partials/new_user.html %}
+		{% include partials/new_user.html %}
 	{% end %}
-	</body>
-</html>
+{% end %}

@@ -1,13 +1,21 @@
+* {
+	box-sizing: border-box;
+}
+
 @font-face {
 	font-family: HeadingFont;
 	src: url('../media/fonts/Plane Crash.ttf');
 }
 
+html, body {
+	height: 100%;
+	width: 100%;
+}
+
 body {
-	background-image: url('../media/sunset.png');
-	background-size: cover;
-	background-position: top;
 	font-family: Roboto, sans-serif;
+	display: flex;
+	flex-direction: column;
 }
 
 h1 {
@@ -21,4 +29,80 @@ h1 {
 
 .single-character {
 	padding: 10px;
+}
+
+a, a:visited, a:hover {
+	text-decoration: none;
+	color: inherit;
+}
+
+.hero {
+	position: absolute;
+	z-index: 2;
+	pointer-events: none;
+	width: 100%;
+	background: linear-gradient(to bottom, black, transparent);
+	color: white;
+}
+
+.menus {
+	display: flex;
+	flex-direction: row;
+	flex-grow: 6;
+	position: relative;
+	height: 100%;
+	color: white;
+}
+
+.hero h1 {
+	font-size: 72px;
+	margin: 10px;
+}
+
+.menus h1 {
+	position: absolute;
+	bottom: 10px;
+	margin: 10px;
+}
+
+.menus a:last-child h1 {
+	right: 0;
+}
+
+.navbar {
+	margin-bottom: 0;
+	border-radius: 0;
+	border: none;
+}
+
+.single-character {
+	padding: 10px;
+}
+
+.menus a {
+	flex-grow: 6;
+	transition: all 0.5s;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	display: block;
+	color: inherit;
+}
+
+.menus a:hover {
+	flex-grow: 7;
+	color: red;
+}
+
+.menus a:first-child {
+	background-image: url('../media/duel.jpg');
+	border-right: 2px solid black;
+}
+
+.menus a:last-child {
+	background-image: url('../media/spring.jpg');
+}
+
+.glyphicon:before {
+    margin-right: 5px;
 }

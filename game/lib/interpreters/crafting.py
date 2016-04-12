@@ -48,7 +48,11 @@ class Craft(Command):
 
 		product = lib.item.Item(recipe.product)
 		sender.inventory.append(product)
-		self.appendToCommandBuffer(sender, "You have crafted a brand new {product}!".format(product=product.name))
+		self.appendToCommandBuffer(sender, "You craft a brand new {product}!".format(product=product.getName(sender)))
+
+		for mobile in sender.inRoomExcept(sender):
+			msg = '{sender} crafts a brand new {product}.'.format(sender=sender.getName(mobile), product=product.getName(mobile))
+			self.appendToCommandBuffer(mobile, msg)
 
 class craftingIngredient(lib.item.Item):
 	def __init__(self, config):

@@ -146,6 +146,10 @@ class Nervous(Affect):
 		super(Nervous, self).__init__('nervousness', caster, target, duration, REFRESHABLE, NOT_FRIENDLY)
 		# super(Nervous, self).__init__('nervousness', caster, target, duration, REFRESHABLE, NOT_FRIENDLY, visible=NOT_VISIBLE)
 
+	def wear(self):
+		self.target.affects.remove(self)
+		self.target.sendToClient('You feel less nervous.')
+
 
 class Stun(Affect):
 	def __init__(self, caster, target, duration):
@@ -156,6 +160,10 @@ class JustDied(Affect):
 	def __init__(self, caster, target, duration):
 		super(JustDied, self).__init__('just died', caster, target, duration, REFRESHABLE, NOT_FRIENDLY)
 		# super(JustDied, self).__init__('just died', caster, target, duration, REFRESHABLE, NOT_FRIENDLY, visible=NOT_VISIBLE)
+
+	def wear(self):
+		self.target.affects.remove(self)
+		self.target.sendToClient('You are ready to fight again.')
 
 
 class Sneak(Affect):

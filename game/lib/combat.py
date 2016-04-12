@@ -81,6 +81,9 @@ def doHit(game, fighter, combatBuffer=None):
 
 
 def doDamage(game, fighter, amount, noun='hit', target=None, combatBuffer=None):
+	fighter.becomeNervous(target)
+	target.becomeNervous(fighter)
+	
 	combatBuffer = {} if not combatBuffer else combatBuffer
 
 	if not target:

@@ -38,6 +38,11 @@ jQuery(function($){
       else {
         historyPointer = 0;
         commandHistory.unshift(text);
+        // Append the command to the output
+
+
+        $('.output > ul').append('<li class="client-command">' + text + '</li>');
+
         socket.send(text);        
       }
       $txt.val('');    

@@ -4,6 +4,8 @@ from bson.objectid import ObjectId
 
 class ClientHandler(BaseHandler):
 	def get(self, slug):
+		self.validateInternalPageAccess()
+
 		# Get player ID.
 		player_id = slug
 

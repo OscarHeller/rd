@@ -20,6 +20,10 @@ class AuthLoginHandler(BaseHandler):
 		if doc:
 			stringID = str(doc['_id'])
 			self.set_secure_cookie('rdu_user', stringID)
+			
+			flash = Flash('Welcome to Redemption: Unleashed.', css_class='alert-success')
+			self.set_flash(flash, 'validation')
+
 			self.redirect('/')
 		else:
 			# No such user or wrong password.

@@ -2,11 +2,9 @@ from base import BaseHandler
 
 class EditorHandler(BaseHandler):
   def get(self):
-    user_id = self.get_current_user()
-    if user_id:
-        self.render('editor.html')
-    else:
-        self.render('error.html')
+    self.validateInternalPageAccess()
+
+    self.render('editor.html')
 
   def post(self):
     user_id = self.get_current_user()

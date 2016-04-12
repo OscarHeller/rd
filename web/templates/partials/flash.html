@@ -1,8 +1,6 @@
 {% try %}
 	{% if flash_msg and css_class %}
-	<div class='container'>
 	<div class='alert {{ css_class }}'>{{ flash_msg }}</div>
-	</div>
 	{% end %}
 {% except %}
 {% end %}

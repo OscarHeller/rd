@@ -6,12 +6,12 @@ root = os.path.dirname(__file__).replace('handlers', '')
 
 class MediaHandler(BaseHandler):
   def get(self):
+    self.validateInternalPageAccess()
+
     images = [image for image in self.get_images()]
     user_id = self.get_current_user()
-    if user_id:
-        self.render('media.html', images=images)
-    else:
-        self.render('error.html')
+
+    self.render('media.html', images=images)
 
   def post(self):
     user_id = self.get_current_user()

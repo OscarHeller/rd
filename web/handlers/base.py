@@ -7,6 +7,12 @@ class BaseHandler(tornado.web.RequestHandler):
 	def initialize(self, db=None):
 		self.db = db
 
+	def validateInternalPageAccess(self):
+		if not self.get_current_user():
+			flash = Flash('You must be logged in to access that page.', css_class='alert-danger')
+			self.set_flash(flash, 'validation')
+			self.redirect('/')
+
 	def write_error(self, status_code, **kwargs):
 		print str(status_code) + ' Error'
 		if status_code == 404:

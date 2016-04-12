@@ -7,6 +7,8 @@ from flash import Flash
 
 class PlayerCreateHandler(BaseHandler):
 	def get(self):
+		self.validateInternalPageAccess()
+
 		if self.has_flash('validation'):
 			flash = self.get_flash('validation')
 			self.render('player/create.html', flash_msg=flash.message, css_class=flash.css_class)
@@ -34,4 +36,9 @@ class PlayerCreateHandler(BaseHandler):
 		else:
 			config = {'user_id': object_user_id, 'name': name, 'charClass': charClass, 'stats': {'charClass': charClass }}
 			self.db.mobiles.insert_one(config)
+
+			flash = Flash('New character "{name}" successfully created.'.format(name=name), css_class='alert-success')
+			self.set_flash(flash, 'validation')
+			self.redirect('/')
+
 			self.redirect('/')

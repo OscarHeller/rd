@@ -62,8 +62,8 @@ class Affect(object):
 		for mobile in self.target.inRoomExcept(self.target):
 			mobile.sendToClient('{target} is no longer affected by {name}.'.format(target=self.target,name=self.name))
 
-	def update(self):
-		self.duration -= 1
+	def update(self, amount):
+		self.duration -= amount
 		if self.duration <= 0:
 			self.wear()
 

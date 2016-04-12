@@ -382,10 +382,9 @@ class Mobile:
 			if self.linkdead <= 0:
 				self.leaveGame()
 
-
 	def updateAffects(self, amount):
 		for affect in self.affects:
-			affect.update()
+			affect.update(amount)
 
 	def isAffectedBy(self, key):
 		if key in [affect.name for affect in self.affects]:
@@ -399,10 +398,11 @@ class Mobile:
 		if self.commandInterpreter.lag > 0:
 			self.commandInterpreter.lag -= amount
 		if self.commandInterpreter.lag <= 0 and len(self.commandInterpreter.commandQueue) > 0:
-			self.processCommand(self.commandInterpreter.commandQueue.pop(0))
+			self.commandInterpreter.processCommand(self.commandInterpreter.commandQueue.pop(0))
 
 	def processCommand(self, command):
-		self.commandInterpreter.processCommand(command)
+		print 'Appending {command} to queue.'.format(command=command)
+		self.commandInterpreter.commandQueue.append(command)
 
 	def getName(self, looker=None):
 		if looker and (looker.isAffectedBy('blind') or looker.isAffectedBy('dirtkick')):

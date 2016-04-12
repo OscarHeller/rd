@@ -28,12 +28,9 @@ class CommandInterpreter:
 
 	def processCommand(self, command):
 		print 'inside CommandInterpreter: ' + command
-		if self.lag > 0:
-			self.commandQueue.append(command)
-			return
-		elif len(command) <= 0:
-			return
 
+		if len(command) <= 0:
+			return
 
 		verb = command.split()[0]
 		args = command.split()[1:]

@@ -26,6 +26,7 @@ class Recall(Command):
 	def execute(self, args, sender):
 		# Preliminary checks
 		self.test(self.checkPosition, (sender, [Position.standing]))
+
 		if sender.room.getStat('no_recall'):
 			raise self.CommandException("You can't recall from this room.")
 		self.appendToCommandBuffer(sender, "You pray for transportation.")

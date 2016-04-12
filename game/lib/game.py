@@ -8,6 +8,7 @@ from mobile import Mobile
 from interpreters.crafting import craftingRecipe
 from lib.interpreters.constants import Range
 import utility
+import datetime
 
 from threading import Timer
 from pymongo import MongoClient
@@ -21,8 +22,10 @@ class Game:
 		self.recipes = []
 		self.online = True
 
+		self.startTime = datetime.datetime.now()
+
 		self.clock = 0
-		self.interval = 1.0
+		self.interval = 0.25
 
 		self.client = MongoClient('localhost')  # FIX ME: this is set in two places, here and in tornadoServer.py. Should be only one.
 		# self.client = MongoClient('mongodb://rdu:omghot4u@ds027769.mongolab.com:27769/redemptionunleashed')
@@ -72,13 +75,20 @@ class Game:
 
 		# Restore charges
 		if self.clock % 6 * self.interval == 0:
+			print ' - Charge Update ' + str(datetime.datetime.now().time())
 			for mobile in [m for m in self.mobiles if m.getStat('charges') < m.getStat('maxcharges')]:
 				mobile.setStat('charges', mobile.getStat('charges') + 1)
 
 		for mobile in self.mobiles:
 			mobile.update(self.interval)
 
-		combat.doGlobalRound(self)
+		if self.clock % 2 == 0:
+			print ' - Combat Update ' + str(datetime.datetime.now().time())
+			combat.doGlobalRound(self)
+
+		if self.clock > 0 and self.clock % 10 == 0:
+			latency = ( ( datetime.datetime.now() - self.startTime ).seconds - self.clock ) / self.clock
+			print 'Game Update {time} : {latency}'.format(time=str(datetime.datetime.now().time()),latency=latency)
 
 		Timer(self.interval, self.updateGame).start()
 

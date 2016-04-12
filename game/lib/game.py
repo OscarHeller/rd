@@ -110,7 +110,7 @@ class Game:
 				return False
 		else:
 			# Make a new mobile
-			name = playerData['name']
+			name = playerData['name'].capitalize()
 			stats = playerData['stats'] if 'stats' in playerData else {}
 
 			newMobile = Mobile(name, self, {'stats': stats})

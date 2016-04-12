@@ -100,7 +100,6 @@ class Kill(Command):
 		# sender does one full round against target
 		combatBuffer = {}
 		combatBuffer = combat.doSingleRound(sender.game, sender, combatBuffer=combatBuffer)
-		combat.appendConditionsToCombatBuffer(combatBuffer)
 		combat.sendCombatBuffer(self.game, combatBuffer)
 
 

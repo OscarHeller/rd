@@ -40,12 +40,12 @@ def doGlobalRound(game):
 	for fighter in fighters:
 		combatBuffer = doSingleRound(game, fighter, combatBuffer=combatBuffer)
 
-	# Append conditions for everyone who's in combat.
-	combatBuffer = appendConditionsToCombatBuffer(combatBuffer)
-
 	sendCombatBuffer(game, combatBuffer)
 
 def doSingleRound(game, fighter, combatBuffer=None):
+	if not fighter.combat:
+		return combatBuffer
+
 	combatBuffer = {} if not combatBuffer else combatBuffer
 
 	target = fighter.combat
@@ -57,6 +57,8 @@ def doSingleRound(game, fighter, combatBuffer=None):
 
 
 def doHit(game, fighter, combatBuffer=None):
+	if not fighter.combat:
+		return combatBuffer
 
 	if 'weapon' in fighter.equipment and fighter.equipment['weapon'] and fighter.equipment['weapon'].noun:
 		noun = fighter.equipment['weapon'].getNoun()
@@ -81,9 +83,12 @@ def doHit(game, fighter, combatBuffer=None):
 
 
 def doDamage(game, fighter, amount, noun='hit', target=None, combatBuffer=None):
+	if not target:
+		return combatBuffer
+
 	fighter.becomeNervous(target)
 	target.becomeNervous(fighter)
-	
+
 	combatBuffer = {} if not combatBuffer else combatBuffer
 
 	if not target:
@@ -108,7 +113,8 @@ def doDamage(game, fighter, amount, noun='hit', target=None, combatBuffer=None):
 
 		combatBuffer = appendToCombatBuffer(mobile, message, combatBuffer)
 
-	target.stats['hitpoints'] -= amount
+	target.damage(amount)
+
 	if target.getStat('hitpoints') <= 0:
 		# looting, can probably move elsewhere when it become more sophisticated -> only loots from inventory at the moment
 		fighter.inventory.extend(target.inventory)
@@ -118,7 +124,7 @@ def doDamage(game, fighter, amount, noun='hit', target=None, combatBuffer=None):
 			message = target.getName(fighter) + " wasn't carrying anything."
 		combatBuffer = appendToCombatBuffer(fighter, message, combatBuffer)
 		target.inventory = []
-		endCombatForPlayersByTarget(game, target)
+
 		target.die()
 
 		message = 'You have killed {target}!'.format(target=target.getName(fighter))
@@ -127,7 +133,7 @@ def doDamage(game, fighter, amount, noun='hit', target=None, combatBuffer=None):
 		message = 'You have been killed!'
 		combatBuffer = appendToCombatBuffer(target, message, combatBuffer)
 
-		for mobile in [mobile for mobile in game.mobiles if mobile != fighter and mobile != target and mobile.room == target.room]:
+		for mobile in target.inRoomExcept([fighter,target]):
 			message = '{fighter} killed {target}!'.format(fighter=fighter.getName(mobile), target=target.getName(mobile))
 			combatBuffer = appendToCombatBuffer(mobile, message, combatBuffer)
 
@@ -137,16 +143,6 @@ def doDamage(game, fighter, amount, noun='hit', target=None, combatBuffer=None):
 				combatBuffer = appendToCombatBuffer(mobile, message, combatBuffer)
 
 	return combatBuffer
-
-
-def endCombatForPlayersByTarget(game, target):
-	target.position = Position.standing
-	target.combat = None
-
-	for mobile in [mobile for mobile in game.mobiles if mobile.combat == target]:
-		print 'ending combat for ' + mobile.getName()
-		mobile.combat = None
-		mobile.position = Position.standing
 
 
 def decorateDamage(amount):
@@ -164,6 +160,9 @@ def appendToCombatBuffer(key, string, combatBuffer):
 
 
 def sendCombatBuffer(game, combatBuffer):
+	if not combatBuffer:
+		return
+
 	for mobile, bufferList in combatBuffer.iteritems():
 		bufferString = '\n\r'.join( bufferList )
 

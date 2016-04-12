@@ -22,10 +22,10 @@ class DirtKick(Command):
 		self.test(self.notAffectedBy, (target, ['dirtkick','blind']), override='They are already blinded.')
 
 		# self.simpleSuccessCheck(50)
+		sender.startCombatWith(target)
 		self.test(self.simpleSuccessCheck, 100)
 
 		sender.setLag(1)
-		sender.startCombatWith(target)
 
 		affect.Affect.factory('DirtKick', sender, target, 2)
 
@@ -47,16 +47,14 @@ class Trip(Command):
 		try:
 			self.test(self.simpleSuccessCheck, 0)
 		except self.CommandException as e:
-			self.commandBuffer = combat.doDamage(self.game, sender, 0, noun='trip', target=target, combatBuffer=self.commandBuffer)
-
-			self.appendToCommandBuffer(sender, target.getCondition())
-			self.appendToCommandBuffer(target, sender.getCondition())
-
 			sender.startCombatWith(target)
+
+			self.commandBuffer = combat.doDamage(self.game, sender, 0, noun='trip', target=target, combatBuffer=self.commandBuffer)
 			return
 
 		sender.setLag(2)
 
+		sender.startCombatWith(target)
 		# Messaging
 		msg = 'You trip {target} and they go down.'.format(target=target.getName(sender))
 		self.appendToCommandBuffer(sender, msg)
@@ -70,10 +68,6 @@ class Trip(Command):
 
 		self.commandBuffer = combat.doDamage(self.game, sender, random.randint(3,5), noun='trip', target=target, combatBuffer=self.commandBuffer)
 
-		self.appendToCommandBuffer(sender, target.getCondition())
-		self.appendToCommandBuffer(target, sender.getCondition())
-
-		sender.startCombatWith(target)
 
 
 class Berserk(Command):
@@ -122,6 +116,8 @@ class Disarm(Command):
 			sender.startCombatWith(target)
 			return
 
+		sender.startCombatWith(target)
+
 		msg = 'You disarm {target}!'.format(target=target.getName(sender))
 		self.appendToCommandBuffer(sender, msg)
 
@@ -131,8 +127,6 @@ class Disarm(Command):
 		for mobile in sender.inRoomExcept([sender,target]):
 			msg = '{sender} disarms {target}!'.format(sender=sender.getName(mobile),target=target.getName(mobile))
 			self.appendToCommandBuffer(mobile, msg)
-
-		sender.startCombatWith(target)
 		target.removeItem(target.equipment['weapon'])
 
 
@@ -152,13 +146,10 @@ class Kick(Command):
 
 		damage = random.randint(10,25)
 
+		sender.startCombatWith(target)
 		self.commandBuffer = combat.doDamage(self.game, sender, damage, noun='kick', target=target, combatBuffer=self.commandBuffer)
 
-		self.appendToCommandBuffer(sender, target.getCondition())
-		self.appendToCommandBuffer(target, sender.getCondition())
-
 		sender.setLag(1)
-		sender.startCombatWith(target)
 
 
 class Bash(Command):
@@ -178,6 +169,8 @@ class Bash(Command):
 		try:
 			self.test(self.simpleSuccessCheck, 100)
 		except self.CommandException as e:
+			sender.startCombatWith(target)
+
 			msg = 'You fall flat on your face.'
 			self.appendToCommandBuffer(sender, msg)
 
@@ -185,10 +178,6 @@ class Bash(Command):
 				msg = '{sender} falls flat on their face.'.format(sender=sender.getName(target))
 				self.appendToCommandBuffer(mobile, msg)
 
-			self.appendToCommandBuffer(sender, target.getCondition())
-			self.appendToCommandBuffer(target, sender.getCondition())
-
-			sender.startCombatWith(target)
 			sender.setLag(2)
 			return
 
@@ -208,8 +197,5 @@ class Bash(Command):
 		damage = random.randint(5,10)
 
 		self.combatBuffer = combat.doDamage(self.game, sender, damage, noun='bash', target=target, combatBuffer=self.commandBuffer)
-
-		self.appendToCommandBuffer(sender, target.getCondition())
-		self.appendToCommandBuffer(target, sender.getCondition())
 
 commandList = [Kick, Bash, DirtKick, Trip, Disarm, Berserk]

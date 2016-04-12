@@ -24,8 +24,8 @@ class Mobile:
 			'attackSpeed': 4,
 			'damage': 10,
 			'hitroll': 5,
-			'hitpoints': 1000,
-			'maxhitpoints': 1000,
+			'hitpoints': 1,
+			'maxhitpoints': 1,
 			'defense': 1,
 			'charges': 2,
 			'maxcharges': 3,
@@ -233,6 +233,11 @@ class Mobile:
 			# Capitalize first letter of message
 			if len(message) > 0:
 				message = message[0].capitalize() + message[1:]
+
+			# If you're in combat, append condition of your enemy
+			if self.combat:
+				message += '\n\r' + self.combat.getCondition(self)
+
 			data = {}
 
 			data['commands'] = self.getCommandList()
@@ -296,12 +301,32 @@ class Mobile:
 
 		self.game.mobiles.remove(self)
 
-	def die(self):
-		affect.Affect.factory('JustDied', self.combat, self, 20)
+	def removeFromCombat(self):
+		# Find all mobiles targeting self
+		for mobile in [mobile for mobile in self.game.mobiles if mobile.combat == self]:
+			# Find another mobile attacking that mobile
+			candidates = [candidate for candidate in self.game.mobiles if candidate.combat == mobile and candidate != self]
+
+			if not candidates:
+				# No other mobiles are fighting the mobile we're ending combat for
+				mobile.combat = None
+				mobile.position = Position.standing
+			else:
+				# Pick the first mobile
+				mobile.combat = candidates[0]
+
 		self.combat = None
 		self.position = Position.standing
+
+	def damage(self, amount):
+		self.setStat('hitpoints', max(0, self.getStat('hitpoints') - amount))
+
+	def die(self):
+		self.removeFromCombat()
+
+		affect.Affect.factory('JustDied', self.combat, self, 20)
+
 		self.stats['hitpoints'] = self.stats['maxhitpoints']
-		self.game.endCombat(self)
 
 	def getStat(self, stat):
 		if stat in self.stats:

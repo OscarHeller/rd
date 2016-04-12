@@ -82,22 +82,6 @@ class Game:
 
 		Timer(self.interval, self.updateGame).start()
 
-	# The MESSAGE is always sent without a name, to be formatted in IF appropriate
-	def sendCondition(self, condition, message, lookers=None, max=None):
-		print "Warning: sendCondition is deprecated, please use list comprehension instead!"
-		lookers = lookers if lookers else []
-		found = False
-		sendCount = 0
-		for mobile in self.mobiles:
-			if condition(mobile):
-				mobile.sendToClient(message.format(*[sender.getName(mobile) for sender in lookers]))
-				found = True
-				if max:
-					sendCount += 1
-					if sendCount >= max:
-						return found
-		return found
-
 	def getPlayerById(self, playerId):
 		matches = [mobile for mobile in self.mobiles if mobile.id == playerId]
 

@@ -27,8 +27,11 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 		})
 
 	def sendToClient(self, data):
+		data['time'] = datetime.datetime.utcnow().isoformat()
+		
 		try:
-			data['message'] = self.colorize(data['message'])
+			if 'message' in data:
+				data['message'] = self.colorize(data['message'])
 
 			from bson.json_util import dumps
 			encodedData = dumps(data)

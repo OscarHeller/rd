@@ -225,6 +225,16 @@ class Mobile:
 		return craft
 
 
+	def sendAffectsToClient(self):
+		if not self.is_player:
+			return
+
+		data = {}
+		data['affects'] = self.getAffectList()
+		data['score'] = self.getScore()
+
+		self.client.sendToClient(data)
+
 	def sendToClient(self, message, names=None, comm=False):
 		names = names if names else []
 		if not self.is_player:
@@ -247,9 +257,7 @@ class Mobile:
 			data['equipment'] = self.getEquipmentList()
 			data['inventory'] = [item.name for item in self.inventory]
 			data['who'] = [mobile.getWhoDesc() for mobile in self.game.mobiles if mobile.is_player]
-			data['time'] = datetime.datetime.utcnow().isoformat()
 			data['message'] = message
-			data['affects'] = self.getAffectList()
 
 			data['comm'] = comm
 

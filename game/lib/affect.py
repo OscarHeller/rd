@@ -32,6 +32,9 @@ class Affect(object):
 			# Apply it
 			self.apply()
 
+			# Send the affect to its target
+			self.target.sendAffectsToClient()
+
 	def __str__(self):
 		return '{name}: {duration}s (from {caster})'.format(name=self.name, duration=self.duration, caster=self.caster.name)
 
@@ -48,21 +51,24 @@ class Affect(object):
 	def apply(self):
 		self.target.affects.append(self)
 		self.target.sendToClient('You are affected by {name}.'.format(name=self.name))
-		self.target.game.sendCondition(
-			(lambda a: a.room == self.target.room and a is not self.target),
-			'{{0}} is affected by {name}.'.format(name=self.name), [self.target])
+
+		for mobile in self.target.inRoomExcept(self.target):
+			mobile.sendToClient('{target} is affected by {name}.'.format(target=self.target,name=self.name))
 
 	def wear(self):
 		self.target.affects.remove(self)
 		self.target.sendToClient('!{name}!'.format(name=self.name))
-		self.target.game.sendCondition(
-			(lambda a: a.room == self.target.room and a is not self.target),
-			'{{0}} is no longer affected by {name}.'.format(name=self.name), [self.target])
+
+		for mobile in self.target.inRoomExcept(self.target):
+			mobile.sendToClient('{target} is no longer affected by {name}.'.format(target=self.target,name=self.name))
 
 	def update(self):
 		self.duration -= 1
 		if self.duration <= 0:
 			self.wear()
+
+		# Send to target
+		self.target.sendAffectsToClient()
 
 	@staticmethod
 	def factory(type, caster, target, duration):
@@ -91,8 +97,8 @@ class Berserk(Affect):
 	def apply(self):
 		self.target.affects.append(self)
 		self.target.sendToClient('Your pulse races as you are consumed by rage!')
-		self.target.game.sendCondition(
-			(lambda a: a.room == self.target.room and a is not self.target), '{0} gets a wild look in their eyes!', [self.target])
+		for mobile in self.target.inRoomExcept(self.target):
+			mobile.sendToClient('{target} gets a wild look in their eyes!'.format(target=self.target))
 
 	def wear(self):
 		self.target.affects.remove(self)
@@ -106,14 +112,14 @@ class Blind(Affect):
 	def apply(self):
 		self.target.affects.append(self)
 		self.target.sendToClient('You are blinded!')
-		self.target.game.sendCondition(
-			(lambda a: a.room == self.target.room and a is not self.target), '{0} appears to be blinded!', [self.target])
+		for mobile in self.target.inRoomExcept(self.target):
+			mobile.sendToClient('{target} appears to be blinded!'.format(target=self.target))
 
 	def wear(self):
 		self.target.affects.remove(self)
 		self.target.sendToClient('You are no longer blinded.')
-		self.target.game.sendCondition(
-			(lambda a: a.room == self.target.room and a is not self.target), '{0} is no longer blinded.', [self.target])
+		for mobile in self.target.inRoomExcept(self.target):
+			mobile.sendToClient('{target} is no longer blinded.'.format(target=self.target))
 
 
 class DirtKick(Affect):
@@ -123,14 +129,14 @@ class DirtKick(Affect):
 	def apply(self):
 		self.target.affects.append(self)
 		self.target.sendToClient('You are blinded by the dirt in your eyes!')
-		self.target.game.sendCondition(
-			(lambda a: a.room == self.target.room and a is not self.target), '{0} is blinded by the dirt in their eyes!', [self.target])
+		for mobile in self.target.inRoomExcept(self.target):
+			mobile.sendToClient('{target} is blinded by the dirt in their eyes!'.format(target=self.target))
 
 	def wear(self):
 		self.target.affects.remove(self)
 		self.target.sendToClient('You rub the dirt out of your eyes.')
-		self.target.game.sendCondition(
-			(lambda a: a.room == self.target.room and a is not self.target), '{0} rubs the dirt out of their eyes.', [self.target])
+		for mobile in self.target.inRoomExcept(self.target):
+			mobile.sendToClient('{target} rubs the dirt out of their eyes.'.format(target=self.target))
 
 
 class Nervous(Affect):

@@ -10,8 +10,6 @@ class Room:
 		self.__repr__ = self.__str__
 		self.game = game
 		self.area = None
-		if 'stats' in config:
-			print self.stats
 
 	def __str__(self):
 		return '{name}: {exits}'.format(name=self.name, exits=', '.join([str(exit) for exit in self.exits]))
@@ -20,6 +18,12 @@ class Room:
 		for index, room in enumerate(self.game.rooms):
 			if self == room:
 				return index
+
+	def getExit(self, direction):
+		for exit in self.exits:
+			if exit.key == direction:
+				return exit
+		return None
 
 	def getStat(self, stat):
 		if stat in self.stats:
@@ -32,3 +36,21 @@ class Room:
 		for item in self.items:
 			itemCommands += item.getCommandInterpreters()
 		return self.commandInterpreters + itemCommands
+
+	def getName(self, looker=None):
+		if looker and (looker.isAffectedBy('blind') or looker.isAffectedBy('dirtkick')):
+			return "You can't see a thing!"
+		else:
+			return self.name
+
+	def getDesc(self, looker=None):
+		if looker and (looker.isAffectedBy('blind') or looker.isAffectedBy('dirtkick')):
+			return "Everything is pitch black."
+		else:
+			return self.desc
+
+	def getBG(self, looker=None):
+		if looker and (looker.isAffectedBy('blind') or looker.isAffectedBy('dirtkick')):
+			return ""
+		else:
+			return self.bg

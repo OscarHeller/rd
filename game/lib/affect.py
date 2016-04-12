@@ -19,6 +19,7 @@ class Affect(object):
 		self.refreshable = refreshable
 		self.friendly = friendly
 		self.visible = visible
+		self.stats = {}
 
 		# Convert duration (in seconds) to duration (in game cycles)
 		self.duration = duration / self.game.interval
@@ -39,6 +40,12 @@ class Affect(object):
 		existingAffect = self.target.isAffectedBy(self.name)
 		existingAffect.duration = self.duration
 		#self.target.sendToClient('{caster} refreshes your {name}.'.format(caster=self.caster.getName(self.target), name=self.name))
+
+	def getStat(self, stat):
+		if stat in self.stats:
+			return self.stats[stat]
+		else:
+			return None
 
 	def apply(self):
 		if not self.visible:
@@ -87,6 +94,7 @@ class Affect(object):
 class Berserk(Affect):
 	def __init__(self, caster, target, duration):
 		super(Berserk, self).__init__('berserk', caster, target, duration, NOT_REFRESHABLE, FRIENDLY)
+		self.stats = { 'damage': 120, 'defense': -20 }
 
 	def apply(self):
 		self.target.affects.append(self)

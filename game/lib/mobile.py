@@ -50,8 +50,8 @@ class Mobile:
 		self.inventory = self.loadInventory(config['inventory'] if 'inventory' in config else [])
 		self.equipment = self.loadEquipment(config['equipment'] if 'equipment' in config else {})
 
-		print self.inventory, self.name
-		print config['inventory'] if 'inventory' in config else self.name
+		#print self.inventory, self.name
+		#print config['inventory'] if 'inventory' in config else self.name
 
 		self.keywords = config['keywords'] if 'keywords' in config else [self.name]
 		self.level = config['level'] if 'level' in config else 51
@@ -189,7 +189,8 @@ class Mobile:
 		}
 
 		for stat in self.stats:
-			score[stat] = self.stats[stat]
+			# show as [base] current
+			score[stat] = "[{base}] {current}".format(base=self.stats[stat], current=self.getStat(stat))
 
 		return score
 
@@ -226,7 +227,7 @@ class Mobile:
 
 	def sendToClient(self, message, names=None, comm=False):
 		names = names if names else []
-		if not self.client:
+		if not self.is_player:
 			return
 		else:
 			# Capitalize first letter of message
@@ -256,11 +257,11 @@ class Mobile:
 				inroom_items = ['No items here.']
 
 			data['room'] = {
-				'title' : self.room.name,
-				'desc' : self.room.desc,
+				'title' : self.room.getName(self),
+				'desc' : self.room.getDesc(self),
 				'mobiles' : inroom_mobiles,
 				'items' : inroom_items,
-				'bg' : self.room.bg,
+				'bg' : self.room.getBG(self),
 				'exits': [exit.key for exit in self.room.exits]
 			}
 
@@ -310,6 +311,10 @@ class Mobile:
 					si = item.getStat(stat)
 					if si and type(s) is type(si):
 						s += si
+			for affect in self.affects:
+				st = affect.getStat(stat)
+				if st and type(st) is type(s):
+					s += st
 			return s
 		else:
 			return 0
@@ -355,7 +360,7 @@ class Mobile:
 		return False
 
 	def setLag(self, amount):
-		self.commandInterpreter.lag = amount
+		self.commandInterpreter.lag = amount * 0.5
 
 	def unLag(self, amount):
 		if self.commandInterpreter.lag > 0:
@@ -367,10 +372,10 @@ class Mobile:
 		self.commandInterpreter.processCommand(command)
 
 	def getName(self, looker=None):
-		if not looker or not looker.isAffectedBy('blind') or not looker.isAffectedBy('dirtkick'):
-			return self.name
-		else:
+		if looker and (looker.isAffectedBy('blind') or looker.isAffectedBy('dirtkick')):
 			return 'someone'
+		else:
+			return self.name
 
 	def getTitle(self):
 		return self.title

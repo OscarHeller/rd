@@ -9,7 +9,7 @@ class Item:
 		# self.longName = config['longName']
 		# self.description = config['description']
 		self.id = config['_id'] if '_id' in config else 'NA'
-		self.keywords = config['keywords'] if 'keywords' in config else name
+		self.keywords = config['keywords'] if 'keywords' in config else self.name
 		self.wear = config['wear'] if 'wear' in config else None
 		self.stats = config['stats'] if 'stats' in config else {}
 		self.noun = config['noun'] if 'noun' in config else 'hit'
@@ -36,4 +36,5 @@ class Item:
 		return desc
 
 	def getName(self, looker=False):
+		#if looker and looker.
 		return self.name

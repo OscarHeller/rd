@@ -157,6 +157,8 @@ function parseServerResponse(data) {
     if ( data.room.hasOwnProperty('bg') && data.room.bg ) {
       console.log('Background image found: ' + data.room.bg);
       $('body').css({'background-image': 'url(' + data.room.bg + ')' });
+    } else {
+      $('body').css({'background-image': ''});
     }
 
     if ( data.room.hasOwnProperty('mobiles') ) {
@@ -251,7 +253,7 @@ function parseServerResponse(data) {
   }
 
   if ( data.hasOwnProperty('message') ) {
-
+    console.log('has message', data, data.message);
     var li = document.createElement('li');
     li.innerHTML = data.message;
     $('.output > ul').append(li); 

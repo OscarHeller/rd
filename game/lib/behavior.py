@@ -35,6 +35,7 @@ class Aggressive(Behavior):
     if not self.mobile.combat:
       targets = [mobile for mobile in self.mobile.inRoomExcept(self.mobile) if mobile.is_player]
       if len(targets) > 0:
+        print "what the hell is going on here?"
         import random
         target = targets[random.randint(0, len(targets) - 1)]
         self.mobile.processCommand("say You are in the wrong place, " + target.name + ".")

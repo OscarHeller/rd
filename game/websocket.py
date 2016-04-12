@@ -32,7 +32,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 			from bson.json_util import dumps
 			encodedData = dumps(data)
-
 			self.write_message(encodedData)
 		except Exception as inst:
 			print 'Error in sendToClient: ', inst
@@ -65,7 +64,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 		import itertools
 
 		# sanitize here, because why not?
-
 		TAG_RE = re.compile(r'<[^>]+>')
 
 		data = TAG_RE.sub('', data)

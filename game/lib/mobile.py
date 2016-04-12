@@ -158,7 +158,7 @@ class Mobile:
 	def getAffectList(self):
 		affectList = {}
 
-		for affect in [affect for affect in self.affects if affect.visible]:
+		for affect in self.affects:
 			affectList[affect.name] = {
 				'duration' : affect.duration,
 				'friendly' : affect.friendly,

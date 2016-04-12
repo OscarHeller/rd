@@ -8,7 +8,7 @@ VISIBLE = True
 NOT_VISIBLE = False
 
 class Affect(object):
-	def __init__(self, name, caster, target, duration, refreshable, friendly, visible=VISIBLE):
+	def __init__(self, name, caster, target, duration, refreshable, friendly):
 		if not target:
 			assert 0, 'Affect must have target.'
 
@@ -18,7 +18,6 @@ class Affect(object):
 		self.game = target.game
 		self.refreshable = refreshable
 		self.friendly = friendly
-		self.visible = visible
 		self.stats = {}
 
 		# Convert duration (in seconds) to duration (in game cycles)
@@ -39,7 +38,6 @@ class Affect(object):
 	def refresh(self):
 		existingAffect = self.target.isAffectedBy(self.name)
 		existingAffect.duration = self.duration
-		#self.target.sendToClient('{caster} refreshes your {name}.'.format(caster=self.caster.getName(self.target), name=self.name))
 
 	def getStat(self, stat):
 		if stat in self.stats:
@@ -48,9 +46,6 @@ class Affect(object):
 			return None
 
 	def apply(self):
-		if not self.visible:
-			return
-
 		self.target.affects.append(self)
 		self.target.sendToClient('You are affected by {name}.'.format(name=self.name))
 		self.target.game.sendCondition(
@@ -58,9 +53,6 @@ class Affect(object):
 			'{{0}} is affected by {name}.'.format(name=self.name), [self.target])
 
 	def wear(self):
-		if not self.visible:
-			return
-
 		self.target.affects.remove(self)
 		self.target.sendToClient('!{name}!'.format(name=self.name))
 		self.target.game.sendCondition(
@@ -144,7 +136,9 @@ class DirtKick(Affect):
 class Nervous(Affect):
 	def __init__(self, caster, target, duration):
 		super(Nervous, self).__init__('nervousness', caster, target, duration, REFRESHABLE, NOT_FRIENDLY)
-		# super(Nervous, self).__init__('nervousness', caster, target, duration, REFRESHABLE, NOT_FRIENDLY, visible=NOT_VISIBLE)
+
+	def apply(self):
+		self.target.affects.append(self)
 
 	def wear(self):
 		self.target.affects.remove(self)
@@ -158,8 +152,10 @@ class Stun(Affect):
 
 class JustDied(Affect):
 	def __init__(self, caster, target, duration):
-		super(JustDied, self).__init__('just died', caster, target, duration, REFRESHABLE, NOT_FRIENDLY)
-		# super(JustDied, self).__init__('just died', caster, target, duration, REFRESHABLE, NOT_FRIENDLY, visible=NOT_VISIBLE)
+		super(JustDied, self).__init__('justdied', caster, target, duration, REFRESHABLE, NOT_FRIENDLY)
+
+	def apply(self):
+		self.target.affects.append(self)
 
 	def wear(self):
 		self.target.affects.remove(self)

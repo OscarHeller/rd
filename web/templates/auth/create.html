@@ -6,15 +6,15 @@
 <form role="form" action="/auth/create" method="POST">
 	<div class="form-group">
 		<label for="email">Email address:</label>
-		<input name="email" class="form-control" id="email" type="email">
+		<input name="email" class="form-control" id="email" type="email" required="true">
 	</div>
 	<div class="form-group">
 		<label for="password">Password:</label>
-		<input type="password" name="password" class="form-control" id="password">
+		<input type="password" name="password" class="form-control" id="password" required="true">
 	</div>
 	<div class="form-group">
 		<label for="retype">Retype Password:</label>
-		<input type="password" name="retype" class="form-control" id="retype">
+		<input type="password" name="retype" class="form-control" id="retype" required="true">
 	</div>
 
 	<button type="submit" class="btn btn-default">Register</button>

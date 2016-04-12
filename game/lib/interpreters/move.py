@@ -58,7 +58,7 @@ class Flee(Command):
 		oldRoom = sender.room
 		direction = exit.key
 
-		combat.endCombatForPlayersByTarget(self.game, sender)
+		sender.removeFromCombat()
 
 		sender.setLag(3)
 		sender.combat = None

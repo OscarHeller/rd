@@ -433,7 +433,7 @@ body {
     column-count: 3;	
 }
 
-li.client-command {
+.output li.client-command {
     padding: 0 0 0 10px;
     border: 0;
     background: none;

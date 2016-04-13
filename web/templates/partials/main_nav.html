@@ -3,16 +3,18 @@
     <div class="navbar-header">
       <a class="navbar-brand" href="/">Redemption Unleashed</a>
     </div>
-    <ul class="nav navbar-nav">
-      {% if current_user %}
-      {% end %}
+    {% if role == 'admin' %}
+    <ul class="nav navbar-nav admin-nav">
+      <li><a href="/editor"><span class="glyphicon glyphicon-edit"></span>Editor</a></li>
+      <li><a href="/media"><span class="glyphicon glyphicon-picture"></span>Media</a></li>
     </ul>
+    {% end %}
     <ul class="nav navbar-nav navbar-right">
       {% if current_user %}
-        <li><a href="/auth/logout?next={{ url_escape(request.uri) }}"><span class="glyphicon glyphicon-log-out">Logout</span></a></li>
+        <li><a href="/auth/logout?next={{ url_escape(request.uri) }}"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
       {% else %}
-        {% raw _('<li><a href="%(url)s"><span class="glyphicon glyphicon-user">Register</span></a></li>') % {"url": "/auth/create?next=" + url_escape(request.uri)} %}
-        {% raw _('<li><a href="%(url)s"><span class="glyphicon glyphicon-log-in">Login</span></a></li>') % {"url": "/auth/login?next=" + url_escape(request.uri)} %}
+        {% raw _('<li><a href="%(url)s"><span class="glyphicon glyphicon-user"></span>Register</a></li>') % {"url": "/auth/create?next=" + url_escape(request.uri)} %}
+        {% raw _('<li><a href="%(url)s"><span class="glyphicon glyphicon-log-in"></span>Login</a></li>') % {"url": "/auth/login?next=" + url_escape(request.uri)} %}
       {% end %}
     </ul>
   </div>

@@ -19,6 +19,9 @@ class AuthLoginHandler(BaseHandler):
 		doc = self.db.accounts.find_one({'email': email, 'password': password})
 		if doc:
 			stringID = str(doc['_id'])
+
+			role = 'admin' if 'admin' in doc and doc['admin'] else 'user'
+			self.set_secure_cookie('rdu_role', role)
 			self.set_secure_cookie('rdu_user', stringID)
 			
 			flash = Flash('Welcome to Redemption: Unleashed.', css_class='alert-success')

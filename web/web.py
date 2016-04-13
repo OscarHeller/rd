@@ -31,7 +31,8 @@ class Application(tornado.web.Application):
 			static_path=os.path.join(os.path.dirname(__file__), 'static'),
 			cookie_secret='__FIX ME:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__',
 			debug=True,
-			default_handler_class = error.ErrorHandler
+			default_handler_class = error.ErrorHandler,
+			login_url = '/auth/login'
 		)
 		super(Application, self).__init__(urls, **settings)
 

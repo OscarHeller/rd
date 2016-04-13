@@ -7,6 +7,10 @@ class BaseHandler(tornado.web.RequestHandler):
 	def initialize(self, db=None):
 		self.db = db
 
+	def render(self, template, **kwargs):
+		kwargs['role'] = self.get_current_role()
+		super(BaseHandler, self).render(template, **kwargs)
+
 	def validateInternalPageAccess(self):
 		if not self.get_current_user():
 			flash = Flash('You must be logged in to access that page.', css_class='alert-danger')
@@ -88,6 +92,12 @@ class BaseHandler(tornado.web.RequestHandler):
 
 	def get_current_user(self):
 		return self.get_secure_cookie('rdu_user')
+
+	def get_current_role(self):
+		return self.get_secure_cookie('rdu_role')
+
+	def is_admin(self):
+		return self.get_secure_cookie('rdu_role') == 'admin'
 
 	def email_in_use(self, email):
 		doc = self.db.accounts.find_one({'email': email})

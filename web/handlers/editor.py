@@ -1,6 +1,9 @@
 from base import BaseHandler
+from admin import administrator
+
 
 class EditorHandler(BaseHandler):
+  @administrator
   def get(self):
     self.validateInternalPageAccess()
 

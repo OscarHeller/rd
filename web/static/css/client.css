@@ -46,6 +46,22 @@ body {
 	flex-direction: row;
 }
 
+.bg {
+  background-size: cover;
+  height: 100vh;
+  width: 100vw;
+  position: absolute;
+  transition: opacity 1s;
+  opacity: 1;
+}
+.outer {
+}
+.inner {
+}
+.hidden {
+  opacity: 0;
+}
+
 .left, .center, .right {
 	flex-basis: 0;
 	position: relative;

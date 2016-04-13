@@ -160,10 +160,18 @@ function parseServerResponse(data) {
     }
 
     if ( data.room.hasOwnProperty('bg') && data.room.bg ) {
-      console.log('Background image found: ' + data.room.bg);
-      $('body').css({'background-image': 'url(' + data.room.bg + ')' });
+      if ($('.bg').attr('bg') != data.room.bg) {
+        $('.hidden').css({'background-image': 'url(' + data.room.bg + ')'})
+        $('.bg').toggleClass('hidden');
+        // to make sure we only fade in and out on a change
+        $('.bg').attr('bg', data.room.bg);
+      }
     } else {
-      $('body').css({'background-image': ''});
+      if ($('.bg').attr('bg') != '') {
+        $('.hidden').css({'background-image': 'none'})
+        $('.bg').toggleClass('hidden');
+        $('.bg').attr('bg', '');
+      }
     }
 
     if ( data.room.hasOwnProperty('mobiles') ) {

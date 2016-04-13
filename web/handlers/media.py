@@ -20,7 +20,7 @@ class MediaHandler(BaseHandler):
       original_fname = file1['filename']
 
       print os.getcwd()
-      output_file = open("static/media/assets/" + str(original_fname), 'wb')
+      output_file = open("web/static/media/assets/" + str(original_fname), 'wb')
       output_file.write(file1['body'])
 
       response = "Success, file " + original_fname + " is uploaded."

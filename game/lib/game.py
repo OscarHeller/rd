@@ -10,6 +10,9 @@ from lib.interpreters.constants import Range
 import utility
 import datetime
 
+import lib.save as save
+import thread
+
 from threading import Timer
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -89,6 +92,15 @@ class Game:
 		if self.clock > 0 and self.clock % 10 == 0:
 			latency = ( ( datetime.datetime.now() - self.startTime ).seconds - self.clock ) / self.clock
 			print 'Game Update {time} : {latency}'.format(time=str(datetime.datetime.now().time()),latency=latency)
+
+		#repop!  -> every 3 minutes?
+		if self.clock % 180 == 0:
+			print 'autosaving players'
+			for mobile in self.mobiles:
+				if mobile.is_player:
+					dbd = save.databaseDaemon()
+					thread.start_new_thread(dbd.saveMobile, (mobile,))
+			self.repopulate()
 
 		Timer(self.interval, self.updateGame).start()
 
@@ -192,10 +204,13 @@ class Game:
 					newRoom.items.append(Item(self.items[item]))
 
 			if 'npcs' in rooms[i]:
-				for mobile in rooms[i]['npcs']:
-					m = Mobile(self.mobile_list[mobile]['name'], self, self.mobile_list[mobile])
-					m.room = newRoom
-					self.mobiles.append(m)
+				# only respawn if there is NO combat going on in the room to avoid insane duplications! FIX ME
+				currentMobiles = [mobile for mobile in self.mobiles if mobile.room == newRoom and mobile.combat and not mobile.is_player]
+				if not len(currentMobiles) > 0:
+					for mobile in rooms[i]['npcs']:
+						m = Mobile(self.mobile_list[mobile]['name'], self, self.mobile_list[mobile])
+						m.room = newRoom
+						self.mobiles.append(m)
 
 			if len(exists) <= 0:
 				self.rooms.append(newRoom)
@@ -213,7 +228,7 @@ class Game:
 		self.loadItems()
 		self.loadMobiles()
 		# reload all mobiles except for players, and those in combat
-		self.mobiles = [mobile for mobile in self.mobiles if mobile.client or mobile.combat]
+		self.mobiles = [mobile for mobile in self.mobiles if mobile.is_player or mobile.combat]
 		[mobile.sendToClient('Something flickers.') for mobile in self.mobiles]
 		self.loadRooms()
 

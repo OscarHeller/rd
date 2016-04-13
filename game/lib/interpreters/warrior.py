@@ -77,10 +77,22 @@ class Berserk(Command):
 	def execute(self, args, sender):
 		self.test(self.checkPosition, (sender, [Position.sleeping, Position.standing]))
 		self.test(self.notAffectedBy, (sender, 'berserk'), override='You can\'t get any angrier.')
+		self.test(self.notAffectedBy, (sender, 'guardian'), override='You can\'t get angry, you are too watchful.')
 
 		sender.heal(25)
 		affect.Affect.factory('Berserk', sender, sender, 5)
 
+class Guardian(Command):
+	def __init__(self, game):
+		super(Guardian, self).__init__(game, 'guardian')
+
+	def execute(self, args, sender):
+		self.test(self.checkPosition, (sender, [Position.sleeping, Position.standing]))
+		self.test(self.notAffectedBy, (sender, 'berserk'), override='You are too angry to guard.')
+		self.test(self.notAffectedBy, (sender, 'guardian'), override='You can\'t get any more vigilant.')
+
+		sender.heal(25)
+		affect.Affect.factory('Guardian', sender, sender, 5)
 
 class Disarm(Command):
 	def __init__(self, game):
@@ -198,4 +210,4 @@ class Bash(Command):
 
 		self.combatBuffer = combat.doDamage(self.game, sender, damage, noun='bash', target=target, combatBuffer=self.commandBuffer)
 
-commandList = [Kick, Bash, DirtKick, Trip, Disarm, Berserk]
+commandList = [Kick, Bash, DirtKick, Trip, Disarm, Berserk, Guardian]

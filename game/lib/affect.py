@@ -74,6 +74,8 @@ class Affect(object):
 	def factory(type, caster, target, duration):
 		if type == 'Berserk':
 			return Berserk(caster, target, duration)
+		if type == 'Guardian':
+			return Guardian(caster, target, duration)
 		if type == 'Blind':
 			return Blind(caster, target, duration)
 		if type == 'DirtKick':
@@ -92,7 +94,7 @@ class Affect(object):
 class Berserk(Affect):
 	def __init__(self, caster, target, duration):
 		super(Berserk, self).__init__('berserk', caster, target, duration, NOT_REFRESHABLE, FRIENDLY)
-		self.stats = { 'damage': 120, 'defense': -20 }
+		self.stats = { 'damage': 50, 'defense': -20 }
 
 	def apply(self):
 		self.target.affects.append(self)
@@ -104,10 +106,25 @@ class Berserk(Affect):
 		self.target.affects.remove(self)
 		self.target.sendToClient('You feel your pulse slow down.')
 
+class Guardian(Affect):
+	def __init__(self, caster, target, duration):
+		super(Guardian, self).__init__('guardian', caster, target, duration, NOT_REFRESHABLE, FRIENDLY)
+		self.stats = { 'defense': 50, 'damage': -20 }
+
+	def apply(self):
+		self.target.affects.append(self)
+		self.target.sendToClient('You adopt the constant vigilance of a guardian.')
+		for mobile in self.target.inRoomExcept(self.target):
+			mobile.sendToClient('{target} becomes serene, yet watchful.'.format(target=self.target))
+
+	def wear(self):
+		self.target.affects.remove(self)
+		self.target.sendToClient('You feel less alert, less aware.')
 
 class Blind(Affect):
 	def __init__(self, caster, target, duration):
 		super(Blind, self).__init__('blind', caster, target, duration, NOT_REFRESHABLE, NOT_FRIENDLY)
+		self.stats = { 'hitroll': -5, 'defense': -5 }
 
 	def apply(self):
 		self.target.affects.append(self)
@@ -125,6 +142,7 @@ class Blind(Affect):
 class DirtKick(Affect):
 	def __init__(self, caster, target, duration):
 		super(DirtKick, self).__init__('dirtkick', caster, target, duration, NOT_REFRESHABLE, NOT_FRIENDLY)
+		self.stats = { 'hitroll': -5, 'defense': -5 }
 
 	def apply(self):
 		self.target.affects.append(self)

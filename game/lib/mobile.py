@@ -332,9 +332,16 @@ class Mobile:
 	def die(self):
 		self.removeFromCombat()
 
-		affect.Affect.factory('JustDied', self.combat, self, 20)
+		if self.is_player:
+			self.respawn()
+		else:
+			self.game.mobiles.remove(self)
 
+	def respawn(self):
+		self.room = self.game.rooms[0]
+		affect.Affect.factory('JustDied', self.combat, self, 20)
 		self.stats['hitpoints'] = self.stats['maxhitpoints']
+
 
 	def getStat(self, stat):
 		if stat in self.stats:

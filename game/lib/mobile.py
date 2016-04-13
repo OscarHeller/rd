@@ -349,8 +349,8 @@ class Mobile:
 			for slot, item in self.equipment.iteritems():
 				if item:
 					si = item.getStat(stat)
-					if si and type(s) is type(si):
-						s += si
+					if si:
+						s += int(si)
 			for affect in self.affects:
 				st = affect.getStat(stat)
 				if st and type(st) is type(s):

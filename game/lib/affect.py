@@ -19,9 +19,7 @@ class Affect(object):
 		self.refreshable = refreshable
 		self.friendly = friendly
 		self.stats = {}
-
-		# Convert duration (in seconds) to duration (in game cycles)
-		self.duration = duration / self.game.interval
+		self.duration = duration
 
 		if not self.refreshable and self.target.isAffectedBy(self.name):
 			self.caster.sendToClient('{target} is already affected by {affect}'.format(target=self.target.name, affect=self.name))

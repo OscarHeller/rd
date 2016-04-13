@@ -47,4 +47,4 @@ class Quit(Command):
 		# Get rid of client
 		sender.client = None
 
-commandList = [Save, Quit]
+commandList = [Save]

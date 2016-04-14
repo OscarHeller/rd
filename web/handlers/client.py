@@ -44,7 +44,7 @@ class ClientHandler(BaseHandler):
 	def _preparePreload(self):
 		print 'Starting preload.'
 		# Static file list for preloading
-		bgPath = os.path.join(os.path.dirname(__file__), '../static/media')
+		bgPath = os.path.join(os.path.dirname(__file__), '../static/media/assets')
 		bgList = []
 
 		for (dirpath, dirnames, filenames) in os.walk(bgPath):

@@ -20,7 +20,7 @@ function preloadAssets() {
 
   for(var x=0;x<bgList.length;x++) {
     mediaArray[x] = new Image();
-    mediaArray[x].src = '../static/media/' + bgList[x];
+    mediaArray[x].src = '../static/media/assets/' + bgList[x];
     console.log('Loaded ' + bgList[x]);
   }
   console.log('Backgrounds loaded.');

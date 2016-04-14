@@ -110,6 +110,8 @@ class Command(object):
 				raise self.CommandException('Target is already affected by {affect}.'.format(affect=affect.name))
 
 	def isLegalCombatTarget(self, target):
+		if target.is_player and target.room.getStat('no_pkill'):
+			raise self.CommandException('You can\'t fight players here.')
 		if target.room.getStat('no_combat'):
 			raise self.CommandException('You can\'t fight in this room.')
 		elif target.isAffectedBy('just died'):

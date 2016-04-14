@@ -11,6 +11,7 @@ class Say(Command):
 		# Preliminary checks
 		self.test(self.checkPosition, (sender, [Position.standing, Position.resting, Position.fighting]))
 		self.test(self.checkIfCanCommunicate, sender)
+		self.test(self.hasAtLeastOneArgument, args, override='Say what?')
 
 		saying = ' '.join(args)
 
@@ -19,6 +20,26 @@ class Say(Command):
 			self.appendToCommandBuffer(mobile, msg)
 
 		msg = '@yYou say \'{saying}\'@x'.format(saying=saying)
+		self.appendToCommandBuffer(sender, msg)
+
+
+class Emote(Command):
+	def __init__(self, game):
+		super(Emote, self).__init__(game, 'emote', comm=True)
+
+	def execute(self, args, sender):
+		# Preliminary checks
+		self.test(self.checkPosition, (sender, [Position.standing, Position.resting, Position.fighting]))
+		self.test(self.checkIfCanCommunicate, sender)
+		self.test(self.hasAtLeastOneArgument, args, override='Emote what?')
+
+		saying = ' '.join(args)
+
+		for mobile in [mobile for mobile in self.game.mobiles if mobile.room == sender.room and mobile != sender]:
+			msg = '{name} {saying}'.format(name=sender.getName(mobile),saying=saying)
+			self.appendToCommandBuffer(mobile, msg)
+
+		msg = '{name} {saying}'.format(name=sender.getName(sender),saying=saying)
 		self.appendToCommandBuffer(sender, msg)
 
 
@@ -66,4 +87,4 @@ class Tell(Command):
 		msg = '@m{name} tells you \'@y{saying}@x\'@x'.format(name=sender.getName(target),saying=saying)
 		self.appendToCommandBuffer(target, msg)
 
-commandList = [Say, Yell, Tell]
+commandList = [Say, Yell, Tell, Emote]

@@ -28,7 +28,11 @@ class Game:
 		self.startTime = datetime.datetime.now()
 
 		self.clock = 0
-		self.interval = 0.25
+		self.combatInterval = 0
+		self.gameUpdateInterval = 0
+		self.repopInterval = 0
+
+		self.interval = 0.1
 
 		self.client = MongoClient('localhost')  # FIX ME: this is set in two places, here and in tornadoServer.py. Should be only one.
 		# self.client = MongoClient('mongodb://rdu:omghot4u@ds027769.mongolab.com:27769/redemptionunleashed')
@@ -75,6 +79,9 @@ class Game:
 
 	def updateGame(self):
 		self.clock += self.interval
+		self.combatInterval += self.interval
+		self.gameUpdateInterval += self.interval
+		self.repopInterval += self.interval
 
 		# Restore charges
 		if self.clock % 6 * self.interval == 0:
@@ -85,16 +92,19 @@ class Game:
 		for mobile in self.mobiles:
 			mobile.update(self.interval)
 
-		if self.clock % 2 == 0:
+		if self.combatInterval > 2:
 			print ' - Combat Update ' + str(datetime.datetime.now().time())
+			self.combatInterval = 0
 			combat.doGlobalRound(self)
 
-		if self.clock > 0 and self.clock % 10 == 0:
+		if self.gameUpdateInterval > 10:
+			self.gameUpdateInterval = 0
 			latency = ( ( datetime.datetime.now() - self.startTime ).seconds - self.clock ) / self.clock
 			print 'Game Update {time} : {latency}'.format(time=str(datetime.datetime.now().time()),latency=latency)
 
 		#repop!  -> every 3 minutes?
-		if self.clock % 180 == 0:
+		if self.repopInterval > 180 == 0:
+			self.repopInterval = 0
 			print 'autosaving players'
 			for mobile in self.mobiles:
 				if mobile.is_player:
@@ -190,6 +200,8 @@ class Game:
 			exists = [r for r in self.rooms if r.id == rooms[i]['id']]
 			if len(exists) > 0:
 				newRoom = exists[0]
+				newRoom.bg = rooms[i]['bg'] if 'bg' in rooms[i] else newRoom.bg
+				newRoom.desc = rooms[i]['description'] if 'description' in rooms[i] else newRoom.desc
 			else:
 				newRoom = Room(self, rooms[i])
 				newRoom.id = rooms[i]['id']

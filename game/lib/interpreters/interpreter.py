@@ -21,7 +21,7 @@ class CommandInterpreter:
 		self.commandInterpreters.extend(status.commandList)
 		self.commandInterpreters.extend(crafting.commandList)
 		self.commandInterpreters.extend(test.commandList)
-		self.commandInterpreters.extend(admin.commandList)
+#		self.commandInterpreters.extend(admin.commandList)
 
 		# Import the appropriate class interpreter
 

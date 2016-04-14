@@ -127,7 +127,7 @@ class Command(object):
 		else:
 			raise self.CommandException('You can\'t go that way.')
 
-		msg = 'You leave {direction}.'.format(direction=direction)
+		msg = 'You leave {direction}.\n\rYou arrive at {newRoom}.'.format(direction=direction,newRoom=newRoom.getName(sender))
 		self.appendToCommandBuffer(sender, msg)
 
 		if not sender.isAffectedBy('sneak'):

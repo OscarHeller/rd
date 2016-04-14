@@ -21,12 +21,14 @@ function preloadAssets() {
   for(var x=0;x<bgList.length;x++) {
     mediaArray[x] = new Image();
     mediaArray[x].src = '../static/media/' + bgList[x];
+    console.log('Loaded ' + bgList[x]);
   }
   console.log('Backgrounds loaded.');
 
   for(var x=0;x<iconList.length;x++) {
     iconArray[x] = new Image();
     iconArray[x].src = '../static/media/icons/' + iconList[x];
+    console.log('Loaded ' + iconList[x]);
   }
   console.log('Icons loaded.');
 

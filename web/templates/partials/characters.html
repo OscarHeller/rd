@@ -8,7 +8,7 @@
 			{% for mobile in mobiles %}
 			<div class="col-sm-4">
 			<div class="single-character well">
-				<h3>{{ mobile['name'] }}<small> {{ mobile['charClass'] }}</small></h3>
+				<h3>{{ mobile['name'] }}<small> {{ mobile['stats']['charClass'] }}</small></h3>
 				<a href="/client/{{ mobile['_id'] }}" class="btn btn-success">Log In</a>
 			</div>
 			</div>

@@ -2,6 +2,14 @@
 <html>
 <head>
   <title>Redemption: Unleashed</title>
+
+  <!-- Set variables for included JS scripts -->
+  <script>
+      var player_id = '{{ player_id }}';
+      var bgList = '{{ bgList }}';
+      var iconList = '{{ iconList }}';
+  </script>
+
   <script src="{{ static_url('js/preload.js') }}"></script>
   <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
   <script src="https://littlegustv.github.io/games/libs/gamepads.js"></script>
@@ -64,11 +72,6 @@
     </div>
   </div>
 </div>
-
-  <!-- Set variables for included JS scripts -->
-  <script>
-      var player_id = '{{ player_id }}';
-  </script>
-  <script src="{{ static_url('js/client.js') }}"></script>
+<script src="{{ static_url('js/client.js') }}"></script>
 </body>
 </html>

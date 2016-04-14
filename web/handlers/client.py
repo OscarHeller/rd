@@ -1,5 +1,6 @@
 from base import BaseHandler
 from bson.objectid import ObjectId
+import os
 
 
 class ClientHandler(BaseHandler):
@@ -35,4 +36,29 @@ class ClientHandler(BaseHandler):
 
 		# This is a good player ID. Send it to the game to load.
 		print('Good player ID found. Sending to game for loading.')
-		self.render('client.html', player_id=player_id)
+
+		bgList, iconList = self._preparePreload()
+
+		self.render('client.html', player_id=player_id, bgList=bgList, iconList=iconList)
+
+	def _preparePreload(self):
+		print 'Starting preload.'
+		# Static file list for preloading
+		bgPath = os.path.join(os.path.dirname(__file__), '../static/media/assets')
+		bgList = []
+
+		for (dirpath, dirnames, filenames) in os.walk(bgPath):
+			bgList.extend(filenames)
+			break
+
+		iconPath = os.path.join(os.path.dirname(__file__), '../static/media/icons')
+		iconList = []
+
+		for (dirpath, dirnames, filenames) in os.walk(iconPath):
+			iconList.extend(filenames)
+			break
+
+		bgList = ','.join(bgList)
+		iconList = ','.join(iconList)
+
+		return bgList, iconList

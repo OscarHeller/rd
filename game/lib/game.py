@@ -103,7 +103,7 @@ class Game:
 			print 'Game Update {time} : {latency}'.format(time=str(datetime.datetime.now().time()),latency=latency)
 
 		#repop!  -> every 3 minutes?
-		if self.repopInterval > 180 == 0:
+		if self.repopInterval > 180:
 			self.repopInterval = 0
 			print 'autosaving players'
 			for mobile in self.mobiles:

@@ -126,6 +126,8 @@ def doDamage(game, fighter, amount, noun='hit', target=None, combatBuffer=None):
 		target.inventory = []
 
 		target.die()
+		if fighter.is_player:
+			target.stats['killer'] = False
 
 		message = 'You have killed {target}!'.format(target=target.getName(fighter))
 		combatBuffer = appendToCombatBuffer(fighter, message, combatBuffer)
